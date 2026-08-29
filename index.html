@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>福島・帰還困難区域マップ</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+html,body,#map{
+  height:100%;
+  width:100%;
+  margin:0;
+}
+
+#title{
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
+  background:white;
+  padding:8px 12px;
+  border-radius:8px;
+  box-shadow:0 1px 6px #888;
+  font-family:sans-serif;
+  font-size:14px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+#locate{
+  position:absolute;
+  bottom:30px;
+  left:15px;
+  z-index:1000;
+  background:white;
+  border:none;
+  border-radius:8px;
+  padding:12px 15px;
+  box-shadow:0 1px 6px #888;
+  font-weight:bold;
+  font-size:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">福島・帰還困難区域マップ</div>
+<button id="locate">◎ 現在地</button>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const map=L.map("map").setView(
+  [37.45,141.00],
+  10
+);
+
+L.tileLayer(
+  "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
+  {
+    attribution:"地理院地図",
+    maxZoom:18
+  }
+).addTo(map);
+
+
+/* 福島第一原発 */
+
+L.circleMarker(
+  [37.4211,141.0328],
+  {
+    radius:6,
+    color:"#000",
+    fillColor:"#fff",
+    fillOpacity:1
+  }
+)
+.addTo(map)
+.bindPopup("福島第一原子力発電所");
+
+
+/* 現在地 */
+
+let currentMarker;
+
+document.getElementById("locate").onclick=function(){
+
+  if(!navigator.geolocation){
+    alert("位置情報を利用できません");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(pos){
+
+      const lat=pos.coords.latitude;
+      const lng=pos.coords.longitude;
+
+      if(currentMarker){
+        map.removeLayer(currentMarker);
+      }
+
+      currentMarker=L.circleMarker(
+        [lat,lng],
+        {
+          radius:9,
+          color:"white",
+          weight:3,
+          fillColor:"#007aff",
+          fillOpacity:1
+        }
+      )
+      .addTo(map)
+      .bindPopup(
+        "現在地<br>"+
+        lat.toFixed(6)+
+        ", "+
+        lng.toFixed(6)
+      )
+      .openPopup();
+
+      map.setView([lat,lng],15);
+
+    },
+
+    function(){
+      alert(
+        "現在地を取得できません。"+
+        "Safariの位置情報を許可してください。"
+      );
+    },
+
+    {
+      enableHighAccuracy:true,
+      timeout:15000
+    }
+
+  );
+
+}
+
+</script>
+
+</body>
+</html>
