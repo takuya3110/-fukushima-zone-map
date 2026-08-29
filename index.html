@@ -10,131 +10,51 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 html,body{
- margin:0;
- height:100%;
+ margin:0;height:100%;
  font-family:-apple-system,BlinkMacSystemFont,
  "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
 }
-#app{
- height:100%;
- display:flex;
- flex-direction:column;
-}
+#app{height:100%;display:flex;flex-direction:column;}
 header{
- background:white;
- padding:8px 10px;
- border-bottom:1px solid #ddd;
- z-index:1000;
+ background:#fff;padding:8px 10px;
+ border-bottom:1px solid #ddd;z-index:1000;
 }
-h1{
- margin:0 0 4px;
- font-size:18px;
-}
-.sub{
- font-size:10px;
- color:#555;
- line-height:1.4;
-}
+h1{margin:0;font-size:18px;}
+.sub{font-size:10px;color:#555;margin-top:3px;}
 #status{
- margin-top:6px;
- padding:9px;
- border-radius:8px;
- background:#eef3f8;
- font-size:13px;
- line-height:1.45;
+ margin-top:6px;padding:9px;border-radius:8px;
+ background:#eef3f8;font-size:13px;line-height:1.5;
 }
-#map{
- flex:1;
- min-height:220px;
-}
+#map{flex:1;min-height:240px;}
 .controls{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:6px;
- padding:7px;
- background:white;
- border-top:1px solid #ddd;
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:6px;padding:7px;background:#fff;
 }
 button{
- border:0;
- border-radius:8px;
- padding:10px 3px;
- font-size:12px;
- font-weight:600;
+ border:0;border-radius:8px;padding:10px 3px;
+ font-size:12px;font-weight:600;
 }
 #gps{background:#1769e0;color:white;}
 #track{background:#08752e;color:white;}
-#all{background:#b62032;color:white;}
+#old{background:#b62032;color:white;}
 #official{background:#444;color:white;}
-#meti{
- grid-column:1/3;
- background:#62509b;
- color:white;
+#meti,#returnArea{
+ grid-column:1/3;color:white;
 }
-#returnArea{
- grid-column:1/3;
- background:#166b83;
- color:white;
-}
-#localOfficial{
- display:none;
- grid-column:1/3;
- background:#9a5c00;
- color:white;
+#meti{background:#62509b;}
+#returnArea{background:#166b83;}
+#local{
+ display:none;grid-column:1/3;
+ background:#9a5c00;color:white;
 }
 .note{
- grid-column:1/3;
- font-size:9px;
- line-height:1.4;
- color:#666;
+ grid-column:1/3;font-size:9px;
+ color:#666;line-height:1.4;
 }
 .legend{
- background:white;
- padding:6px 8px;
- font-size:10px;
- line-height:1.55;
- box-shadow:0 1px 5px rgba(0,0,0,.3);
- border-radius:5px;
-}
-#panel{
- display:none;
- position:fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
- z-index:9999;
- overflow:auto;
- box-sizing:border-box;
- padding:10px;
- background:rgba(0,0,0,.88);
-}
-.panelBox{
- max-width:900px;
- margin:auto;
- background:white;
- border-radius:10px;
- overflow:hidden;
-}
-.panelHead{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:10px;
-}
-#close{
- padding:7px 12px;
- background:#eee;
- color:#222;
-}
-#officialImage{
- display:block;
- width:100%;
-}
-.panelText{
- padding:10px;
- font-size:11px;
- line-height:1.6;
+ background:white;padding:6px 8px;
+ font-size:10px;line-height:1.5;
+ box-shadow:0 1px 5px #888;
 }
 </style>
 </head>
@@ -144,18 +64,15 @@ button{
 <div id="app">
 
 <header>
-
 <h1>福島・帰還困難区域チェッカー</h1>
-
 <div class="sub">
-赤＝旧帰還困難区域GIS参考境界　
-緑点＝解除済み特定復興再生拠点の代表地点
+2026年版・現地確認支援
 </div>
 
 <div id="status">
-<b>📍「現在地」または「移動追跡」を押してください。</b>
+<b>📍 現在地を押してください。</b><br>
+青＝現在地　緑＝解除済み拠点の代表地点
 </div>
-
 </header>
 
 <div id="map"></div>
@@ -165,84 +82,51 @@ button{
 <button id="gps">📍 現在地</button>
 <button id="track">▶ 移動追跡</button>
 
-<button id="all">🟥 区域全体</button>
-<button id="official">🗺 公式区域図</button>
+<button id="old">🟥 旧区域を表示</button>
+<button id="official">🗺 福島県公式情報</button>
 
-<button id="meti">📋 METI 最新・避難指示情報</button>
-
-<button id="returnArea">
-🏠 特定帰還居住区域の最新情報
+<button id="meti">
+📋 METI 最新避難指示情報
 </button>
 
-<button id="localOfficial">
-⚠️ この市町村の立入規制情報
+<button id="returnArea">
+🟣 特定帰還居住区域
+</button>
+
+<button id="local">
+⚠️ 現在地周辺の立入規制情報
 </button>
 
 <div class="note">
-赤は過去の帰還困難区域GISを参考表示したものです。
-解除済み特定復興再生拠点区域や、その後解除された区域を含むため、
-赤＝現在の帰還困難区域ではありません。<br>
-特定帰還居住区域は、現時点では原則として帰還困難区域内で、
-将来の避難指示解除に向けて除染・インフラ整備が進められている区域です。
-立入規制緩和区域も「避難指示解除」とは異なります。
+重要：旧帰還困難区域GISは現在の法的境界ではないため、
+初期状態では表示していません。
+特定復興再生拠点区域は解除済みですが、
+特定帰還居住区域は原則として現在も帰還困難区域内です。
+立入規制緩和も避難指示解除とは異なります。
+最終的な区域・立入可否は国・自治体の最新情報で確認してください。
 </div>
 
 </div>
 </div>
 
-
-<div id="panel">
-
-<div class="panelBox">
-
-<div class="panelHead">
-<strong>福島県公式 避難指示区域図</strong>
-<button id="close">閉じる</button>
-</div>
-
-<img
-id="officialImage"
-src="https://www.pref.fukushima.lg.jp/img/portal2023/en131-202506.webp">
-
-<div class="panelText">
-
-<b>公式図との照合用です。</b><br><br>
-
-現在残る避難指示区域は帰還困難区域です。<br>
-特定復興再生拠点区域は6町村ですべて解除済みです。<br><br>
-
-一方、特定帰還居住区域は
-「これから避難指示解除を目指して整備している区域」であり、
-解除済み区域として扱ってはいけません。
-
-</div>
-
-</div>
-</div>
-
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
 
 <script>
-
-/* ===========================
-   MAP
-=========================== */
 
 const map=L.map("map").setView([37.47,140.93],10);
 
 L.tileLayer(
  "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
- {
-  attribution:"地理院タイル",
-  maxZoom:18
- }
+ {attribution:"地理院タイル",maxZoom:18}
 ).addTo(map);
 
 
-/* ===========================
-   OLD DTRZ
-=========================== */
+/* --------------------------
+ 旧DTRZ参考データ
+ 初期状態では非表示
+-------------------------- */
 
 const zoneText=`37.373734,140.910095;
 37.375999,140.904694;
@@ -461,20 +345,22 @@ const oldZone=L.polygon(
   color:"#b00020",
   weight:2,
   fillColor:"#e32636",
-  fillOpacity:.23,
+  fillOpacity:.20,
   dashArray:"6,4"
  }
-).addTo(map);
-
-oldZone.bindPopup(
- "<b>旧・帰還困難区域GIS参考境界</b><br>"+
- "現在の法的境界ではありません。"
 );
 
+oldZone.bindPopup(
+ "<b>旧・帰還困難区域</b><br>"+
+ "参考GIS。現在の法的境界ではありません。"
+);
 
-/* ===========================
-   LIFTED BASE REPRESENTATIVE POINTS
-=========================== */
+let oldVisible=false;
+
+
+/* --------------------------
+ 解除済み拠点・代表地点
+-------------------------- */
 
 const lifted=[
  ["大熊町・大野駅周辺",37.4075,140.9830],
@@ -486,7 +372,6 @@ const lifted=[
 ];
 
 lifted.forEach(p=>{
-
  L.circleMarker(
   [p[1],p[2]],
   {
@@ -496,18 +381,14 @@ lifted.forEach(p=>{
    fillColor:"#34a853",
    fillOpacity:1
   }
- )
- .addTo(map)
+ ).addTo(map)
  .bindPopup(
   "<b>"+p[0]+"</b><br>"+
   "特定復興再生拠点区域は解除済み。"+
-  "<br><small>この点自体は区域境界ではありません。</small>"
+  "<br><small>点は区域境界ではありません。</small>"
  );
-
 });
 
-
-/* Fukushima Daiichi */
 
 L.circleMarker(
  [37.4211,141.0328],
@@ -518,15 +399,13 @@ L.circleMarker(
   fillColor:"#111",
   fillOpacity:1
  }
-)
-.addTo(map)
+).addTo(map)
 .bindPopup("<b>福島第一原子力発電所</b>");
 
 
-
-/* ===========================
-   MUNICIPALITIES
-=========================== */
+/* --------------------------
+ 市町村
+-------------------------- */
 
 const municipalities={
  "07212":"南相馬市",
@@ -539,54 +418,19 @@ const municipalities={
 };
 
 
-/* ===========================
-   POINT IN POLYGON
-=========================== */
-
-function pointInPolygon(lat,lng,poly){
-
- let inside=false;
-
- for(let i=0,j=poly.length-1;i<poly.length;j=i++){
-
-  const yi=poly[i][0];
-  const xi=poly[i][1];
-  const yj=poly[j][0];
-  const xj=poly[j][1];
-
-  const intersect=
-   ((yi>lat)!==(yj>lat)) &&
-   (
-    lng<
-    (xj-xi)*(lat-yi)/(yj-yi)+xi
-   );
-
-  if(intersect)inside=!inside;
- }
-
- return inside;
-}
-
-
-/* ===========================
-   REVERSE GEOCODER
-=========================== */
+/* --------------------------
+ 逆ジオコーダー
+-------------------------- */
 
 async function reverseGeocode(lat,lng){
 
  try{
 
-  const u=
+  const url=
    "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/"+
-   "LonLatToAddress?lat="+
-   encodeURIComponent(lat)+
-   "&lon="+
-   encodeURIComponent(lng);
+   "LonLatToAddress?lat="+lat+"&lon="+lng;
 
-  const r=await fetch(u);
-
-  if(!r.ok)throw new Error();
-
+  const r=await fetch(url);
   const j=await r.json();
 
   if(!j.results)return null;
@@ -597,33 +441,28 @@ async function reverseGeocode(lat,lng){
   };
 
  }catch(e){
-
   return null;
-
  }
 
 }
 
 
-/* ===========================
-   GPS
-=========================== */
+/* --------------------------
+ GPS
+-------------------------- */
 
 let userMarker=null;
 let accuracyCircle=null;
-let watchId=null;
 let tracking=false;
-
-const status=document.getElementById("status");
-const trackButton=document.getElementById("track");
-const localOfficial=document.getElementById("localOfficial");
-
-let currentCode="";
-let currentTown="";
+let watchId=null;
 let localUrl="";
 
+const status=document.getElementById("status");
+const track=document.getElementById("track");
+const local=document.getElementById("local");
 
-async function processPosition(pos,follow){
+
+async function showPosition(pos,follow){
 
  const lat=pos.coords.latitude;
  const lng=pos.coords.longitude;
@@ -653,285 +492,220 @@ async function processPosition(pos,follow){
   }
  ).addTo(map);
 
- if(follow){
-  map.setView([lat,lng],16);
- }
+ if(follow)map.setView([lat,lng],16);
 
  const ad=await reverseGeocode(lat,lng);
 
- currentCode=ad ? ad.code : "";
- currentTown=ad ? ad.town : "";
+ const code=ad ? ad.code : "";
+ const town=ad ? ad.town : "";
+ const muni=municipalities[code] || "";
 
- const municipality=
-  municipalities[currentCode] || "";
-
- const insideOld=
-  pointInPolygon(lat,lng,zonePoints);
-
-
- let headline="";
- let text="";
+ let title="";
+ let explanation="";
  let bg="#eef3f8";
 
+ if(code && !municipalities[code]){
 
- if(currentCode && !municipalities[currentCode]){
-
-  headline=
-   "✅ 現在、帰還困難区域が残る7市町村の外です。";
-
-  text=
-   "この市町村には現在の帰還困難区域は設定されていません。";
-
+  title="🟢 現在の帰還困難区域が残る7市町村の外";
+  explanation=
+   "この市町村には現在、帰還困難区域は設定されていません。";
   bg="#e7f6ea";
 
- }
- else if(municipality && !insideOld){
+ }else if(muni){
 
-  headline=
-   "✅ 旧DTRZ参考境界の外側です。";
-
-  text=
-   municipality+
-   "には帰還困難区域が残りますが、"+
-   "この現在地は旧DTRZ参考境界の外側です。";
-
-  bg="#e7f6ea";
-
- }
- else if(municipality && insideOld){
-
-  headline=
-   "⚠️ 現在の区域を公式情報で確認してください。";
-
-  text=
-   "旧DTRZ参考境界の内側です。"+
-   "ここには現在も帰還困難区域の部分と、"+
-   "既に避難指示が解除された部分の双方が存在します。";
-
+  title="🟠 区域の詳細確認が必要";
+  explanation=
+   muni+
+   "には現在も帰還困難区域が残っています。"+
+   "同じ市町村内に解除済み区域もあるため、"+
+   "市町村名だけでは現在地を法的に判定できません。";
   bg="#fff3d9";
 
- }
- else{
+ }else{
 
-  headline=
-   "現在地を取得しました。";
-
-  text=
-   "住所情報による詳細判定はできませんでした。";
+  title="📍 現在地を取得しました";
+  explanation="住所情報を十分取得できませんでした。";
 
  }
 
+ status.style.background=bg;
 
- /* 大熊町・双葉町の最新立入規制 */
+ status.innerHTML=
+  "<b>"+title+"</b><br>"+
+  "📍 "+(muni || "対象7市町村外")+
+  (town ? " "+town : "")+
+  "<br>"+explanation+
+  "<br><small>"+
+  lat.toFixed(6)+", "+
+  lng.toFixed(6)+
+  "　GPS精度 約"+Math.round(acc)+"m"+
+  "</small>";
 
- localOfficial.style.display="none";
+
+ /* 最新の立入規制緩和情報 */
+
+ local.style.display="none";
  localUrl="";
 
- if(currentCode==="07545"){
+ if(code==="07545"){
 
-  localOfficial.style.display="block";
-
-  localOfficial.innerHTML=
-   "⚠️ 大熊町・立入規制緩和の公式情報";
+  local.style.display="block";
+  local.innerHTML=
+   "⚠️ 大熊町・立入規制緩和情報";
 
   localUrl=
    "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2026/260615ookumamachi-tachiirikiseikanwa.html";
 
  }
 
- if(currentCode==="07546"){
+ if(code==="07546"){
 
-  localOfficial.style.display="block";
-
-  localOfficial.innerHTML=
-   "⚠️ 双葉町・立入規制緩和の公式情報";
+  local.style.display="block";
+  local.innerHTML=
+   "⚠️ 双葉町・立入規制緩和情報";
 
   localUrl=
    "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2026/20260213futabamachi-tachiirikiseikanwa.html";
 
  }
 
-
- status.style.background=bg;
-
- status.innerHTML=
-  "<b>"+headline+"</b><br>"+
-  "📍 "+
-  (municipality || "対象7市町村外")+
-  (currentTown ? " "+currentTown : "")+
-  "<br>"+
-  text+
-  "<br><small>"+
-  "緯度経度："+lat.toFixed(6)+
-  ", "+lng.toFixed(6)+
-  "　GPS精度：約"+Math.round(acc)+"m"+
-  "</small>";
-
-
- userMarker
- .bindPopup(
-  "<b>現在地</b><br>"+
-  (municipality || "")+
-  (currentTown ? " "+currentTown : "")+
-  "<br>"+
-  lat.toFixed(6)+", "+lng.toFixed(6)
- )
- .openPopup();
-
 }
 
 
-/* CURRENT LOCATION */
+/* 現在地 */
 
-document
-.getElementById("gps")
-.addEventListener("click",()=>{
+document.getElementById("gps")
+.onclick=()=>{
 
- status.style.background="#eef3f8";
  status.innerHTML="<b>現在地を取得しています…</b>";
 
  navigator.geolocation.getCurrentPosition(
-
-  pos=>processPosition(pos,true),
-
-  ()=>{
-   status.innerHTML=
-    "<b>現在地を取得できませんでした。</b>";
-  },
-
+  p=>showPosition(p,true),
+  ()=>status.innerHTML=
+   "<b>現在地を取得できませんでした。</b>",
   {
    enableHighAccuracy:true,
    timeout:15000,
    maximumAge:2000
   }
-
  );
 
-});
+};
 
 
-/* TRACKING */
+/* 移動追跡 */
 
-trackButton.addEventListener("click",()=>{
+track.onclick=()=>{
 
  if(!tracking){
 
   tracking=true;
+  track.innerHTML="■ 追跡停止";
+  track.style.background="#a06400";
 
-  trackButton.innerHTML="■ 追跡停止";
-  trackButton.style.background="#a06400";
-
-  watchId=
-   navigator.geolocation.watchPosition(
-
-    pos=>processPosition(pos,true),
-
-    ()=>{
-     status.innerHTML=
-      "<b>位置情報を追跡できません。</b>";
-    },
-
-    {
-     enableHighAccuracy:true,
-     maximumAge:3000,
-     timeout:20000
-    }
-
-   );
+  watchId=navigator.geolocation.watchPosition(
+   p=>showPosition(p,true),
+   ()=>{},
+   {
+    enableHighAccuracy:true,
+    maximumAge:3000,
+    timeout:20000
+   }
+  );
 
  }else{
 
   tracking=false;
 
-  if(watchId!==null){
+  if(watchId!==null)
    navigator.geolocation.clearWatch(watchId);
-   watchId=null;
-  }
 
-  trackButton.innerHTML="▶ 移動追跡";
-  trackButton.style.background="#08752e";
+  watchId=null;
+
+  track.innerHTML="▶ 移動追跡";
+  track.style.background="#08752e";
 
  }
 
-});
+};
 
 
-/* BUTTONS */
+/* 旧区域 */
 
-document
-.getElementById("all")
-.addEventListener("click",()=>{
- map.fitBounds(
-  oldZone.getBounds(),
-  {padding:[15,15]}
+document.getElementById("old").onclick=()=>{
+
+ if(!oldVisible){
+
+  oldZone.addTo(map);
+  oldVisible=true;
+
+  document.getElementById("old").innerHTML=
+   "⬜ 旧区域を隠す";
+
+  map.fitBounds(oldZone.getBounds());
+
+ }else{
+
+  map.removeLayer(oldZone);
+  oldVisible=false;
+
+  document.getElementById("old").innerHTML=
+   "🟥 旧区域を表示";
+
+ }
+
+};
+
+
+/* 公式情報 */
+
+document.getElementById("official").onclick=()=>{
+
+ window.open(
+  "https://www.pref.fukushima.lg.jp/site/portal/m1-3.html",
+  "_blank"
  );
-});
 
+};
 
-document
-.getElementById("official")
-.addEventListener("click",()=>{
- document.getElementById("panel").style.display="block";
-});
-
-
-document
-.getElementById("close")
-.addEventListener("click",()=>{
- document.getElementById("panel").style.display="none";
-});
-
-
-document
-.getElementById("meti")
-.addEventListener("click",()=>{
+document.getElementById("meti").onclick=()=>{
 
  window.open(
   "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html",
   "_blank"
  );
 
-});
+};
 
-
-document
-.getElementById("returnArea")
-.addEventListener("click",()=>{
+document.getElementById("returnArea").onclick=()=>{
 
  window.open(
-  "https://josen.env.go.jp/return/",
+  "https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/",
   "_blank"
  );
 
-});
+};
+
+local.onclick=()=>{
+ if(localUrl)window.open(localUrl,"_blank");
+};
 
 
-localOfficial.addEventListener("click",()=>{
+/* 凡例 */
 
- if(localUrl){
-  window.open(localUrl,"_blank");
- }
-
-});
-
-
-/* LEGEND */
-
-const legend=L.control({
- position:"bottomright"
-});
+const legend=L.control({position:"bottomright"});
 
 legend.onAdd=function(){
 
- const d=
-  L.DomUtil.create("div","legend");
+ const d=L.DomUtil.create("div","legend");
 
  d.innerHTML=
-  '<span style="color:#e32636;font-size:16px">■</span> 旧DTRZ参考境界<br>'+
+  '<span style="color:#1769e0;font-size:16px">●</span> 現在地<br>'+
   '<span style="color:#18863b;font-size:16px">●</span> 解除済み拠点・代表地点<br>'+
-  '<span style="color:#1769e0;font-size:16px">●</span> 現在地';
+  '<span style="color:#e32636;font-size:16px">■</span> 旧DTRZ（表示時のみ）';
 
  return d;
+
 };
 
 legend.addTo(map);
