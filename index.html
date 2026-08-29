@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>福島・帰還困難区域マップ</title>
 
 <link rel="stylesheet"
@@ -13,6 +14,7 @@ html,body,#map{
   height:100%;
   width:100%;
   margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;
 }
 
 #title{
@@ -21,51 +23,104 @@ html,body,#map{
   left:50%;
   transform:translateX(-50%);
   z-index:1000;
-  background:white;
+  background:rgba(255,255,255,.96);
   padding:8px 12px;
-  border-radius:8px;
-  box-shadow:0 1px 6px #888;
-  font-family:sans-serif;
+  border-radius:9px;
+  box-shadow:0 1px 6px #777;
   font-size:14px;
   font-weight:bold;
   white-space:nowrap;
 }
 
-#locate{
+#status{
   position:absolute;
-  bottom:30px;
-  left:15px;
+  left:10px;
+  right:10px;
+  bottom:90px;
   z-index:1000;
-  background:white;
-  border:none;
-  border-radius:8px;
-  padding:12px 15px;
+  background:rgba(255,255,255,.96);
+  padding:9px 11px;
+  border-radius:9px;
   box-shadow:0 1px 6px #888;
+  font-size:13px;
+  line-height:1.45;
+}
+
+#buttons{
+  position:absolute;
+  left:10px;
+  bottom:25px;
+  z-index:1000;
+  display:flex;
+  gap:7px;
+}
+
+button{
+  background:white;
+  border:1px solid #bbb;
+  border-radius:9px;
+  padding:11px 13px;
+  box-shadow:0 1px 6px #888;
+  font-size:14px;
   font-weight:bold;
-  font-size:15px;
+}
+
+.red{
+  color:#c00000;
+  font-weight:bold;
+}
+
+.green{
+  color:#087830;
+  font-weight:bold;
+}
+
+.small{
+  font-size:10px;
+  color:#666;
+  margin-top:3px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="title">福島・帰還困難区域マップ</div>
-<button id="locate">◎ 現在地</button>
+<div id="title">
+福島・帰還困難区域マップ
+</div>
+
+<div id="status">
+区域データを読み込んでいます…
+</div>
+
+<div id="buttons">
+<button id="locate">◎ 現在地を判定</button>
+<button id="whole">全体表示</button>
+</div>
+
 <div id="map"></div>
+
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/osmtogeojson@3.0.0/osmtogeojson.js"></script>
+
+
 <script>
 
+/* =====================
+   地図
+===================== */
+
 const map=L.map("map").setView(
-  [37.45,141.00],
+  [37.48,140.94],
   10
 );
 
 L.tileLayer(
   "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
   {
-    attribution:"地理院地図",
+    attribution:"地理院地図 / © OpenStreetMap contributors",
     maxZoom:18
   }
 ).addTo(map);
@@ -78,6 +133,7 @@ L.circleMarker(
   {
     radius:6,
     color:"#000",
+    weight:2,
     fillColor:"#fff",
     fillOpacity:1
   }
@@ -86,66 +142,618 @@ L.circleMarker(
 .bindPopup("福島第一原子力発電所");
 
 
-/* 現在地 */
+let zoneData=null;
+let zoneLayer=null;
+let currentMarker=null;
+let accuracyCircle=null;
 
-let currentMarker;
 
-document.getElementById("locate").onclick=function(){
+/* =====================
+   OSM区域取得
+===================== */
+
+async function getOverpass(endpoint){
+
+  const query=
+    `[out:json][timeout:60];
+     relation(20011373);
+     (._;>>;);
+     out body geom;`;
+
+  const response=await fetch(
+    endpoint,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":
+        "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      body:
+        "data="+encodeURIComponent(query)
+    }
+  );
+
+  if(!response.ok){
+    throw new Error(
+      "HTTP "+response.status
+    );
+  }
+
+  return await response.json();
+}
+
+
+async function loadZone(){
+
+  const status=
+    document.getElementById("status");
+
+  /*
+    1つ目が混雑・停止していても
+    別サーバーを自動で試す
+  */
+
+  const servers=[
+
+    "https://overpass-api.de/api/interpreter",
+
+    "https://overpass.kumi.systems/api/interpreter",
+
+    "https://overpass.nchc.org.tw/api/interpreter"
+
+  ];
+
+
+  for(const server of servers){
+
+    try{
+
+      status.innerHTML=
+        "帰還困難区域データを取得中…";
+
+      const osm=
+        await getOverpass(server);
+
+
+      if(
+        !osm ||
+        !osm.elements ||
+        osm.elements.length===0
+      ){
+        throw new Error(
+          "データなし"
+        );
+      }
+
+
+      /*
+        OSMデータをGeoJSONに変換
+      */
+
+      const geo=
+        osmtogeojson(osm);
+
+
+      const polygons=
+        geo.features.filter(f=>
+
+          f.geometry &&
+
+          (
+            f.geometry.type==="Polygon" ||
+            f.geometry.type==="MultiPolygon"
+          )
+
+        );
+
+
+      if(polygons.length===0){
+        throw new Error(
+          "ポリゴンなし"
+        );
+      }
+
+
+      zoneData={
+        type:"FeatureCollection",
+        features:polygons
+      };
+
+
+      zoneLayer=L.geoJSON(
+        zoneData,
+        {
+          style:{
+            color:"#d00000",
+            weight:2.5,
+            fillColor:"#e00000",
+            fillOpacity:0.30
+          },
+
+          onEachFeature:
+          function(feature,layer){
+
+            layer.bindPopup(
+              "<b>帰還困難区域・参考境界</b>"+
+              "<br>OpenStreetMap relation 20011373"+
+              "<br><small>"+
+              "法的な区域確認は国・自治体の最新情報を確認してください。"+
+              "</small>"
+            );
+
+          }
+        }
+      ).addTo(map);
+
+
+      status.innerHTML=
+        "<span class='red'>"+
+        "■ 赤：帰還困難区域・参考境界"+
+        "</span>"+
+        "<div class='small'>"+
+        "OpenStreetMap境界を表示中。"+
+        "公式2026年区域図との照合前です。"+
+        "</div>";
+
+
+      /*
+       初回だけ区域全体表示
+      */
+
+      const bounds=
+        zoneLayer.getBounds();
+
+      if(bounds.isValid()){
+
+        map.fitBounds(
+          bounds,
+          {
+            padding:[15,15]
+          }
+        );
+
+      }
+
+
+      return;
+
+    }
+
+    catch(error){
+
+      console.log(
+        server,
+        error
+      );
+
+    }
+
+  }
+
+
+  status.innerHTML=
+    "<b style='color:#c00000'>"+
+    "区域データの取得に失敗しました"+
+    "</b>"+
+    "<br>"+
+    "地図・現在地機能は利用できます。";
+
+}
+
+
+/* =====================
+   点がポリゴン内か判定
+===================== */
+
+function pointInRing(
+  lat,
+  lng,
+  ring
+){
+
+  let inside=false;
+
+  for(
+    let i=0,j=ring.length-1;
+    i<ring.length;
+    j=i++
+  ){
+
+    const xi=ring[i][0];
+    const yi=ring[i][1];
+
+    const xj=ring[j][0];
+    const yj=ring[j][1];
+
+    const intersect=
+
+      ((yi>lat)!=(yj>lat))
+
+      &&
+
+      (
+        lng <
+        (xj-xi)*
+        (lat-yi)/
+        ((yj-yi)||1e-12)
+        +xi
+      );
+
+    if(intersect){
+      inside=!inside;
+    }
+
+  }
+
+  return inside;
+}
+
+
+function insidePolygon(
+  lat,
+  lng,
+  polygon
+){
+
+  if(
+    !polygon ||
+    polygon.length===0
+  ){
+    return false;
+  }
+
+  /*
+   外周
+  */
+
+  if(
+    !pointInRing(
+      lat,
+      lng,
+      polygon[0]
+    )
+  ){
+    return false;
+  }
+
+
+  /*
+   穴があれば除外
+  */
+
+  for(
+    let i=1;
+    i<polygon.length;
+    i++
+  ){
+
+    if(
+      pointInRing(
+        lat,
+        lng,
+        polygon[i]
+      )
+    ){
+      return false;
+    }
+
+  }
+
+  return true;
+}
+
+
+function isInsideZone(
+  lat,
+  lng
+){
+
+  if(!zoneData){
+    return null;
+  }
+
+
+  for(
+    const feature of
+    zoneData.features
+  ){
+
+    const g=
+      feature.geometry;
+
+
+    if(
+      g.type==="Polygon"
+    ){
+
+      if(
+        insidePolygon(
+          lat,
+          lng,
+          g.coordinates
+        )
+      ){
+        return true;
+      }
+
+    }
+
+
+    if(
+      g.type==="MultiPolygon"
+    ){
+
+      for(
+        const polygon
+        of g.coordinates
+      ){
+
+        if(
+          insidePolygon(
+            lat,
+            lng,
+            polygon
+          )
+        ){
+          return true;
+        }
+
+      }
+
+    }
+
+  }
+
+
+  return false;
+}
+
+
+/* =====================
+   現在地
+===================== */
+
+document
+.getElementById("locate")
+.onclick=function(){
+
+  const status=
+    document.getElementById("status");
+
 
   if(!navigator.geolocation){
-    alert("位置情報を利用できません");
+
+    alert(
+      "位置情報を利用できません"
+    );
+
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
+
+  status.innerHTML=
+    "現在地を取得しています…";
+
+
+  navigator.geolocation
+  .getCurrentPosition(
 
     function(pos){
 
-      const lat=pos.coords.latitude;
-      const lng=pos.coords.longitude;
+      const lat=
+        pos.coords.latitude;
+
+      const lng=
+        pos.coords.longitude;
+
+      const accuracy=
+        pos.coords.accuracy;
+
 
       if(currentMarker){
-        map.removeLayer(currentMarker);
+
+        map.removeLayer(
+          currentMarker
+        );
+
       }
 
-      currentMarker=L.circleMarker(
-        [lat,lng],
-        {
-          radius:9,
-          color:"white",
-          weight:3,
-          fillColor:"#007aff",
-          fillOpacity:1
-        }
-      )
-      .addTo(map)
-      .bindPopup(
-        "現在地<br>"+
-        lat.toFixed(6)+
-        ", "+
-        lng.toFixed(6)
-      )
-      .openPopup();
 
-      map.setView([lat,lng],15);
+      if(accuracyCircle){
+
+        map.removeLayer(
+          accuracyCircle
+        );
+
+      }
+
+
+      accuracyCircle=
+        L.circle(
+          [lat,lng],
+          {
+            radius:accuracy,
+            color:"#007aff",
+            weight:1,
+            fillOpacity:.06
+          }
+        )
+        .addTo(map);
+
+
+      currentMarker=
+        L.circleMarker(
+          [lat,lng],
+          {
+            radius:9,
+            color:"white",
+            weight:3,
+            fillColor:"#007aff",
+            fillOpacity:1
+          }
+        )
+        .addTo(map)
+        .bindPopup(
+          "<b>現在地</b>"+
+          "<br>"+
+          lat.toFixed(6)+
+          ", "+
+          lng.toFixed(6)+
+          "<br>"+
+          "精度 約"+
+          Math.round(accuracy)+
+          "m"
+        )
+        .openPopup();
+
+
+      map.setView(
+        [lat,lng],
+        15
+      );
+
+
+      const inside=
+        isInsideZone(
+          lat,
+          lng
+        );
+
+
+      if(inside===true){
+
+        status.innerHTML=
+
+          "<span class='red' "+
+          "style='font-size:17px'>"+
+
+          "帰還困難区域内です"+
+
+          "</span>"+
+
+          "<br>"+
+
+          "GPS精度：約"+
+
+          Math.round(accuracy)+
+
+          "m"+
+
+          "<div class='small'>"+
+
+          "OpenStreetMap参考境界による判定。"+
+          "実際の立入可否とは必ずしも一致しません。"+
+
+          "</div>";
+
+      }
+
+
+      else if(inside===false){
+
+        status.innerHTML=
+
+          "<span class='green' "+
+          "style='font-size:17px'>"+
+
+          "帰還困難区域の外です"+
+
+          "</span>"+
+
+          "<br>"+
+
+          "GPS精度：約"+
+
+          Math.round(accuracy)+
+
+          "m"+
+
+          "<div class='small'>"+
+
+          "OpenStreetMap参考境界による判定。"+
+
+          "</div>";
+
+      }
+
+
+      else{
+
+        status.innerHTML=
+
+          "<b>"+
+          "現在地を取得しました"+
+          "</b>"+
+
+          "<br>"+
+
+          "帰還困難区域データが"+
+          "まだ読み込まれていません。";
+
+      }
 
     },
+
 
     function(){
-      alert(
+
+      status.innerHTML=
+
         "現在地を取得できません。"+
-        "Safariの位置情報を許可してください。"
-      );
+        "<br>"+
+        "Safariの位置情報を確認してください。";
+
     },
+
 
     {
       enableHighAccuracy:true,
-      timeout:15000
+      timeout:15000,
+      maximumAge:0
     }
 
   );
 
-}
+};
+
+
+/* =====================
+   全体表示
+===================== */
+
+document
+.getElementById("whole")
+.onclick=function(){
+
+  if(
+    zoneLayer &&
+    zoneLayer.getBounds().isValid()
+  ){
+
+    map.fitBounds(
+      zoneLayer.getBounds(),
+      {
+        padding:[15,15]
+      }
+    );
+
+  }
+
+  else{
+
+    map.setView(
+      [37.48,140.94],
+      10
+    );
+
+  }
+
+};
+
+
+/* 起動 */
+
+loadZone();
 
 </script>
 
