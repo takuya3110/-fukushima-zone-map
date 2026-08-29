@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
 <title>福島・帰還困難区域チェッカー</title>
 
 <link rel="stylesheet"
@@ -16,150 +15,128 @@ html,body{
   font-family:-apple-system,BlinkMacSystemFont,
   "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
 }
-
 #app{
   height:100%;
   display:flex;
   flex-direction:column;
 }
-
 header{
-  background:white;
-  padding:10px 12px;
+  background:#fff;
+  padding:9px 11px;
   border-bottom:1px solid #ddd;
   z-index:1000;
 }
-
 h1{
-  margin:0 0 5px;
-  font-size:19px;
+  margin:0 0 4px;
+  font-size:18px;
 }
-
 .sub{
   font-size:11px;
   color:#555;
-  line-height:1.45;
+  line-height:1.4;
 }
-
 #status{
   margin-top:7px;
-  padding:8px;
+  padding:9px;
   background:#eef3f8;
   border-radius:8px;
   font-size:13px;
   font-weight:600;
-  line-height:1.45;
+  line-height:1.5;
 }
-
-#map{
-  flex:1;
+#address{
+  margin-top:5px;
+  font-size:12px;
+  font-weight:400;
+  color:#444;
 }
-
+#map{flex:1;}
 .controls{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:7px;
-  background:white;
-  padding:9px;
+  background:#fff;
+  padding:8px;
   border-top:1px solid #ddd;
 }
-
 button{
   border:0;
   border-radius:9px;
-  padding:11px 5px;
-  font-weight:600;
+  padding:11px 4px;
   font-size:14px;
+  font-weight:600;
 }
-
-#gps{
-  background:#1769e0;
-  color:white;
-}
-
-#all{
-  background:#b62032;
-  color:white;
-}
-
+#gps{background:#1769e0;color:white;}
+#all{background:#b62032;color:white;}
 #official{
   grid-column:1/3;
-  background:#555;
+  background:#444;
   color:white;
 }
-
 .note{
   grid-column:1/3;
   color:#666;
   font-size:10px;
   line-height:1.4;
 }
-
 .legend{
-  background:white;
+  background:#fff;
   padding:7px 9px;
   font-size:11px;
   line-height:1.6;
   box-shadow:0 1px 5px rgba(0,0,0,.3);
   border-radius:5px;
 }
-
-.areaLabel{
+.label{
   color:#08752e;
   font-size:11px;
   font-weight:bold;
   white-space:nowrap;
   text-shadow:
-    -1px -1px 0 white,
-     1px -1px 0 white,
-    -1px  1px 0 white,
-     1px  1px 0 white;
+  -1px -1px 0 white,
+   1px -1px 0 white,
+  -1px 1px 0 white,
+   1px 1px 0 white;
 }
-
 #panel{
   display:none;
   position:fixed;
-  top:0;
   left:0;
-  height:100%;
+  top:0;
   width:100%;
-  background:rgba(0,0,0,.85);
+  height:100%;
+  background:rgba(0,0,0,.88);
   z-index:9999;
   overflow:auto;
-  padding:12px;
   box-sizing:border-box;
+  padding:10px;
 }
-
 .panelBox{
-  background:white;
   max-width:900px;
   margin:auto;
+  background:white;
   border-radius:10px;
   overflow:hidden;
 }
-
 .panelHead{
-  padding:10px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+  padding:10px;
 }
-
 #close{
+  padding:7px 12px;
   background:#eee;
   color:#222;
-  padding:7px 12px;
 }
-
 #officialImage{
   display:block;
   width:100%;
 }
-
 .panelText{
   padding:10px;
   font-size:12px;
-  line-height:1.55;
+  line-height:1.5;
 }
 </style>
 </head>
@@ -173,12 +150,14 @@ button{
 
 <div class="sub">
 赤＝旧帰還困難区域GIS参考境界　
-緑＝解除済み特定復興再生拠点の概略位置
+緑＝解除済み拠点の代表地点
 </div>
 
 <div id="status">
-「現在地」を押してください。
+📍「現在地」を押してください。
+<div id="address"></div>
 </div>
+
 </header>
 
 <div id="map"></div>
@@ -186,14 +165,15 @@ button{
 <div class="controls">
 
 <button id="gps">📍 現在地</button>
-
 <button id="all">🟥 区域全体</button>
 
 <button id="official">🗺 最新公式区域図</button>
 
 <div class="note">
-※赤は旧DTRZ公開GIS境界です。緑は解除済み拠点のおおよその位置を示すための表示であり、
-区域境界そのものではありません。現在の法的境界・立入可否は公式情報を優先してください。
+赤色は旧帰還困難区域の参考GIS境界です。
+現在の帰還困難区域には解除済み区域があるため、
+赤色の中＝現在も帰還困難区域、とは限りません。
+最終判断は国・福島県の最新情報を優先してください。
 </div>
 
 </div>
@@ -204,17 +184,16 @@ button{
 <div class="panelBox">
 
 <div class="panelHead">
-<strong>福島県公式 避難指示区域図</strong>
+<strong>福島県公式・避難指示区域図</strong>
 <button id="close">閉じる</button>
 </div>
 
-<img
-id="officialImage"
-src="https://www.pref.fukushima.lg.jp/img/portal2023/en131-202506.webp">
+<img id="officialImage"
+src="https://www.pref.fukushima.lg.jp/uploaded/image/230283.png">
 
 <div class="panelText">
-この公式図と地図上の赤い参考境界を比較してください。<br><br>
-緑表示の特定復興再生拠点区域はすべて避難指示解除済みです。
+福島県が掲載している公式区域図です。<br>
+地図上の現在地と照合して確認してください。
 </div>
 
 </div>
@@ -235,9 +214,7 @@ L.tileLayer(
 }).addTo(map);
 
 
-/* ======================================================
-   旧DTRZ参考境界
-====================================================== */
+/* ===== 旧DTRZ参考境界 ===== */
 
 const zoneText=`37.373734,140.910095;
 37.375999,140.904694;
@@ -442,273 +419,267 @@ const zoneText=`37.373734,140.910095;
 37.370266,140.908798;
 37.373734,140.910095`;
 
-
 const zonePoints=
 zoneText.replace(/\n/g,"")
 .split(";")
 .map(p=>{
-  const a=p.split(",");
-  return [Number(a[0]),Number(a[1])];
+ const a=p.split(",");
+ return [Number(a[0]),Number(a[1])];
 });
 
-
 const oldZone=L.polygon(zonePoints,{
-  color:"#b00020",
-  weight:2,
-  fillColor:"#e32636",
-  fillOpacity:.23,
-  dashArray:"6,4"
+ color:"#b00020",
+ weight:2,
+ fillColor:"#e32636",
+ fillOpacity:.25,
+ dashArray:"6,4"
 }).addTo(map);
 
 oldZone.bindPopup(
-"<b>旧・帰還困難区域GIS参考境界</b><br>"+
-"現在の法的境界ではありません。"
+ "<b>旧・帰還困難区域GIS参考境界</b><br>"+
+ "現在の法的境界ではありません。"
 );
 
 
-/* ======================================================
-   解除済み特定復興再生拠点
-   ※代表点＋概略表示。境界判定には使用しない。
-====================================================== */
+/* ===== 解除済み拠点・代表地点 ===== */
 
-const bases=[
-
-{
- name:"大熊町",
- detail:"特定復興再生拠点 約860ha<br>2022年6月30日解除",
- lat:37.407,
- lng:140.982,
- radius:1500
-},
-
-{
- name:"双葉町",
- detail:"特定復興再生拠点 約555ha<br>2022年8月解除",
- lat:37.454,
- lng:141.005,
- radius:1200
-},
-
-{
- name:"浪江町・室原",
- detail:"浪江町特定復興再生拠点の一部",
- lat:37.512,
- lng:140.923,
- radius:900
-},
-
-{
- name:"浪江町・末森／大堀",
- detail:"浪江町特定復興再生拠点の一部",
- lat:37.500,
- lng:140.885,
- radius:900
-},
-
-{
- name:"浪江町・津島",
- detail:"浪江町特定復興再生拠点の一部",
- lat:37.559,
- lng:140.758,
- radius:1000
-},
-
-{
- name:"富岡町",
- detail:"特定復興再生拠点 約390ha<br>2023年4月・11月解除",
- lat:37.368,
- lng:140.995,
- radius:1300
-},
-
-{
- name:"飯舘村・長泥",
- detail:"特定復興再生拠点 約186ha<br>2023年5月解除",
- lat:37.616,
- lng:140.733,
- radius:800
-},
-
-{
- name:"葛尾村",
- detail:"特定復興再生拠点 約95ha<br>2022年6月解除",
- lat:37.514,
- lng:140.792,
- radius:600
-}
-
+const liftedPlaces=[
+ ["大野駅・大熊町拠点",37.4075,140.9830],
+ ["双葉駅・双葉町拠点",37.4545,141.0053],
+ ["浪江町拠点",37.4938,140.9890],
+ ["夜ノ森・富岡町拠点",37.3683,140.9950],
+ ["飯舘村・長泥",37.6160,140.7330],
+ ["葛尾村拠点",37.5140,140.7920]
 ];
 
+liftedPlaces.forEach(p=>{
 
-const baseGroup=L.layerGroup().addTo(map);
-
-bases.forEach(b=>{
-
-  L.circle(
-    [b.lat,b.lng],
-    {
-      radius:b.radius,
-      color:"#078837",
-      weight:2,
-      dashArray:"5,4",
-      fillColor:"#34b864",
-      fillOpacity:.13
-    }
-  )
-  .addTo(baseGroup)
-  .bindPopup(
-    "<b>"+b.name+"</b><br>"+
-    b.detail+
-    "<br><small>※円は区域境界ではなく概略位置です。</small>"
-  );
-
-
-  L.marker(
-    [b.lat,b.lng],
-    {
-      icon:L.divIcon({
-        className:"",
-        html:
-        '<div class="areaLabel">'+
-        b.name+
-        '</div>',
-        iconAnchor:[0,0]
-      })
-    }
-  ).addTo(baseGroup);
+ L.circleMarker([p[1],p[2]],{
+  radius:6,
+  color:"#08752e",
+  weight:2,
+  fillColor:"#32a852",
+  fillOpacity:1
+ })
+ .addTo(map)
+ .bindPopup(
+   "<b>"+p[0]+"</b><br>"+
+   "特定復興再生拠点区域は避難指示解除済み。"+
+   "<br><small>この点は区域境界ではありません。</small>"
+ );
 
 });
 
 
-/* 福島第一 */
+/* ===== 福島第一 ===== */
 
 L.circleMarker(
-[37.4211,141.0328],
-{
- radius:7,
- color:"white",
- weight:2,
- fillColor:"#111",
- fillOpacity:1
-})
-.addTo(map)
-.bindPopup("<b>福島第一原子力発電所</b>");
+ [37.4211,141.0328],
+ {
+  radius:7,
+  color:"white",
+  weight:2,
+  fillColor:"#111",
+  fillOpacity:1
+ })
+ .addTo(map)
+ .bindPopup("<b>福島第一原子力発電所</b>");
 
 
 
-/* ======================================================
- GPS
-====================================================== */
+/* ===== point in polygon ===== */
+
+function pointInPolygon(lat,lng,poly){
+
+ let inside=false;
+
+ for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+
+  const yi=poly[i][0];
+  const xi=poly[i][1];
+
+  const yj=poly[j][0];
+  const xj=poly[j][1];
+
+  const intersect=
+   ((yi>lat)!==(yj>lat)) &&
+   (
+    lng <
+    (xj-xi)*(lat-yi)/(yj-yi)+xi
+   );
+
+  if(intersect) inside=!inside;
+ }
+
+ return inside;
+}
+
+
+/* ===== 市町村コード ===== */
+
+const municipalities={
+ "07212":"南相馬市",
+ "07543":"富岡町",
+ "07545":"大熊町",
+ "07546":"双葉町",
+ "07547":"浪江町",
+ "07548":"葛尾村",
+ "07564":"飯舘村"
+};
+
+
+/* ===== GPS ===== */
 
 let userMarker=null;
 let accuracyCircle=null;
 
 const status=document.getElementById("status");
+const addressBox=document.getElementById("address");
 
+async function getAddress(lat,lng){
 
-function pointInPolygon(lat,lng,poly){
+ try{
 
-  let inside=false;
+  const url=
+   "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/"+
+   "LonLatToAddress?lat="+
+   encodeURIComponent(lat)+
+   "&lon="+
+   encodeURIComponent(lng);
 
-  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const r=await fetch(url);
 
-    const yi=poly[i][0];
-    const xi=poly[i][1];
+  if(!r.ok) throw new Error();
 
-    const yj=poly[j][0];
-    const xj=poly[j][1];
+  const d=await r.json();
 
-    const intersect=
-    ((yi>lat)!==(yj>lat)) &&
-    (
-      lng <
-      (xj-xi)*(lat-yi)/(yj-yi)+xi
-    );
+  if(!d.results) return null;
 
-    if(intersect)inside=!inside;
-  }
+  const code=d.results.muniCd || "";
+  const town=d.results.lv01Nm || "";
 
-  return inside;
+  return {
+   code:code,
+   municipality:municipalities[code] || "",
+   town:town
+  };
+
+ }catch(e){
+
+  return null;
+
+ }
+
 }
-
 
 
 document.getElementById("gps")
 .addEventListener("click",()=>{
 
- status.innerHTML="現在地を取得しています…";
+ status.innerHTML=
+  "現在地を取得しています…"+
+  '<div id="address"></div>';
 
  navigator.geolocation.getCurrentPosition(
 
- pos=>{
+ async pos=>{
 
-   const lat=pos.coords.latitude;
-   const lng=pos.coords.longitude;
-   const acc=pos.coords.accuracy;
+  const lat=pos.coords.latitude;
+  const lng=pos.coords.longitude;
+  const acc=pos.coords.accuracy;
 
-   if(userMarker)map.removeLayer(userMarker);
-   if(accuracyCircle)map.removeLayer(accuracyCircle);
+  if(userMarker) map.removeLayer(userMarker);
+  if(accuracyCircle) map.removeLayer(accuracyCircle);
 
-   userMarker=L.circleMarker(
+  userMarker=L.circleMarker(
    [lat,lng],
    {
-     radius:9,
-     color:"white",
-     weight:3,
-     fillColor:"#1769e0",
-     fillOpacity:1
-   }).addTo(map);
+    radius:9,
+    color:"white",
+    weight:3,
+    fillColor:"#1769e0",
+    fillOpacity:1
+   }
+  ).addTo(map);
 
-   accuracyCircle=L.circle(
+  accuracyCircle=L.circle(
    [lat,lng],
    {
-     radius:acc,
-     color:"#1769e0",
-     weight:1,
-     fillOpacity:.07
-   }).addTo(map);
+    radius:acc,
+    color:"#1769e0",
+    weight:1,
+    fillOpacity:.07
+   }
+  ).addTo(map);
 
 
-   const oldInside=
+  const oldInside=
    pointInPolygon(lat,lng,zonePoints);
 
+  const ad=await getAddress(lat,lng);
 
-   if(oldInside){
+  let addressText="";
 
-     status.innerHTML=
-     "⚠️ 旧DTRZ参考境界では区域内です。<br>"+
-     "解除済み拠点を含むため、現在の帰還困難区域とは限りません。";
+  if(ad){
 
-   }else{
+   addressText=
+    (ad.municipality ? ad.municipality+" " : "")+
+    (ad.town || "");
 
-     status.innerHTML=
-     "✓ 旧DTRZ参考境界では区域外です。<br>"+
-     "現在の法的区域判定を保証するものではありません。";
-
-   }
+  }
 
 
-   map.setView([lat,lng],15);
+  if(oldInside){
 
-   userMarker
-   .bindPopup(
+   status.innerHTML=
+    "⚠️ <b>旧DTRZ参考境界の内側です。</b><br>"+
+    "ただし、解除済み区域が含まれるため、"+
+    "現在も帰還困難区域とは限りません。"+
+    "<div id='address'>"+
+    (addressText ?
+      "現在地：福島県 "+addressText :
+      "地名を取得できませんでした。")+
+    "</div>";
+
+  }else{
+
+   status.innerHTML=
+    "✅ <b>旧DTRZ参考境界の外側です。</b><br>"+
+    "現在残っている帰還困難区域は旧区域より縮小しているため、"+
+    "参考上は帰還困難区域外と考えられます。"+
+    "<div id='address'>"+
+    (addressText ?
+      "現在地：福島県 "+addressText :
+      "地名を取得できませんでした。")+
+    "</div>";
+
+  }
+
+
+  map.setView([lat,lng],16);
+
+  userMarker.bindPopup(
    "<b>現在地</b><br>"+
+   (addressText || "")+
+   "<br>"+
    lat.toFixed(6)+", "+lng.toFixed(6)+
    "<br>GPS精度 約"+Math.round(acc)+"m"
-   )
-   .openPopup();
+  ).openPopup();
 
  },
 
- ()=>{
-   status.innerHTML=
-   "現在地を取得できませんでした。";
+ err=>{
+
+  status.innerHTML=
+   "現在地を取得できませんでした。"+
+   "<br>Safariの位置情報利用を確認してください。";
+
  },
 
  {
-   enableHighAccuracy:true,
-   timeout:15000,
-   maximumAge:3000
+  enableHighAccuracy:true,
+  timeout:15000,
+  maximumAge:3000
  }
 
  );
@@ -716,17 +687,19 @@ document.getElementById("gps")
 });
 
 
+/* ===== buttons ===== */
+
 document.getElementById("all")
 .addEventListener("click",()=>{
- map.fitBounds(oldZone.getBounds(),{padding:[15,15]});
+ map.fitBounds(oldZone.getBounds(),{
+  padding:[15,15]
+ });
 });
-
 
 document.getElementById("official")
 .addEventListener("click",()=>{
  document.getElementById("panel").style.display="block";
 });
-
 
 document.getElementById("close")
 .addEventListener("click",()=>{
@@ -734,16 +707,20 @@ document.getElementById("close")
 });
 
 
-const legend=L.control({position:"bottomright"});
+/* ===== legend ===== */
+
+const legend=L.control({
+ position:"bottomright"
+});
 
 legend.onAdd=function(){
 
  const d=L.DomUtil.create("div","legend");
 
  d.innerHTML=
- '<span style="color:#e32636;font-size:17px">■</span> 旧DTRZ参考境界<br>'+
- '<span style="color:#16a34a;font-size:17px">●</span> 解除済み拠点・概略位置<br>'+
- '<span style="color:#1769e0;font-size:17px">●</span> 現在地';
+  '<span style="color:#e32636;font-size:17px">■</span> 旧DTRZ参考境界<br>'+
+  '<span style="color:#18863b;font-size:17px">●</span> 解除済み拠点・代表地点<br>'+
+  '<span style="color:#1769e0;font-size:17px">●</span> 現在地';
 
  return d;
 };
@@ -751,5 +728,6 @@ legend.onAdd=function(){
 legend.addTo(map);
 
 </script>
+
 </body>
 </html>
