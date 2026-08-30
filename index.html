@@ -75,6 +75,30 @@ h1{
  margin-top:2px;
 }
 
+.confidence{
+ display:inline-block;
+ padding:2px 6px;
+ border-radius:10px;
+ font-size:9px;
+ font-weight:700;
+ margin-top:3px;
+}
+
+.c-high{
+ background:#dff3e4;
+ color:#176b2d;
+}
+
+.c-mixed{
+ background:#ffe1e4;
+ color:#a00018;
+}
+
+.c-check{
+ background:#fff0c7;
+ color:#795000;
+}
+
 .coords{
  font-size:9px;
  color:#777;
@@ -164,7 +188,7 @@ button{
 <h1>福島・帰還困難区域チェッカー</h1>
 
 <div class="sub">
-2026年版｜地点ごとの判定結果を地図上の色で表示
+v20｜公式情報による解除判定を6市町村へ拡大
 </div>
 
 <div id="status">
@@ -173,9 +197,7 @@ button{
 
 </header>
 
-
 <div id="map"></div>
-
 
 <div id="trafficBox">
 
@@ -186,7 +208,6 @@ button{
 </button>
 
 </div>
-
 
 <div class="controls">
 
@@ -223,14 +244,11 @@ button{
 </button>
 
 <div class="note">
-
-🟢＝公式情報から解除を確認　
-🔴＝帰還困難区域または帰還困難区域が存在する地区　
-🟠＝住所だけでは判定不能。<br>
-地区内に解除済み区域と未解除区域が混在する場合、
-赤でも選択地点そのものが帰還困難区域とは限りません。
-立入規制緩和＝避難指示解除ではありません。
-
+🟢＝公式情報から解除側と確認　
+🔴＝帰還困難区域または帰還困難区域を含む地区　
+🟠＝住所だけでは確定不能。<br>
+赤でも、同じ地区内の解除済み部分にいる可能性があります。
+立入規制緩和区域は避難指示解除区域とは別です。
 </div>
 
 </div>
@@ -289,76 +307,56 @@ const municipalities={
 
  "07212":{
   name:"南相馬市",
-
   official:
   "https://www.city.minamisoma.lg.jp/portal/sections/12/1240/12401/genshiryokusaigaikuiki/1424.html",
-
   entry:
   "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"
  },
 
-
  "07543":{
   name:"富岡町",
-
   official:
-  "https://www.tomioka-town.jp/",
-
+  "https://www.tomioka-town.jp/life/7/37/129/",
   entry:
   "https://www.tomioka-town.jp/soshiki/anzentaisaku/1153.html"
  },
 
-
  "07545":{
   name:"大熊町",
-
   official:
   "https://www.town.okuma.fukushima.jp/soshiki/somu/1534.html",
-
   entry:
   "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2026/260615ookumamachi-tachiirikiseikanwa.html"
  },
 
-
  "07546":{
   name:"双葉町",
-
   official:
-  "https://www.town.fukushima-futaba.lg.jp/",
-
+  "https://www.town.fukushima-futaba.lg.jp/9137.htm",
   entry:
   "https://www.town.fukushima-futaba.lg.jp/item/17316.htm"
  },
 
-
  "07547":{
   name:"浪江町",
-
   official:
   "https://www.town.namie.fukushima.jp/soshiki/2/34026.html",
-
   entry:
   "https://www.town.namie.fukushima.jp/soshiki/1/19635.html"
  },
 
-
  "07548":{
   name:"葛尾村",
-
   official:
   "https://www.katsurao.org/",
-
   entry:
-  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"
+  "https://www.katsurao.org/soshiki/3/tuukoukisei20260826.html"
  },
-
 
  "07564":{
   name:"飯舘村",
-
   official:
   "https://www.vill.iitate.fukushima.jp/",
-
   entry:
   "https://www.meti.go.jp/earthquake/nuclear/20250331iitatemura-tachiirikiseikanwa.html"
  }
@@ -367,47 +365,73 @@ const municipalities={
 
 
 /* =====================================================
-   DEFINITELY RELEASED
-
-   現在は公式資料で大字全域解除を
-   明確に確認できた浪江町を使用
+   浪江町：大字全域解除
 ===================================================== */
 
-const definiteReleased={
+const namieReleased=[
 
- "07547":[
+ "立野",
+ "藤橋",
+ "西台",
+ "酒田",
+ "苅宿",
 
-  "立野",
-  "藤橋",
-  "西台",
-  "酒田",
-  "苅宿",
+ "棚塩",
+ "北幾世橋",
+ "幾世橋",
+ "権現堂",
+ "請戸",
 
-  "棚塩",
-  "北幾世橋",
-  "幾世橋",
-  "権現堂",
-  "請戸",
+ "中浜",
+ "両竹",
+ "高瀬",
+ "牛渡",
+ "川添",
 
-  "中浜",
+ "樋渡",
+ "谷津田",
+ "加倉",
+ "田尻",
+ "小野田"
+
+];
+
+
+/* =====================================================
+   明確な解除側住所
+===================================================== */
+
+const releasedWords={
+
+ /* 大熊町 */
+ "07545":[
+  "中屋敷",
+  "大川原"
+ ],
+
+ /* 双葉町
+    旧避難指示解除準備区域 */
+ "07546":[
   "両竹",
-  "高瀬",
-  "牛渡",
-  "川添",
+  "中野",
+  "中浜"
+ ],
 
-  "樋渡",
-  "谷津田",
-  "加倉",
-  "田尻",
-  "小野田"
+ /* 浪江町 */
+ "07547":namieReleased,
 
+ /* 葛尾村
+    帰還困難区域は野行地区。
+    大字落合は解除側。 */
+ "07548":[
+  "大字落合"
  ]
 
 };
 
 
 /* =====================================================
-   DEFINITELY DIFFICULT
+   全域帰還困難と確認できるもの
 ===================================================== */
 
 const definiteDifficult={
@@ -420,38 +444,31 @@ const definiteDifficult={
 
 
 /* =====================================================
-   MIXED / DIFFICULT AREAS
+   帰還困難区域を含む地区
 ===================================================== */
 
 const mixedDifficult={
 
  "07212":{
-
   words:[
    "小高区金谷"
   ],
-
   text:
   "小高区金谷の小畑・ドウケ・出戸間船・野中等に帰還困難区域があります。"
-
  },
 
 
  "07543":{
-
   words:[
    "小良ヶ浜",
    "深谷"
   ],
-
   text:
-  "小良ヶ浜・深谷地区には現在も帰還困難区域があります。"
-
+  "小良ヶ浜・深谷地区を中心に現在も帰還困難区域が残っています。"
  },
 
 
  "07545":{
-
   words:[
    "野上",
    "下野上",
@@ -459,15 +476,12 @@ const mixedDifficult={
    "夫沢",
    "小入野"
   ],
-
   text:
-  "帰還困難区域・解除済み区域・特定帰還居住区域等が混在します。"
-
+  "帰還困難区域、解除済み区域、特定帰還居住区域等が混在します。"
  },
 
 
  "07546":{
-
   words:[
    "下長塚",
    "三字",
@@ -479,15 +493,12 @@ const mixedDifficult={
    "渋川",
    "鴻草"
   ],
-
   text:
-  "帰還困難区域・解除済み区域・特定帰還居住区域等が混在します。"
-
+  "帰還困難区域、解除済み区域、特定帰還居住区域等が混在します。"
  },
 
 
  "07547":{
-
   words:[
    "井手",
    "小丸",
@@ -502,104 +513,81 @@ const mixedDifficult={
    "昼曽根",
    "羽附"
   ],
-
   text:
   "帰還困難区域と地番指定の解除済み区域等が混在します。"
-
  },
 
 
  "07548":{
-
   words:[
-   "小出谷",
    "野行",
-   "柏原"
+   "柏原",
+   "大字葛尾"
   ],
-
   text:
-  "帰還困難区域・解除済み区域等が混在します。"
-
+  "野行を中心に帰還困難区域と解除済み区域が混在します。"
  },
 
 
  "07564":{
-
   words:[
    "長泥"
   ],
-
   text:
   "長泥地区には帰還困難区域と解除済み区域が混在します。"
-
  }
 
 };
 
 
 /* =====================================================
-   RELAXED ENTRY RULES
+   立入規制緩和
 ===================================================== */
 
 const relaxedRules={
 
  "07545":{
-
   words:[
    "下野上",
    "野上",
    "熊"
   ],
-
   text:
   "一部に立入規制緩和区域があります。"
-
  },
 
-
  "07546":{
-
   words:[
    "下長塚",
    "羽鳥",
    "三字"
   ],
-
   text:
   "一部に立入規制緩和区域があります。"
-
  },
 
-
  "07547":{
-
   words:[
    "津島",
    "南津島"
   ],
-
   text:
   "一部に立入規制緩和区域があります。"
-
  },
 
-
  "07564":{
-
   words:[
    "長泥"
   ],
-
   text:
   "一部に立入規制緩和区域があります。"
-
  }
 
 };
 
 
 /* =====================================================
-   TRAFFIC INFO
+   通過交通
 ===================================================== */
 
 const trafficInfo={
@@ -607,26 +595,20 @@ const trafficInfo={
  "07212":
  "南相馬市周辺には帰還困難区域に関係する通行ルートがあります。実際の対象道路をMETI最新情報で確認してください。",
 
-
  "07543":
- "富岡町では経路により通行条件が異なります。道路標識と公式情報を確認してください。",
-
+ "富岡町では経路によって通行条件が異なります。道路標識と公式情報を確認してください。",
 
  "07545":
  "大熊町には特別通過交通が適用される道路があります。対象道路・車種・条件をMETI最新情報で確認してください。",
 
-
  "07546":
  "双葉町には特別通過交通が適用される道路があります。対象道路・時間・車種等をMETI最新情報で確認してください。",
-
 
  "07547":
  "浪江町周辺には特別通過交通に関係するルートがあります。実際に走行する道路をMETI最新情報で確認してください。",
 
-
  "07548":
  "葛尾村では道路ごとの通行規制を村・METIの最新情報で確認してください。",
-
 
  "07564":
  "飯舘村では道路ごとの通行規制を村・METIの最新情報で確認してください。"
@@ -709,7 +691,7 @@ function includesAny(town,words){
 
 
 /* =====================================================
-   EVACUATION RESULT
+   避難指示判定
 ===================================================== */
 
 function evacuationResult(code,town){
@@ -718,7 +700,9 @@ function evacuationResult(code,town){
   municipalities[code];
 
 
- /* ---------- 7市町村外 ---------- */
+ /* ==========================================
+    帰還困難区域が残る7市町村外
+ ========================================== */
 
  if(!muni){
 
@@ -731,6 +715,9 @@ function evacuationResult(code,town){
    title:
    "帰還困難区域対象7市町村の外",
 
+   confidence:
+   "市町村レベルで確認",
+
    text:
    "現在帰還困難区域が残る7市町村には該当しません。"
 
@@ -739,12 +726,88 @@ function evacuationResult(code,town){
  }
 
 
- /* ---------- 全域解除 ---------- */
+ /* ==========================================
+    南相馬市
+
+    現在の帰還困難区域として市が
+    列挙する住所は小高区金谷の一部。
+ ========================================== */
+
+ if(code==="07212"){
+
+  if(
+   town &&
+   town.indexOf("小高区金谷")===-1
+  ){
+
+   return{
+
+    type:"released",
+
+    icon:"🟢",
+
+    title:
+    "帰還困難区域の公表住所外",
+
+    confidence:
+    "住所地名で確認",
+
+    text:
+    "南相馬市が現在帰還困難区域として公表している"+
+    "小高区金谷の該当地区には一致しません。"+
+    "国有林等では別途境界確認が必要です。"
+
+   };
+
+  }
+
+ }
+
+
+ /* ==========================================
+    飯舘村
+
+    長泥以外は2017年解除済み。
+ ========================================== */
+
+ if(code==="07564"){
+
+  if(
+   town &&
+   town.indexOf("長泥")===-1
+  ){
+
+   return{
+
+    type:"released",
+
+    icon:"🟢",
+
+    title:
+    "避難指示解除側を確認",
+
+    confidence:
+    "地区名で確認",
+
+    text:
+    "飯舘村で現在帰還困難区域が残る長泥地区には"+
+    "一致しません。"
+
+   };
+
+  }
+
+ }
+
+
+ /* ==========================================
+    個別の解除確認
+ ========================================== */
 
  const released=
   includesAny(
    town,
-   definiteReleased[code]
+   releasedWords[code]
   );
 
 
@@ -757,19 +820,23 @@ function evacuationResult(code,town){
    icon:"🟢",
 
    title:
-   "避難指示解除を確認",
+   "避難指示解除側を確認",
+
+   confidence:
+   "公式地区情報で確認",
 
    text:
    "「"+released+
-   "」は自治体公式資料で"+
-   "大字全域の避難指示解除を確認できます。"
+   "」は公式情報から避難指示解除側の地区であることを確認できます。"
 
   };
 
  }
 
 
- /* ---------- 全域帰還困難 ---------- */
+ /* ==========================================
+    全域帰還困難
+ ========================================== */
 
  const difficult=
   includesAny(
@@ -789,6 +856,9 @@ function evacuationResult(code,town){
    title:
    "帰還困難区域を確認",
 
+   confidence:
+   "大字全域で確認",
+
    text:
    "「"+difficult+
    "」は国の公示で大字全域が"+
@@ -799,7 +869,9 @@ function evacuationResult(code,town){
  }
 
 
- /* ---------- 混在地区 ---------- */
+ /* ==========================================
+    混在地区
+ ========================================== */
 
  const rule=
   mixedDifficult[code];
@@ -825,10 +897,14 @@ function evacuationResult(code,town){
     title:
     "帰還困難区域を含む地区",
 
+    confidence:
+    "地点境界は未確定",
+
     text:
     "「"+hit+"」に一致。"+
     rule.text+
-    " 選択地点そのものの法的区域は境界確認が必要です。"
+    " 選択地点そのものが帰還困難区域かは"+
+    "境界確認が必要です。"
 
    };
 
@@ -837,7 +913,9 @@ function evacuationResult(code,town){
  }
 
 
- /* ---------- 未確定 ---------- */
+ /* ==========================================
+    その他
+ ========================================== */
 
  return{
 
@@ -848,9 +926,13 @@ function evacuationResult(code,town){
   title:
   "区域境界の確認が必要",
 
+  confidence:
+  "住所だけでは未確定",
+
   text:
   "この市町村には帰還困難区域が残っていますが、"+
-  "取得できる住所情報だけではこの地点を確定できません。"
+  "現在取得できる住所情報だけでは"+
+  "この地点を確定できません。"
 
  };
 
@@ -858,7 +940,7 @@ function evacuationResult(code,town){
 
 
 /* =====================================================
-   ENTRY RESULT
+   立入規制判定
 ===================================================== */
 
 function entryResult(code,town){
@@ -905,8 +987,7 @@ function entryResult(code,town){
     text:
     "「"+hit+"」の"+
     rule.text+
-    " 地区全体が緩和区域という意味ではなく、"+
-    "避難指示解除とも異なります。"
+    " 地区全体が緩和区域という意味ではありません。"
 
    };
 
@@ -931,7 +1012,7 @@ function entryResult(code,town){
 
 
 /* =====================================================
-   MARKER COLOR
+   COLOR
 ===================================================== */
 
 function markerColor(type){
@@ -949,6 +1030,26 @@ function markerColor(type){
 
 
  return "#e28a00";
+
+}
+
+
+/* =====================================================
+   CONFIDENCE CLASS
+===================================================== */
+
+function confidenceClass(type){
+
+ if(type==="released")
+  return "c-high";
+
+
+ if(type==="difficult" ||
+    type==="mixed")
+  return "c-mixed";
+
+
+ return "c-check";
 
 }
 
@@ -1104,6 +1205,12 @@ async function evaluatePoint(
   : "";
 
 
+ const confClass=
+  confidenceClass(
+   ev.type
+  );
+
+
  status.innerHTML=
 
   '<div class="place">'+
@@ -1119,6 +1226,12 @@ async function evaluatePoint(
     " 避難指示｜"+
     ev.title+
    '</b>'+
+   '<br>'+
+   '<span class="confidence '+
+    confClass+
+   '">'+
+    ev.confidence+
+   '</span>'+
    '<span class="detail">'+
     ev.text+
    '</span>'+
@@ -1251,7 +1364,7 @@ async function showGPS(pos,follow){
 
 
 /* =====================================================
-   GPS BUTTON
+   CURRENT LOCATION
 ===================================================== */
 
 document
@@ -1285,7 +1398,7 @@ document
 
 
 /* =====================================================
-   TRACKING
+   TRACK
 ===================================================== */
 
 trackButton.onclick=()=>{
@@ -1411,7 +1524,7 @@ map.on(
 
 
 /* =====================================================
-   OFFICIAL BUTTONS
+   LINKS
 ===================================================== */
 
 document
@@ -1506,7 +1619,7 @@ document
    "<br><br>"+
    "<b>重要：</b>"+
    "同じ市町村内でも道路によって条件が異なります。"+
-   "このアプリは現在地が対象道路上かまでは判定していません。";
+   "現在の座標が対象道路上かまでは判定していません。";
 
  }else{
 
@@ -1560,7 +1673,7 @@ legend.onAdd=
   d.innerHTML=
 
    '<span style="color:#1b8f3a;font-size:18px">●</span>'+
-   " 解除確認"+
+   " 解除側を確認"+
    "<br>"+
 
    '<span style="color:#d00020;font-size:18px">●</span>'+
