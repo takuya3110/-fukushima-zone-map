@@ -25,7 +25,7 @@ html,body{
 }
 
 header{
- background:#fff;
+ background:white;
  padding:8px 10px;
  border-bottom:1px solid #ddd;
  z-index:1000;
@@ -44,16 +44,32 @@ h1{
 
 #status{
  margin-top:7px;
- padding:10px;
+ padding:9px;
  border-radius:9px;
  background:#eef3f8;
- font-size:13px;
- line-height:1.5;
+ font-size:12px;
+ line-height:1.45;
+}
+
+.resultRow{
+ margin-top:6px;
+ padding:7px;
+ border-radius:7px;
+ background:white;
+}
+
+.resultTitle{
+ font-weight:700;
+}
+
+.small{
+ font-size:10px;
+ color:#555;
 }
 
 #map{
  flex:1;
- min-height:250px;
+ min-height:240px;
 }
 
 .controls{
@@ -61,7 +77,7 @@ h1{
  grid-template-columns:1fr 1fr;
  gap:6px;
  padding:7px;
- background:#fff;
+ background:white;
  border-top:1px solid #ddd;
 }
 
@@ -71,42 +87,20 @@ button{
  padding:10px 3px;
  font-size:12px;
  font-weight:600;
+ color:white;
 }
 
-#gps{
- background:#1769e0;
- color:#fff;
-}
-
-#track{
- background:#08752e;
- color:#fff;
-}
-
-#official{
- background:#444;
- color:#fff;
-}
-
-#meti{
- background:#62509b;
- color:#fff;
-}
-
-#municipal{
- background:#a05a00;
- color:#fff;
-}
-
-#entry{
- background:#b24600;
- color:#fff;
-}
+#gps{background:#1769e0;}
+#track{background:#08752e;}
+#official{background:#444;}
+#municipal{background:#a05a00;}
+#entry{background:#b24600;}
+#traffic{background:#006d77;}
+#meti{background:#62509b;}
 
 #returnArea{
  grid-column:1/3;
- background:#166b83;
- color:#fff;
+ background:#6e3b8e;
 }
 
 .note{
@@ -116,40 +110,34 @@ button{
  line-height:1.45;
 }
 
-.badge{
- display:inline-block;
- margin-top:3px;
- padding:3px 7px;
- border-radius:12px;
- font-size:10px;
- font-weight:bold;
+#trafficBox{
+ display:none;
+ position:absolute;
+ left:10px;
+ right:10px;
+ bottom:95px;
+ z-index:2000;
+ background:white;
+ padding:12px;
+ border-radius:10px;
+ box-shadow:0 3px 14px rgba(0,0,0,.35);
+ max-height:45%;
+ overflow:auto;
+ font-size:12px;
+ line-height:1.5;
 }
 
-.high{
- background:#ffd9dd;
- color:#a00018;
-}
-
-.medium{
- background:#fff0c7;
- color:#7a4c00;
-}
-
-.low{
- background:#dff2e3;
- color:#086323;
-}
-
-.tap{
- background:#e8efff;
- color:#174f9d;
+#trafficClose{
+ width:100%;
+ margin-top:8px;
+ background:#555;
 }
 
 .legend{
  background:white;
  padding:6px 8px;
  font-size:10px;
- line-height:1.55;
+ line-height:1.5;
  box-shadow:0 1px 5px rgba(0,0,0,.3);
  border-radius:5px;
 }
@@ -166,16 +154,29 @@ button{
 <h1>福島・帰還困難区域チェッカー</h1>
 
 <div class="sub">
-GPSまたは地図タップで、避難指示・立入情報を確認
+2026年版｜避難指示・立入規制・通過交通を分けて確認
 </div>
 
 <div id="status">
-<b>📍「現在地」を押すか、地図上の調べたい場所をタップしてください。</b>
+<b>📍 現在地を押すか、地図上の地点をタップしてください。</b>
 </div>
 
 </header>
 
+
 <div id="map"></div>
+
+
+<div id="trafficBox">
+
+<div id="trafficText"></div>
+
+<button id="trafficClose">
+閉じる
+</button>
+
+</div>
+
 
 <div class="controls">
 
@@ -187,20 +188,24 @@ GPSまたは地図タップで、避難指示・立入情報を確認
 ▶ 移動追跡
 </button>
 
-<button id="official">
-🗺 福島県公式区域情報
-</button>
-
-<button id="meti">
-📋 METI最新避難指示
-</button>
-
 <button id="municipal">
-🏛 この市町村の公式情報
+🏛 自治体公式
 </button>
 
 <button id="entry">
-🚧 立入・通行情報
+🚧 立入規制情報
+</button>
+
+<button id="traffic">
+🚗 特別通過交通
+</button>
+
+<button id="official">
+🗺 福島県公式
+</button>
+
+<button id="meti">
+📋 METI最新
 </button>
 
 <button id="returnArea">
@@ -208,14 +213,14 @@ GPSまたは地図タップで、避難指示・立入情報を確認
 </button>
 
 <div class="note">
+
 <b>重要：</b>
-このアプリは行政上の避難指示・立入規制の確認を補助するものです。
+帰還困難区域、立入規制緩和区域、特別通過交通は別の制度です。
+「立入規制緩和」や「道路を通過可能」であっても、
+避難指示解除済みとは限りません。
+このアプリは行政上の区域確認を補助するもので、
 放射線安全性を判定するものではありません。
-地区名が一致しても同じ地区内に解除済み区域等が含まれる場合があります。
-最終的な区域確認は国・自治体の公式情報で行ってください。
-<br>
-特定帰還居住区域や立入規制緩和区域は、
-「避難指示解除済み」と同じ意味ではありません。
+
 </div>
 
 </div>
@@ -229,13 +234,14 @@ src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 
 <script>
 
-/* ===========================
-   地図
-=========================== */
+/* =========================================
+   MAP
+========================================= */
 
 const map=
  L.map("map")
  .setView([37.47,140.93],10);
+
 
 L.tileLayer(
  "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
@@ -259,22 +265,25 @@ L.circleMarker(
  }
 )
 .addTo(map)
-.bindPopup("<b>福島第一原子力発電所</b>");
+.bindPopup(
+ "<b>福島第一原子力発電所</b>"
+);
 
 
-/* ===========================
-   解除済み拠点・代表地点
-   ※境界ではない
-=========================== */
+/* =========================================
+   解除済み特定復興再生拠点・代表地点
+   ※区域境界ではない
+========================================= */
 
 const lifted=[
  ["大熊町・大野駅",37.4075,140.9830],
  ["双葉町・双葉駅",37.4545,141.0053],
- ["浪江町・拠点区域",37.4938,140.9890],
+ ["浪江町・中心部",37.4938,140.9890],
  ["富岡町・夜ノ森",37.3683,140.9950],
  ["飯舘村・長泥拠点",37.6160,140.7330],
  ["葛尾村・拠点区域",37.5140,140.7920]
 ];
+
 
 lifted.forEach(p=>{
 
@@ -292,176 +301,280 @@ lifted.forEach(p=>{
  .bindPopup(
   "<b>"+p[0]+"</b><br>"+
   "特定復興再生拠点区域は解除済み。"+
-  "<br><small>この点は区域境界を表しません。</small>"
+  "<br><small>点は区域境界ではありません。</small>"
  );
 
 });
 
 
-/* ===========================
-   市町村
-=========================== */
+/* =========================================
+   MUNICIPALITIES
+========================================= */
 
 const municipalities={
 
  "07212":{
-   name:"南相馬市",
-   official:
-    "https://www.city.minamisoma.lg.jp/portal/sections/12/1240/12401/genshiryokusaigaikuiki/1424.html",
-   entry:
-    "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"
+  name:"南相馬市",
+
+  official:
+  "https://www.city.minamisoma.lg.jp/portal/sections/12/1240/12401/genshiryokusaigaikuiki/1424.html",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"
  },
 
  "07543":{
-   name:"富岡町",
-   official:
-    "https://www.tomioka-town.jp/",
-   entry:
-    "https://www.tomioka-town.jp/soshiki/anzentaisaku/1153.html"
+  name:"富岡町",
+
+  official:
+  "https://www.tomioka-town.jp/",
+
+  entry:
+  "https://www.tomioka-town.jp/soshiki/anzentaisaku/1153.html"
  },
 
  "07545":{
-   name:"大熊町",
-   official:
-    "https://www.town.okuma.fukushima.jp/",
-   entry:
-    "https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"
+  name:"大熊町",
+
+  official:
+  "https://www.town.okuma.fukushima.jp/",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2026/260615ookumamachi-tachiirikiseikanwa.html"
  },
 
  "07546":{
-   name:"双葉町",
-   official:
-    "https://www.town.fukushima-futaba.lg.jp/",
-   entry:
-    "https://www.town.fukushima-futaba.lg.jp/item/17316.htm"
+  name:"双葉町",
+
+  official:
+  "https://www.town.fukushima-futaba.lg.jp/",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2026/20260213futabamachi-tachiirikiseikanwa.html"
  },
 
  "07547":{
-   name:"浪江町",
-   official:
-    "https://www.town.namie.fukushima.jp/",
-   entry:
-    "https://www.town.namie.fukushima.jp/soshiki/1/19635.html"
+  name:"浪江町",
+
+  official:
+  "https://www.town.namie.fukushima.jp/",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2025/20250715namiemachi-tachiirikiseikanwa.html"
  },
 
  "07548":{
-   name:"葛尾村",
-   official:
-    "https://www.katsurao.org/",
-   entry:
-    "https://www.katsurao.org/soshiki/3/tuukoukisei20260826.html"
+  name:"葛尾村",
+
+  official:
+  "https://www.katsurao.org/",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"
  },
 
  "07564":{
-   name:"飯舘村",
-   official:
-    "https://www.vill.iitate.fukushima.jp/",
-   entry:
-    "https://www.meti.go.jp/earthquake/nuclear/20250331iitatemura-tachiirikiseikanwa.html"
+  name:"飯舘村",
+
+  official:
+  "https://www.vill.iitate.fukushima.jp/",
+
+  entry:
+  "https://www.meti.go.jp/earthquake/nuclear/20250331iitatemura-tachiirikiseikanwa.html"
  }
 
 };
 
 
-/* ===========================
-   現在帰還困難区域が
-   存在することを公式情報で
-   確認できる地区名
-=========================== */
+/* =========================================
+   帰還困難区域に関係する地区
+   大字レベル判定
+========================================= */
 
-const rules={
+const difficultRules={
 
  "07212":{
-   words:[
-    "小高区金谷"
-   ],
-   detail:
-    "南相馬市の帰還困難区域は、小高区金谷のうち"+
-    "小畑・ドウケ・出戸間船・野中などです。"
+  words:["小高区金谷"],
+  text:
+  "南相馬市では小高区金谷の一部に帰還困難区域が残っています。"
  },
 
  "07543":{
-   words:[
-    "小良ヶ浜",
-    "深谷"
-   ],
-   detail:
-    "富岡町では小良ヶ浜・深谷地区に帰還困難区域が残っています。"
+  words:["小良ヶ浜","深谷"],
+  text:
+  "富岡町では小良ヶ浜・深谷地区に帰還困難区域が残っています。"
  },
 
  "07545":{
-   words:[
-    "野上",
-    "下野上",
-    "熊",
-    "夫沢",
-    "小入野"
-   ],
-   detail:
-    "大熊町ではこの地区の全部または一部に"+
-    "帰還困難区域または特定帰還居住区域があります。"+
-    "大野駅周辺など解除済み区域も混在します。"
+  words:[
+   "野上",
+   "下野上",
+   "熊",
+   "夫沢",
+   "小入野"
+  ],
+  text:
+  "大熊町の帰還困難区域に関係する地区です。解除済み区域も混在します。"
  },
 
  "07546":{
-   words:[
-    "下長塚",
-    "三字",
-    "羽鳥"
-   ],
-   detail:
-    "双葉町ではこの地区の一部に特定帰還居住区域や"+
-    "立入規制緩和区域があります。避難指示解除とは別です。"
+  words:[
+   "下長塚",
+   "三字",
+   "羽鳥",
+   "石熊",
+   "山田",
+   "細谷",
+   "寺松",
+   "渋川",
+   "鴻草"
+  ],
+  text:
+  "双葉町の帰還困難区域に関係する地区です。解除済み区域等も混在します。"
  },
 
  "07547":{
-   words:[
-    "井手",
-    "小丸",
-    "大堀",
-    "酒井",
-    "室原",
-    "末森",
-    "津島",
-    "南津島",
-    "川房",
-    "昼曽根",
-    "下津島",
-    "赤宇木",
-    "羽附"
-   ],
-   detail:
-    "浪江町が帰還困難区域への立入り申請対象として"+
-    "公表している地域名に一致します。"+
-    "一部解除済み区域を含みます。"
+  words:[
+   "井手",
+   "小丸",
+   "大堀",
+   "酒井",
+   "室原",
+   "末森",
+   "津島",
+   "南津島",
+   "川房",
+   "昼曽根",
+   "下津島",
+   "赤宇木",
+   "羽附"
+  ],
+  text:
+  "浪江町の帰還困難区域に関係する地区です。解除済み区域等も混在します。"
  },
 
  "07548":{
-   words:[
-    "小出谷",
-    "野行",
-    "柏原"
-   ],
-   detail:
-    "葛尾村の帰還困難区域・特定帰還居住区域に"+
-    "関係する地区です。解除済み部分もあります。"
+  words:[
+   "小出谷",
+   "野行",
+   "柏原"
+  ],
+  text:
+  "葛尾村の帰還困難区域に関係する地区です。解除済み部分もあります。"
  },
 
  "07564":{
-   words:[
-    "長泥"
-   ],
-   detail:
-    "飯舘村で帰還困難区域が残る長泥地区です。"+
-    "特定復興再生拠点区域や曲田の一部には解除済み区域があります。"
+  words:["長泥"],
+  text:
+  "飯舘村の長泥地区には帰還困難区域が残っています。解除済み部分もあります。"
  }
 
 };
 
 
-/* ===========================
-   逆ジオコーダ
-=========================== */
+/* =========================================
+   立入規制緩和区域に関係する地区
+
+   「地区全体が緩和区域」という意味ではない
+========================================= */
+
+const relaxedRules={
+
+ "07545":{
+  words:[
+   "下野上",
+   "野上",
+   "熊"
+  ],
+  text:
+  "2026年6月22日から、下野上1区・野上2区、熊2区・熊3区、熊2区・町区の各一部で立入規制が緩和されています。"
+ },
+
+ "07546":{
+  words:[
+   "下長塚",
+   "羽鳥",
+   "三字"
+  ],
+  text:
+  "下長塚・羽鳥・三字行政区の一部などに立入規制緩和区域があります。2026年2月にも羽鳥行政区で追加設定されています。"
+ },
+
+ "07547":{
+  words:[
+   "津島",
+   "南津島"
+  ],
+  text:
+  "津島地区・南津島下地区等の一部に、2025年7月15日から立入規制緩和区域があります。"
+ },
+
+ "07564":{
+  words:[
+   "長泥"
+  ],
+  text:
+  "長泥地区の一部には、2025年3月31日から立入規制緩和区域があります。"
+ }
+
+};
+
+
+/* =========================================
+   特別通過交通
+========================================= */
+
+const trafficInfo={
+
+ "07212":
+ `<b>南相馬市周辺</b><br>
+ 国道114号（南相馬市区間）<br>
+ 県道49号（南相馬市区間）<br><br>
+ METI資料では、対象区間は通行証不要・通行時間制限なし。`,
+
+ "07545":
+ `<b>大熊町</b><br>
+ ・町道東15号～県道252号の一部<br>
+ ・県道252号<br>
+ ・町道東67号～国道6号<br><br>
+ 対象区間では通行証不要で通過できる制度があります。
+ 道路により歩行者・軽車両等の制限があります。`,
+
+ "07546":
+ `<b>双葉町</b><br>
+ ・県道35号～国道288号<br>
+ ・国道288号の一部<br>
+ ・町道101号／109号<br><br>
+ 町道101号・109号は原則8:00～18:00。
+ 車種等の制限があります。`,
+
+ "07547":
+ `<b>浪江町周辺</b><br>
+ 双葉町・浪江町境から県道35号～国道288号へ接続する
+ 特別通過交通ルートがあります。<br><br>
+ 実際に走行する道路が対象ルートか、METI公式資料で確認してください。`,
+
+ "07543":
+ `<b>富岡町</b><br>
+ 特別通過交通の対象路線は地点・経路によって異なります。
+ METI最新資料で確認してください。`,
+
+ "07548":
+ `<b>葛尾村</b><br>
+ 帰還困難区域内の一般道路すべてが自由通行できるわけではありません。
+ METI・村の最新通行規制を確認してください。`,
+
+ "07564":
+ `<b>飯舘村</b><br>
+ 帰還困難区域内の一般道路すべてが自由通行できるわけではありません。
+ METI・村の最新情報を確認してください。`
+
+};
+
+
+/* =========================================
+   REVERSE GEOCODER
+========================================= */
 
 async function reverseGeocode(lat,lng){
 
@@ -474,12 +587,14 @@ async function reverseGeocode(lat,lng){
    "&lon="+
    encodeURIComponent(lng);
 
-  const r=await fetch(url);
+  const r=
+   await fetch(url);
 
   if(!r.ok)
    throw new Error();
 
-  const j=await r.json();
+  const j=
+   await r.json();
 
   if(!j.results)
    return null;
@@ -498,75 +613,52 @@ async function reverseGeocode(lat,lng){
 }
 
 
-/* ===========================
-   判定
-=========================== */
+/* =========================================
+   RULE MATCH
+========================================= */
 
-function classifyAddress(code,town){
+function matchRule(rules,code,town){
 
- if(!municipalities[code]){
+ const rule=
+  rules[code];
 
-  return{
-   level:"low",
-   title:"🟢 帰還困難区域が残る7市町村の外",
-   text:
-    "現在、帰還困難区域が残る7市町村には該当しません。"
-  };
+ if(!rule || !town)
+  return null;
 
- }
+ const hit=
+  rule.words.find(
+   word=>town.indexOf(word)!==-1
+  );
 
- const rule=rules[code];
-
- if(rule && town){
-
-  const hit=
-   rule.words.find(
-    w=>town.indexOf(w)!==-1
-   );
-
-  if(hit){
-
-   return{
-    level:"high",
-    title:"🔴 帰還困難区域等に関係する地区名",
-    text:
-     "地区名「"+hit+"」に一致しました。"+
-     rule.detail+
-     " 同じ地区内に解除済み区域がある場合があるため、"+
-     "この結果だけで法的区域を確定しないでください。"
-   };
-
-  }
-
- }
+ if(!hit)
+  return null;
 
  return{
-  level:"medium",
-  title:"🟠 7市町村内・区域境界の確認が必要",
-  text:
-   "この市町村には現在も帰還困難区域があります。"+
-   "取得できた住所情報だけでは区域内・区域外を確定できません。"
+  hit:hit,
+  text:rule.text
  };
 
 }
 
 
-/* ===========================
-   表示
-=========================== */
+/* =========================================
+   DISPLAY STATE
+========================================= */
 
 let currentMarker=null;
-let accuracyCircle=null;
 let selectedMarker=null;
+let accuracyCircle=null;
 
-let tracking=false;
 let watchId=null;
+let tracking=false;
 
 let currentOfficial=
  "https://www.pref.fukushima.lg.jp/sec/11050a/";
 
 let currentEntry=
  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html";
+
+let currentCode="";
 
 const status=
  document.getElementById("status");
@@ -575,6 +667,10 @@ const trackButton=
  document.getElementById("track");
 
 
+/* =========================================
+   EVALUATE POINT
+========================================= */
+
 async function evaluatePoint(
  lat,
  lng,
@@ -582,13 +678,16 @@ async function evaluatePoint(
  accuracy=null
 ){
 
- status.style.background="#eef3f8";
-
  status.innerHTML=
-  "<b>住所を確認しています…</b>";
+  "<b>住所と区域情報を確認しています…</b>";
+
+ status.style.background=
+  "#eef3f8";
+
 
  const ad=
   await reverseGeocode(lat,lng);
+
 
  const code=
   ad ? ad.code : "";
@@ -596,8 +695,14 @@ async function evaluatePoint(
  const town=
   ad ? ad.town : "";
 
+
+ currentCode=
+  code;
+
+
  const muni=
   municipalities[code];
+
 
  if(muni){
 
@@ -617,95 +722,187 @@ async function evaluatePoint(
 
  }
 
- const result=
-  classifyAddress(code,town);
 
- let bg="#eef3f8";
- let badge="";
+ const difficult=
+  matchRule(
+   difficultRules,
+   code,
+   town
+  );
 
- if(result.level==="high"){
 
-  bg="#fff0f1";
+ const relaxed=
+  matchRule(
+   relaxedRules,
+   code,
+   town
+  );
 
-  badge=
-   '<span class="badge high">'+
-   '公式地区名との照合：注意'+
-   '</span>';
+
+ let evacuationHTML="";
+
+ let entryHTML="";
+
+ let trafficHTML="";
+
+
+ /* ---------- 避難指示 ---------- */
+
+ if(!muni){
+
+  evacuationHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🟢 避難指示
+    </div>
+    現在帰還困難区域が残る7市町村の外です。
+    </div>`;
+
+ }else if(difficult){
+
+  evacuationHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🔴 避難指示
+    </div>
+    帰還困難区域に関係する地区名
+    「${difficult.hit}」に一致。<br>
+    <span class="small">
+    ${difficult.text}<br>
+    地区内に解除済み区域が混在する場合があるため、
+    この結果だけでは法的区域を確定できません。
+    </span>
+    </div>`;
+
+ }else{
+
+  evacuationHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🟠 避難指示
+    </div>
+    帰還困難区域が残る市町村ですが、
+    住所情報だけでは区域内・区域外を確定できません。
+    </div>`;
 
  }
 
- if(result.level==="medium"){
 
-  bg="#fff7df";
+ /* ---------- 立入規制 ---------- */
 
-  badge=
-   '<span class="badge medium">'+
-   '境界確認が必要'+
-   '</span>';
+ if(relaxed){
+
+  entryHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🚧 立入規制
+    </div>
+    立入規制緩和区域が含まれる地区名
+    「${relaxed.hit}」に一致。<br>
+    <span class="small">
+    ${relaxed.text}<br>
+    緩和区域＝避難指示解除ではありません。
+    </span>
+    </div>`;
+
+ }else if(muni){
+
+  entryHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🚧 立入規制
+    </div>
+    取得した地区名だけでは
+    立入規制緩和区域か判定できません。
+    </div>`;
+
+ }else{
+
+  entryHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🚧 立入規制
+    </div>
+    帰還困難区域に伴う立入規制の対象7市町村外です。
+    </div>`;
 
  }
 
- if(result.level==="low"){
 
-  bg="#e9f6ec";
+ /* ---------- 通過交通 ---------- */
 
-  badge=
-   '<span class="badge low">'+
-   '市町村レベルで区域外'+
-   '</span>';
+ if(trafficInfo[code]){
+
+  trafficHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🚗 特別通過交通
+    </div>
+    この市町村には特別通過交通に関係する
+    ルートまたは通行規制があります。<br>
+    <span class="small">
+    下の「🚗 特別通過交通」で確認できます。
+    </span>
+    </div>`;
+
+ }else{
+
+  trafficHTML=
+   `<div class="resultRow">
+    <div class="resultTitle">
+    🚗 特別通過交通
+    </div>
+    この地点について個別ルート判定は行っていません。
+    </div>`;
 
  }
 
- status.style.background=bg;
 
- const sourceText=
-  source==="gps"
-  ? "📍 現在地"
-  : "👆 地図で選択";
-
- let accText="";
+ let accuracyText="";
 
  if(accuracy!==null){
 
-  accText=
-   "　GPS精度：約"+
-   Math.round(accuracy)+
-   "m";
+  accuracyText=
+   `・GPS精度 約${Math.round(accuracy)}m`;
 
  }
 
+
+ const sourceText=
+  source==="gps"
+  ? "📍現在地"
+  : "👆地図選択";
+
+
  status.innerHTML=
 
-  "<b>"+result.title+"</b><br>"+
+  `<b>${sourceText}：
+  ${muni ? muni.name : "対象7市町村外"}
+  ${town || ""}</b>
 
-  sourceText+
-  "："+
-  (muni ? muni.name : "対象7市町村外")+
-  (town ? " "+town : "")+
+  ${evacuationHTML}
 
-  "<br>"+badge+
+  ${entryHTML}
 
-  "<br>"+result.text+
+  ${trafficHTML}
 
-  "<br><small>"+
-  "緯度経度："+
+  <div class="small"
+       style="margin-top:6px">
 
-  lat.toFixed(6)+
-  ", "+
-  lng.toFixed(6)+
+  ${lat.toFixed(6)},
+  ${lng.toFixed(6)}
+  ${accuracyText}
 
-  accText+
-
-  "</small>";
+  </div>`;
 
 }
 
 
-/* ===========================
+/* =========================================
    GPS
-=========================== */
+========================================= */
 
-async function showPosition(pos,follow){
+async function showGPS(pos,follow){
 
  const lat=
   pos.coords.latitude;
@@ -716,11 +913,13 @@ async function showPosition(pos,follow){
  const acc=
   pos.coords.accuracy;
 
+
  if(currentMarker)
   map.removeLayer(currentMarker);
 
  if(accuracyCircle)
   map.removeLayer(accuracyCircle);
+
 
  currentMarker=
   L.circleMarker(
@@ -732,7 +931,9 @@ async function showPosition(pos,follow){
     fillColor:"#1769e0",
     fillOpacity:1
    }
-  ).addTo(map);
+  )
+  .addTo(map);
+
 
  accuracyCircle=
   L.circle(
@@ -743,10 +944,19 @@ async function showPosition(pos,follow){
     weight:1,
     fillOpacity:.07
    }
-  ).addTo(map);
+  )
+  .addTo(map);
 
- if(follow)
-  map.setView([lat,lng],16);
+
+ if(follow){
+
+  map.setView(
+   [lat,lng],
+   16
+  );
+
+ }
+
 
  await evaluatePoint(
   lat,
@@ -765,13 +975,16 @@ document
  status.innerHTML=
   "<b>現在地を取得しています…</b>";
 
+
  navigator.geolocation.getCurrentPosition(
 
-  p=>showPosition(p,true),
+  p=>showGPS(p,true),
 
   ()=>{
+
    status.innerHTML=
     "<b>現在地を取得できませんでした。</b>";
+
   },
 
   {
@@ -785,9 +998,9 @@ document
 };
 
 
-/* ===========================
-   移動追跡
-=========================== */
+/* =========================================
+   TRACK
+========================================= */
 
 trackButton.onclick=()=>{
 
@@ -801,10 +1014,11 @@ trackButton.onclick=()=>{
   trackButton.style.background=
    "#a06400";
 
+
   watchId=
    navigator.geolocation.watchPosition(
 
-    p=>showPosition(p,true),
+    p=>showGPS(p,true),
 
     ()=>{},
 
@@ -820,8 +1034,14 @@ trackButton.onclick=()=>{
 
   tracking=false;
 
-  if(watchId!==null)
-   navigator.geolocation.clearWatch(watchId);
+  if(watchId!==null){
+
+   navigator.geolocation.clearWatch(
+    watchId
+   );
+
+  }
+
 
   watchId=null;
 
@@ -836,56 +1056,46 @@ trackButton.onclick=()=>{
 };
 
 
-/* ===========================
-   地図をタップして判定
-=========================== */
+/* =========================================
+   MAP CLICK
+========================================= */
 
-map.on("click",async e=>{
+map.on(
+ "click",
+ async e=>{
 
- const lat=e.latlng.lat;
- const lng=e.latlng.lng;
+  const lat=e.latlng.lat;
+  const lng=e.latlng.lng;
 
- if(selectedMarker)
-  map.removeLayer(selectedMarker);
 
- selectedMarker=
-  L.marker([lat,lng])
-  .addTo(map)
-  .bindPopup(
-   "<b>調べる地点</b><br>"+
-   "住所を確認しています…"
-  )
-  .openPopup();
+  if(selectedMarker)
+   map.removeLayer(selectedMarker);
 
- await evaluatePoint(
-  lat,
-  lng,
-  "tap"
- );
 
- const ad=
-  await reverseGeocode(lat,lng);
+  selectedMarker=
+   L.marker(
+    [lat,lng]
+   )
+   .addTo(map)
+   .bindPopup(
+    "<b>調べる地点</b>"
+   )
+   .openPopup();
 
- if(ad){
 
-  const muni=
-   municipalities[ad.code];
-
-  selectedMarker
-   .setPopupContent(
-    "<b>調べる地点</b><br>"+
-    (muni ? muni.name : "")+
-    (ad.town ? " "+ad.town : "")
-   );
+  await evaluatePoint(
+   lat,
+   lng,
+   "tap"
+  );
 
  }
+);
 
-});
 
-
-/* ===========================
-   リンク
-=========================== */
+/* =========================================
+   BUTTONS
+========================================= */
 
 document
 .getElementById("official")
@@ -893,18 +1103,6 @@ document
 
  window.open(
   "https://www.pref.fukushima.lg.jp/sec/11050a/",
-  "_blank"
- );
-
-};
-
-
-document
-.getElementById("meti")
-.onclick=()=>{
-
- window.open(
-  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html",
   "_blank"
  );
 
@@ -936,6 +1134,18 @@ document
 
 
 document
+.getElementById("meti")
+.onclick=()=>{
+
+ window.open(
+  "https://www.meti.go.jp/earthquake/nuclear/kinkyu.html",
+  "_blank"
+ );
+
+};
+
+
+document
 .getElementById("returnArea")
 .onclick=()=>{
 
@@ -947,14 +1157,77 @@ document
 };
 
 
-/* ===========================
-   凡例
-=========================== */
+/* =========================================
+   TRAFFIC BOX
+========================================= */
+
+document
+.getElementById("traffic")
+.onclick=()=>{
+
+ const box=
+  document.getElementById(
+   "trafficBox"
+  );
+
+ const text=
+  document.getElementById(
+   "trafficText"
+  );
+
+
+ if(trafficInfo[currentCode]){
+
+  text.innerHTML=
+
+   `<b>🚗 特別通過交通</b><br><br>`+
+
+   trafficInfo[currentCode]+
+
+   `<br><br>
+   <b>注意：</b>
+   地点が同じ市町村にあるだけでは、
+   現在走行している道路が対象路線とは判定できません。
+   実際の道路標識とMETI公式情報を確認してください。`;
+
+ }else{
+
+  text.innerHTML=
+
+   `<b>🚗 特別通過交通</b><br><br>
+   現在選択している地点について、
+   このアプリで表示できる個別ルート情報はありません。`;
+
+ }
+
+
+ box.style.display=
+  "block";
+
+};
+
+
+document
+.getElementById("trafficClose")
+.onclick=()=>{
+
+ document
+ .getElementById("trafficBox")
+ .style.display=
+  "none";
+
+};
+
+
+/* =========================================
+   LEGEND
+========================================= */
 
 const legend=
  L.control({
   position:"bottomright"
  });
+
 
 legend.onAdd=function(){
 
@@ -964,14 +1237,20 @@ legend.onAdd=function(){
    "legend"
   );
 
+
  d.innerHTML=
-  '<span style="color:#1769e0;font-size:16px">●</span> 現在地<br>'+
-  '📍 地図タップ＝任意地点を確認<br>'+
-  '<span style="color:#18863b;font-size:16px">●</span> 解除済み拠点の代表地点';
+
+  '<span style="color:#1769e0;font-size:16px">●</span> GPS現在地<br>'+
+
+  '📍 地図タップ＝任意地点<br>'+
+
+  '<span style="color:#18863b;font-size:16px">●</span> 解除済み拠点・代表地点';
+
 
  return d;
 
 };
+
 
 legend.addTo(map);
 
