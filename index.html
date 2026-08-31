@@ -25,7 +25,7 @@ html,body{
 }
 
 header{
- background:white;
+ background:#fff;
  padding:7px 9px;
  border-bottom:1px solid #ddd;
  z-index:1000;
@@ -51,63 +51,59 @@ h1{
  line-height:1.4;
 }
 
-.place{
- font-weight:700;
- font-size:13px;
-}
-
-.row{
- background:white;
- border-radius:7px;
- padding:5px 7px;
- margin-top:4px;
-}
-
-.detail{
- display:block;
- color:#555;
- font-size:10px;
- margin-top:2px;
-}
-
-.badge{
- display:inline-block;
- border-radius:10px;
- padding:2px 6px;
- margin-top:3px;
- font-size:9px;
- font-weight:bold;
-}
-
-.green{
- background:#def3e3;
- color:#176b2d;
-}
-
-.red{
- background:#ffe0e4;
- color:#a00018;
-}
-
-.orange{
- background:#fff0c7;
- color:#795000;
-}
-
-.purple{
- background:#eee2f5;
- color:#63317a;
-}
-
-.coords{
- font-size:9px;
- color:#777;
- margin-top:5px;
+#mapWrap{
+ position:relative;
+ flex:1;
+ min-height:280px;
 }
 
 #map{
- flex:1;
- min-height:250px;
+ width:100%;
+ height:100%;
+}
+
+#anchorPanel{
+ position:absolute;
+ z-index:2000;
+ left:8px;
+ right:8px;
+ bottom:8px;
+ background:rgba(255,255,255,.95);
+ border-radius:11px;
+ padding:7px;
+ box-shadow:0 2px 12px rgba(0,0,0,.28);
+}
+
+.anchorTitle{
+ font-size:10px;
+ font-weight:bold;
+ margin-bottom:5px;
+}
+
+.anchorButtons{
+ display:grid;
+ grid-template-columns:1fr 1fr 1fr;
+ gap:4px;
+}
+
+.anchorButtons button{
+ background:#292929;
+ padding:8px 2px;
+}
+
+#overlayToggle{
+ margin-top:5px;
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:4px;
+}
+
+#overlayToggle button{
+ background:#71418c;
+}
+
+#opacityBtn{
+ background:#596d78 !important;
 }
 
 .controls{
@@ -125,15 +121,24 @@ button{
  padding:9px 3px;
  font-size:11px;
  font-weight:600;
- color:white;
+ color:#fff;
 }
 
-#gps{background:#1769e0}
-#track{background:#08752e}
-#overlay{background:#8435a8}
-#calibrate{background:#8b5c00}
-#layers{background:#496272}
-#official{background:#444}
+#gps{
+ background:#1769e0;
+}
+
+#track{
+ background:#08752e;
+}
+
+#whole{
+ background:#876000;
+}
+
+#official{
+ background:#444;
+}
 
 .note{
  grid-column:1/3;
@@ -143,88 +148,78 @@ button{
 }
 
 .legend{
- background:white;
- padding:7px 9px;
+ background:#fff;
+ padding:6px 8px;
  font-size:9px;
  line-height:1.5;
  box-shadow:0 1px 5px rgba(0,0,0,.3);
- border-radius:6px;
+ border-radius:5px;
 }
 
-.panel{
- display:none;
+.anchorIcon{
+ width:18px;
+ height:18px;
+ border:2px solid #000;
+ border-radius:50%;
+ background:#fff;
+ box-sizing:border-box;
+ position:relative;
+}
+
+.anchorIcon:before{
+ content:"";
  position:absolute;
- z-index:3000;
- left:8px;
- right:8px;
- bottom:82px;
- background:white;
- border-radius:12px;
- padding:10px;
- box-shadow:0 4px 20px rgba(0,0,0,.35);
- font-size:11px;
+ left:7px;
+ top:-7px;
+ width:2px;
+ height:28px;
+ background:#000;
 }
 
-.panelTitle{
- font-weight:bold;
- margin-bottom:7px;
-}
-
-.calGrid{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:5px;
-}
-
-.calGrid button{
- background:#655;
- padding:8px;
-}
-
-.calGrid .blank{
- visibility:hidden;
-}
-
-.calGrid2{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:5px;
- margin-top:6px;
-}
-
-.calGrid2 button{
- background:#465c6b;
-}
-
-.closeButton{
- margin-top:8px;
- width:100%;
- background:#444;
-}
-
-#calValues{
- background:#f2f2f2;
- padding:6px;
- border-radius:6px;
- margin-top:7px;
- font-size:9px;
- font-family:monospace;
-}
-
-.layerRow{
- margin:5px 0;
- padding:6px;
- background:#f4f4f4;
- border-radius:7px;
+.anchorIcon:after{
+ content:"";
+ position:absolute;
+ left:-7px;
+ top:7px;
+ width:28px;
+ height:2px;
+ background:#000;
 }
 
 .anchorLabel{
- background:white;
- border:1px solid #333;
- padding:1px 4px;
+ background:#fff;
+ color:#000;
+ border:1px solid #222;
  border-radius:4px;
+ padding:1px 4px;
  font-size:9px;
+ font-weight:bold;
  white-space:nowrap;
+}
+
+.place{
+ font-weight:bold;
+ font-size:13px;
+}
+
+.row{
+ background:#fff;
+ padding:5px 7px;
+ border-radius:7px;
+ margin-top:4px;
+}
+
+.detail{
+ display:block;
+ color:#555;
+ font-size:10px;
+ margin-top:2px;
+}
+
+.coords{
+ color:#777;
+ font-size:9px;
+ margin-top:5px;
 }
 
 </style>
@@ -239,16 +234,60 @@ button{
 <h1>福島・規制区域マップ</h1>
 
 <div class="sub">
-v24｜大熊町公式図・GIS位置合わせ版
+v25｜大熊町公式図・3基準点位置合わせ
 </div>
 
 <div id="status">
-<b>📍現在地を押すか、地図をタップしてください。</b>
+<b>🎯 下の「大熊IC」「大野駅」「熊町」を順番に押してください。</b>
 </div>
 
 </header>
 
+
+<div id="mapWrap">
+
 <div id="map"></div>
+
+<div id="anchorPanel">
+
+<div class="anchorTitle">
+🎯 位置合わせ基準点
+</div>
+
+<div class="anchorButtons">
+
+<button onclick="focusAnchor('ic')">
+① 大熊IC
+</button>
+
+<button onclick="focusAnchor('station')">
+② 大野駅
+</button>
+
+<button onclick="focusAnchor('kumamachi')">
+③ 熊町
+</button>
+
+</div>
+
+<div id="overlayToggle">
+
+<button id="overlayButton"
+onclick="toggleOverlay()">
+🗺 公式図 ON
+</button>
+
+<button id="opacityBtn"
+onclick="changeOpacity()">
+👁 透明度 45%
+</button>
+
+</div>
+
+</div>
+
+</div>
+
 
 <div class="controls">
 
@@ -260,25 +299,16 @@ v24｜大熊町公式図・GIS位置合わせ版
 ▶ 移動追跡
 </button>
 
-<button id="overlay">
-🗺 公式区域図
-</button>
-
-<button id="calibrate">
-🎯 位置合わせ
-</button>
-
-<button id="layers">
-🎨 規制レイヤー
+<button id="whole">
+🗾 大熊町全体
 </button>
 
 <button id="official">
-🏛 最新公式資料
+🏛 公式資料
 </button>
 
 <div class="note">
 
-最終版：
 🔴帰還困難　
 🟣特定帰還居住　
 ▧立入規制緩和　
@@ -286,117 +316,12 @@ v24｜大熊町公式図・GIS位置合わせ版
 ⬛中間貯蔵　
 🔵GPS<br>
 
-<strong>
-v24では公式区域図をGIS化するための位置合わせを行います。
-色の面はまだ地点の法的判定には使いません。
-</strong>
+v25の公式図は位置合わせ用です。
+<strong>まだ区域判定には使用しません。</strong>
 
 </div>
 
 </div>
-
-</div>
-
-
-<div id="calPanel" class="panel">
-
-<div class="panelTitle">
-🎯 公式図の位置合わせ
-</div>
-
-<div>
-黒い十字の「大熊IC」「大野駅」「熊町」を、
-公式図上の同じ場所へ合わせます。
-</div>
-
-<div class="calGrid">
-
-<button class="blank">　</button>
-<button onclick="moveOverlay(0.001,0)">↑ 北へ</button>
-<button class="blank">　</button>
-
-<button onclick="moveOverlay(0,-0.001)">← 西へ</button>
-<button onclick="resetCalibration()">初期値</button>
-<button onclick="moveOverlay(0,0.001)">東へ →</button>
-
-<button class="blank">　</button>
-<button onclick="moveOverlay(-0.001,0)">↓ 南へ</button>
-<button class="blank">　</button>
-
-</div>
-
-<div class="calGrid2">
-
-<button onclick="resizeOverlay(0,0.002)">
-↔ 横に広げる
-</button>
-
-<button onclick="resizeOverlay(0,-0.002)">
-↔ 横を縮める
-</button>
-
-<button onclick="resizeOverlay(0.002,0)">
-↕ 縦に広げる
-</button>
-
-<button onclick="resizeOverlay(-0.002,0)">
-↕ 縦を縮める
-</button>
-
-</div>
-
-<div id="calValues"></div>
-
-<button class="closeButton"
-onclick="closeCal()">
-閉じる
-</button>
-
-</div>
-
-
-<div id="layerPanel" class="panel">
-
-<div class="panelTitle">
-🎨 最終版の規制レイヤー
-</div>
-
-<div class="layerRow">
-🔴 <b>帰還困難区域</b><br>
-避難指示が現在も継続している区域
-</div>
-
-<div class="layerRow">
-🟣 <b>特定帰還居住区域</b><br>
-帰還困難区域の中で避難指示解除を目指す区域
-</div>
-
-<div class="layerRow">
-▧ <b>立入規制緩和区域</b><br>
-帰還困難区域であっても立入申請が不要な区域
-</div>
-
-<div class="layerRow">
-🟢 <b>避難指示解除区域</b>
-</div>
-
-<div class="layerRow">
-⬛ <b>中間貯蔵施設等</b>
-</div>
-
-<div class="layerRow">
-🔵 <b>GPS現在地</b>
-</div>
-
-<div style="font-size:9px;color:#666;margin-top:7px">
-v25以降でこれらを独立したGeoJSONレイヤーとして実装します。
-複数の規制が重なる場所は重ねて表示します。
-</div>
-
-<button class="closeButton"
-onclick="closeLayers()">
-閉じる
-</button>
 
 </div>
 
@@ -405,17 +330,21 @@ onclick="closeLayers()">
 src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
+
 <script>
 
 /* =====================================================
-   MAP
+ MAP
 ===================================================== */
 
 const map =
-L.map("map").setView(
+L.map("map",{
+ zoomControl:true
+}).setView(
  [37.402,140.985],
  13
 );
+
 
 L.tileLayer(
  "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
@@ -427,13 +356,13 @@ L.tileLayer(
 
 
 /* =====================================================
-   FUKUSHIMA DAIICHI
+ FUKUSHIMA DAIICHI
 ===================================================== */
 
 L.circleMarker(
  [37.4211,141.0328],
  {
-  radius:7,
+  radius:6,
   color:"#fff",
   weight:2,
   fillColor:"#111",
@@ -447,9 +376,7 @@ L.circleMarker(
 
 
 /* =====================================================
-   OFFICIAL OKUMA MAP
-
-   2026-03-24
+ OFFICIAL IMAGE
 ===================================================== */
 
 const OKUMA_IMAGE =
@@ -457,77 +384,102 @@ const OKUMA_IMAGE =
 
 
 /*
- v23 initial bounds.
+ v23/v24 provisional bounds.
 
- v24では手動微調整し、
- 次段階のGeoJSON化に使う。
+ この値はまだ最終GIS座標ではない。
 */
 
-const INITIAL_BOUNDS = {
+const OKUMA_BOUNDS = [
+ [37.3600,140.8300],
+ [37.4470,141.0600]
+];
 
- south:37.3600,
- west:140.8300,
- north:37.4470,
- east:141.0600
+
+let officialOverlay =
+L.imageOverlay(
+ OKUMA_IMAGE,
+ OKUMA_BOUNDS,
+ {
+  opacity:0.45,
+  zIndex:450,
+  interactive:false
+ }
+);
+
+
+officialOverlay.addTo(map);
+
+
+let overlayVisible=true;
+
+let opacityIndex=1;
+
+const opacityLevels=[
+ 0.25,
+ 0.45,
+ 0.65,
+ 0.80
+];
+
+
+/* =====================================================
+ ANCHORS
+===================================================== */
+
+const anchors={
+
+ ic:{
+  name:"大熊IC",
+  lat:37.41237,
+  lng:140.96395,
+  zoom:16
+ },
+
+ station:{
+  name:"大野駅",
+  lat:37.40938,
+  lng:140.98431,
+  zoom:17
+ },
+
+ kumamachi:{
+  name:"熊町周辺",
+  lat:37.38174,
+  lng:141.00752,
+  zoom:16
+ }
 
 };
 
 
-let bounds =
-JSON.parse(
- JSON.stringify(INITIAL_BOUNDS)
-);
+const anchorLayer =
+L.layerGroup().addTo(map);
 
 
-let overlay = null;
-let overlayVisible = false;
+function makeAnchor(key){
+
+ const a=
+ anchors[key];
 
 
-/* =====================================================
-   CONTROL POINTS
-
-   地理的位置確認用。
-   区域境界そのものではない。
-===================================================== */
-
-const anchors = [
-
- {
-  name:"大熊IC",
-  lat:37.41237,
-  lng:140.96395
- },
-
- {
-  name:"大野駅",
-  lat:37.40938,
-  lng:140.98431
- },
-
- {
-  name:"熊町周辺",
-  lat:37.38174,
-  lng:141.00752
- }
-
-];
+ const icon=
+ L.divIcon({
+  className:"",
+  html:'<div class="anchorIcon"></div>',
+  iconSize:[18,18],
+  iconAnchor:[9,9]
+ });
 
 
-anchors.forEach(a=>{
-
- const marker =
-
- L.circleMarker(
+ const marker=
+ L.marker(
   [a.lat,a.lng],
   {
-   radius:6,
-   color:"#000",
-   weight:2,
-   fillColor:"#fff",
-   fillOpacity:1
+   icon:icon,
+   zIndexOffset:2000
   }
  )
- .addTo(map);
+ .addTo(anchorLayer);
 
 
  marker.bindTooltip(
@@ -535,486 +487,160 @@ anchors.forEach(a=>{
   {
    permanent:true,
    direction:"top",
+   offset:[0,-12],
    className:"anchorLabel"
   }
  );
 
-});
+}
+
+
+makeAnchor("ic");
+makeAnchor("station");
+makeAnchor("kumamachi");
 
 
 /* =====================================================
-   OVERLAY
+ FOCUS ANCHOR
 ===================================================== */
 
-function leafletBounds(){
+function focusAnchor(key){
 
- return[
-  [bounds.south,bounds.west],
-  [bounds.north,bounds.east]
- ];
+ const a=
+ anchors[key];
 
-}
-
-
-function updateOverlay(){
-
- if(overlay){
-
-  overlay.setBounds(
-   leafletBounds()
-  );
-
- }
-
- updateCalValues();
-
-}
-
-
-function showOverlay(){
-
- if(!overlay){
-
-  overlay =
-  L.imageOverlay(
-   OKUMA_IMAGE,
-   leafletBounds(),
-   {
-    opacity:0.55,
-    zIndex:450
-   }
-  );
-
- }
-
-
- if(!map.hasLayer(overlay)){
-
-  overlay.addTo(map);
-
- }
-
-
- overlayVisible=true;
-
-
- document
- .getElementById("overlay")
- .innerHTML=
- "✖ 公式図を消す";
-
-}
-
-
-function hideOverlay(){
-
- if(overlay &&
-    map.hasLayer(overlay)){
-
-  map.removeLayer(
-   overlay
-  );
-
- }
-
-
- overlayVisible=false;
-
-
- document
- .getElementById("overlay")
- .innerHTML=
- "🗺 公式区域図";
-
-}
-
-
-/* =====================================================
-   CALIBRATION
-===================================================== */
-
-function moveOverlay(
- dLat,
- dLng
-){
-
- bounds.south += dLat;
- bounds.north += dLat;
-
- bounds.west += dLng;
- bounds.east += dLng;
-
- updateOverlay();
-
-}
-
-
-function resizeOverlay(
- dLat,
- dLng
-){
-
- /*
- dLat:
- north/southを反対方向に移動。
-
- dLng:
- east/westを反対方向に移動。
- */
-
- bounds.south -= dLat/2;
- bounds.north += dLat/2;
-
- bounds.west -= dLng/2;
- bounds.east += dLng/2;
-
- updateOverlay();
-
-}
-
-
-function resetCalibration(){
-
- bounds =
- JSON.parse(
-  JSON.stringify(
-   INITIAL_BOUNDS
-  )
- );
-
- updateOverlay();
-
-}
-
-
-function updateCalValues(){
-
- document
- .getElementById(
-  "calValues"
- )
- .innerHTML=
-
- "south="+
- bounds.south.toFixed(5)+
- "<br>"+
-
- "west="+
- bounds.west.toFixed(5)+
- "<br>"+
-
- "north="+
- bounds.north.toFixed(5)+
- "<br>"+
-
- "east="+
- bounds.east.toFixed(5);
-
-}
-
-
-function closeCal(){
-
- document
- .getElementById("calPanel")
- .style.display="none";
-
-}
-
-
-function closeLayers(){
-
- document
- .getElementById("layerPanel")
- .style.display="none";
-
-}
-
-
-/* =====================================================
-   OFFICIAL MAP BUTTON
-===================================================== */
-
-document
-.getElementById("overlay")
-.onclick=()=>{
 
  if(!overlayVisible){
 
-  showOverlay();
+  officialOverlay.addTo(map);
+  overlayVisible=true;
 
-  map.fitBounds(
-   leafletBounds()
+ }
+
+
+ map.setView(
+  [a.lat,a.lng],
+  a.zoom,
+  {
+   animate:false
+  }
+ );
+
+
+ document
+ .getElementById("status")
+ .innerHTML=
+
+ '<div class="place">'+
+ '🎯 '+a.name+
+ '</div>'+
+
+ '<div class="row">'+
+ '<b>黒い十字＝実座標</b>'+
+ '<span class="detail">'+
+ '半透明の公式区域図上で、同じ地点がどこに描かれているか確認します。'+
+ '</span>'+
+ '</div>'+
+
+ '<div class="coords">'+
+ a.lat.toFixed(5)+
+ ', '+
+ a.lng.toFixed(5)+
+ '</div>';
+
+}
+
+
+/* =====================================================
+ OVERLAY
+===================================================== */
+
+function toggleOverlay(){
+
+ const b=
+ document.getElementById(
+  "overlayButton"
+ );
+
+
+ if(overlayVisible){
+
+  map.removeLayer(
+   officialOverlay
   );
+
+  overlayVisible=false;
+
+  b.innerHTML=
+  "🗺 公式図 OFF";
+
 
  }else{
 
-  hideOverlay();
+  officialOverlay.addTo(map);
+
+  overlayVisible=true;
+
+  b.innerHTML=
+  "🗺 公式図 ON";
 
  }
 
-};
+}
 
 
 /* =====================================================
-   CALIBRATION BUTTON
+ OPACITY
+===================================================== */
+
+function changeOpacity(){
+
+ opacityIndex=
+ (opacityIndex+1)
+ %opacityLevels.length;
+
+
+ const value=
+ opacityLevels[
+  opacityIndex
+ ];
+
+
+ officialOverlay.setOpacity(
+  value
+ );
+
+
+ document
+ .getElementById(
+  "opacityBtn"
+ )
+ .innerHTML=
+
+ "👁 透明度 "+
+ Math.round(value*100)+
+ "%";
+
+}
+
+
+/* =====================================================
+ WHOLE AREA
 ===================================================== */
 
 document
-.getElementById("calibrate")
+.getElementById("whole")
 .onclick=()=>{
 
- showOverlay();
-
- document
- .getElementById("calPanel")
- .style.display="block";
-
- updateCalValues();
+ map.fitBounds(
+  OKUMA_BOUNDS
+ );
 
 };
 
 
 /* =====================================================
-   LAYERS
-===================================================== */
-
-document
-.getElementById("layers")
-.onclick=()=>{
-
- document
- .getElementById("layerPanel")
- .style.display="block";
-
-};
-
-
-/* =====================================================
-   MUNICIPALITIES
-===================================================== */
-
-const municipalities={
-
- "07212":{
-  name:"南相馬市"
- },
-
- "07543":{
-  name:"富岡町"
- },
-
- "07545":{
-  name:"大熊町"
- },
-
- "07546":{
-  name:"双葉町"
- },
-
- "07547":{
-  name:"浪江町"
- },
-
- "07548":{
-  name:"葛尾村"
- },
-
- "07564":{
-  name:"飯舘村"
- }
-
-};
-
-
-/* =====================================================
-   RELEASED WORDS
-===================================================== */
-
-const releasedWords={
-
- "07545":[
-  "中屋敷",
-  "大川原"
- ],
-
- "07546":[
-  "両竹",
-  "中野",
-  "中浜"
- ],
-
- "07547":[
-  "立野","藤橋","西台","酒田",
-  "苅宿","棚塩","北幾世橋",
-  "幾世橋","権現堂","請戸",
-  "中浜","両竹","高瀬",
-  "牛渡","川添","樋渡",
-  "谷津田","加倉","田尻",
-  "小野田"
- ],
-
- "07548":[
-  "大字落合"
- ]
-
-};
-
-
-/* =====================================================
-   DEFINITE DTRZ
-===================================================== */
-
-const definiteDifficult={
-
- "07547":[
-  "酒井"
- ]
-
-};
-
-
-/* =====================================================
-   MIXED AREAS
-===================================================== */
-
-const difficultRules={
-
- "07212":{
-  words:["小高区金谷"]
- },
-
- "07543":{
-  words:["小良ヶ浜","深谷"]
- },
-
- "07545":{
-  words:[
-   "野上",
-   "下野上",
-   "熊",
-   "熊川",
-   "夫沢",
-   "小入野"
-  ]
- },
-
- "07546":{
-  words:[
-   "下長塚",
-   "三字",
-   "羽鳥",
-   "石熊",
-   "山田",
-   "細谷",
-   "寺松",
-   "渋川",
-   "鴻草"
-  ]
- },
-
- "07547":{
-  words:[
-   "井手","小丸","大堀",
-   "室原","末森","津島",
-   "南津島","下津島",
-   "赤宇木","川房",
-   "昼曽根","羽附"
-  ]
- },
-
- "07548":{
-  words:[
-   "野行",
-   "柏原",
-   "大字葛尾"
-  ]
- },
-
- "07564":{
-  words:[
-   "長泥"
-  ]
- }
-
-};
-
-
-/* =====================================================
-   RESIDENCE AREAS
-===================================================== */
-
-const residenceRules={
-
- "07545":[
-  "下野上",
-  "野上",
-  "大字熊",
-  "熊川",
-  "夫沢"
- ],
-
- "07546":[
-  "下長塚",
-  "羽鳥",
-  "三字",
-  "石熊",
-  "山田"
- ],
-
- "07547":[
-  "井手","小丸","大堀",
-  "酒井","室原","羽附",
-  "津島","下津島","南津島",
-  "赤宇木","川房","昼曽根"
- ],
-
- "07543":[
-  "小良ヶ浜",
-  "深谷"
- ],
-
- "07548":[
-  "野行",
-  "柏原",
-  "小出谷"
- ]
-
-};
-
-
-/* =====================================================
-   RELAXED AREAS
-===================================================== */
-
-const relaxedRules={
-
- "07545":[
-  "下野上",
-  "野上",
-  "大字熊"
- ],
-
- "07546":[
-  "下長塚",
-  "羽鳥",
-  "三字"
- ],
-
- "07547":[
-  "津島",
-  "南津島"
- ],
-
- "07564":[
-  "長泥"
- ]
-
-};
-
-
-/* =====================================================
-   REVERSE GEOCODER
+ SIMPLE REVERSE GEOCODER
 ===================================================== */
 
 async function reverseGeocode(
@@ -1024,7 +650,8 @@ async function reverseGeocode(
 
  try{
 
-  const url =
+  const url=
+
   "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/"+
   "LonLatToAddress?lat="+
   encodeURIComponent(lat)+
@@ -1032,15 +659,11 @@ async function reverseGeocode(
   encodeURIComponent(lng);
 
 
-  const r =
+  const r=
   await fetch(url);
 
 
-  if(!r.ok)
-   throw new Error();
-
-
-  const j =
+  const j=
   await r.json();
 
 
@@ -1071,452 +694,34 @@ async function reverseGeocode(
 
 
 /* =====================================================
-   MATCH
+ MUNICIPALITY
 ===================================================== */
 
-function match(
- town,
- words
-){
+const municipalityNames={
 
- if(!town || !words)
-  return null;
+ "07212":"南相馬市",
+ "07543":"富岡町",
+ "07545":"大熊町",
+ "07546":"双葉町",
+ "07547":"浪江町",
+ "07548":"葛尾村",
+ "07564":"飯舘村"
 
-
- return(
-  words.find(
-   w=>town.includes(w)
-  ) || null
- );
-
-}
+};
 
 
 /* =====================================================
-   EVACUATION
+ CURRENT GPS
 ===================================================== */
-
-function evacuationResult(
- code,
- town
-){
-
- if(!municipalities[code]){
-
-  return{
-   type:"released",
-   icon:"🟢",
-   title:"帰還困難区域が残る7市町村の外",
-   text:"市町村レベルでは対象外です。"
-  };
-
- }
-
-
- if(
-  code==="07212" &&
-  town &&
-  !town.includes("小高区金谷")
- ){
-
-  return{
-   type:"released",
-   icon:"🟢",
-   title:"公表されている残存地区外",
-   text:
-   "小高区金谷の公表住所には一致しません。国有林等は別途確認が必要です。"
-  };
-
- }
-
-
- if(
-  code==="07564" &&
-  town &&
-  !town.includes("長泥")
- ){
-
-  return{
-   type:"released",
-   icon:"🟢",
-   title:"避難指示解除側",
-   text:
-   "帰還困難区域が残る長泥地区には一致しません。"
-  };
-
- }
-
-
- const rel =
- match(
-  town,
-  releasedWords[code]
- );
-
-
- if(rel){
-
-  return{
-   type:"released",
-   icon:"🟢",
-   title:"避難指示解除を確認",
-   text:
-   "「"+rel+
-   "」は公表情報から解除側であることを確認できます。"
-  };
-
- }
-
-
- const dif =
- match(
-  town,
-  definiteDifficult[code]
- );
-
-
- if(dif){
-
-  return{
-   type:"difficult",
-   icon:"🔴",
-   title:"帰還困難区域を確認",
-   text:
-   "「"+dif+
-   "」は大字全域が帰還困難区域として公示されています。"
-  };
-
- }
-
-
- const rule =
- difficultRules[code];
-
-
- if(rule){
-
-  const hit =
-  match(
-   town,
-   rule.words
-  );
-
-
-  if(hit){
-
-   return{
-    type:"mixed",
-    icon:"🔴",
-    title:"帰還困難区域を含む地区",
-    text:
-    "「"+hit+
-    "」に一致します。区域が混在するため地点境界の確認が必要です。"
-   };
-
-  }
-
- }
-
-
- return{
-  type:"unknown",
-  icon:"🟠",
-  title:"区域境界確認が必要",
-  text:
-  "住所情報のみでは地点の区域を確定できません。"
- };
-
-}
-
-
-/* =====================================================
-   SUB STATUS
-===================================================== */
-
-function subResult(
- code,
- town,
- rules
-){
-
- const words =
- rules[code];
-
-
- const hit =
- match(
-  town,
-  words
- );
-
-
- return{
-  active:!!hit,
-  hit:hit
- };
-
-}
-
-
-/* =====================================================
-   STATE
-===================================================== */
-
-const status =
-document.getElementById("status");
-
-const trackButton =
-document.getElementById("track");
 
 let gpsMarker=null;
-let selectedMarker=null;
 let accuracyCircle=null;
 
 let tracking=false;
 let watchId=null;
 
 
-/* =====================================================
-   EVALUATE
-===================================================== */
-
-async function evaluatePoint(
- lat,
- lng,
- source,
- accuracy=null
-){
-
- status.innerHTML=
- "<b>住所・規制情報を確認しています…</b>";
-
-
- const ad =
- await reverseGeocode(
-  lat,
-  lng
- );
-
-
- if(!ad){
-
-  status.innerHTML=
-  "<b>住所情報を取得できませんでした。</b>";
-
-  return null;
-
- }
-
-
- const code =
- ad.code;
-
-
- const town =
- ad.town;
-
-
- const muni =
- municipalities[code];
-
-
- const ev =
- evacuationResult(
-  code,
-  town
- );
-
-
- const residence =
- subResult(
-  code,
-  town,
-  residenceRules
- );
-
-
- const relaxed =
- subResult(
-  code,
-  town,
-  relaxedRules
- );
-
-
- const place =
- (muni
-  ?muni.name
-  :"対象7市町村外")+
- (town
-  ?" "+town
-  :"");
-
-
- const sourceText =
- source==="gps"
- ?"📍 現在地"
- :"👆 選択地点";
-
-
- let bg="#fff7df";
-
- if(ev.type==="released")
-  bg="#e9f6ec";
-
- if(
-  ev.type==="difficult" ||
-  ev.type==="mixed"
- )
-  bg="#fff0f1";
-
- status.style.background=bg;
-
-
- let html=
-
- '<div class="place">'+
- sourceText+
- '：'+
- place+
- '</div>';
-
-
- let badge="orange";
-
- if(ev.type==="released")
-  badge="green";
-
- if(
-  ev.type==="difficult" ||
-  ev.type==="mixed"
- )
-  badge="red";
-
-
- html+=
-
- '<div class="row">'+
- '<b>'+
- ev.icon+
- ' 避難指示｜'+
- ev.title+
- '</b><br>'+
- '<span class="badge '+
- badge+
- '">'+
-
- (
- ev.type==="released"
- ?"解除側":
- ev.type==="unknown"
- ?"未確定":
- "帰還困難区域関係"
- )+
-
- '</span>'+
- '<span class="detail">'+
- ev.text+
- '</span>'+
- '</div>';
-
-
- if(residence.active){
-
-  html+=
-
-  '<div class="row">'+
-  '<b>🟣 特定帰還居住区域｜'+
-  '該当区域を含む地区</b>'+
-  '<br>'+
-  '<span class="badge purple">'+
-  '地区レベル'+
-  '</span>'+
-  '<span class="detail">'+
-  'この地区の一部に設定されています。'+
-  '地点そのものの区域内外はGIS境界完成後に判定します。'+
-  '</span>'+
-  '</div>';
-
- }
-
-
- html+=
-
- '<div class="row">'+
- '<b>▧ 立入規制｜'+
- (
- relaxed.active
- ?"規制緩和区域を含む地区"
- :"地点確認が必要"
- )+
- '</b>'+
- '<span class="detail">'+
-
- (
- relaxed.active
- ?"この地区の一部に立入規制緩和区域があります。避難指示解除とは別制度です。"
- :"住所だけでは立入規制の状態を確定できません。"
- )+
-
- '</span>'+
- '</div>';
-
-
- html+=
-
- '<div class="coords">'+
- lat.toFixed(6)+
- ', '+
- lng.toFixed(6)+
-
- (
- accuracy!==null
- ?"・GPS精度 約"+
- Math.round(accuracy)+
- "m"
- :""
- )+
-
- '</div>';
-
-
- status.innerHTML=
- html;
-
-
- return{
-  ev:ev,
-  place:place
- };
-
-}
-
-
-/* =====================================================
-   MARKER COLOR
-===================================================== */
-
-function markerColor(type){
-
- if(type==="released")
-  return "#198c3b";
-
- if(
-  type==="difficult" ||
-  type==="mixed"
- )
-  return "#d00020";
-
- return "#e28a00";
-
-}
-
-
-/* =====================================================
-   GPS
-===================================================== */
-
-async function showGPS(
+async function displayGPS(
  pos,
  follow
 ){
@@ -1531,31 +736,44 @@ async function showGPS(
  pos.coords.accuracy;
 
 
- const result =
- await evaluatePoint(
+ const ad=
+ await reverseGeocode(
   lat,
-  lng,
-  "gps",
-  acc
+  lng
  );
 
 
- if(!result)
-  return;
+ let place=
+ "住所取得中";
+
+
+ if(ad){
+
+  place=
+  (
+   municipalityNames[ad.code]||
+   "対象7市町村外"
+  )+
+  (
+   ad.town
+   ?" "+ad.town
+   :""
+  );
+
+ }
 
 
  if(gpsMarker)
-  map.removeLayer(gpsMarker);
+  map.removeLayer(
+   gpsMarker
+  );
 
 
  if(accuracyCircle)
-  map.removeLayer(accuracyCircle);
+  map.removeLayer(
+   accuracyCircle
+  );
 
-
- /*
- GPSは区域色とは独立して
- 常に青で表示する。
- */
 
  gpsMarker=
 
@@ -1566,14 +784,13 @@ async function showGPS(
    color:"#fff",
    weight:3,
    fillColor:"#1677ff",
-   fillOpacity:1
+   fillOpacity:1,
+   zIndexOffset:3000
   }
  )
  .addTo(map)
  .bindPopup(
-  "<b>"+
-  result.place+
-  "</b>"
+  "<b>"+place+"</b>"
  );
 
 
@@ -1592,6 +809,31 @@ async function showGPS(
  .addTo(map);
 
 
+ document
+ .getElementById("status")
+ .innerHTML=
+
+ '<div class="place">'+
+ '📍 '+place+
+ '</div>'+
+
+ '<div class="row">'+
+ '<b>🔵 GPS現在地</b>'+
+ '<span class="detail">'+
+ '区域ポリゴン完成後、この座標と各規制レイヤーを自動照合します。'+
+ '</span>'+
+ '</div>'+
+
+ '<div class="coords">'+
+ lat.toFixed(6)+
+ ', '+
+ lng.toFixed(6)+
+ '・精度 約'+
+ Math.round(acc)+
+ 'm'+
+ '</div>';
+
+
  if(follow){
 
   map.setView(
@@ -1605,24 +847,28 @@ async function showGPS(
 
 
 /* =====================================================
-   CURRENT LOCATION
+ GPS BUTTON
 ===================================================== */
 
 document
 .getElementById("gps")
 .onclick=()=>{
 
- status.innerHTML=
- "<b>現在地を取得しています…</b>";
+ document
+ .getElementById("status")
+ .innerHTML=
+ "<b>📍 現在地を取得しています…</b>";
 
 
  navigator.geolocation.getCurrentPosition(
 
-  p=>showGPS(p,true),
+  p=>displayGPS(p,true),
 
   ()=>{
 
-   status.innerHTML=
+   document
+   .getElementById("status")
+   .innerHTML=
    "<b>現在地を取得できませんでした。</b>";
 
   },
@@ -1639,19 +885,27 @@ document
 
 
 /* =====================================================
-   TRACKING
+ TRACK
 ===================================================== */
 
-trackButton.onclick=()=>{
+document
+.getElementById("track")
+.onclick=()=>{
+
+ const b=
+ document.getElementById(
+  "track"
+ );
+
 
  if(!tracking){
 
   tracking=true;
 
-  trackButton.innerHTML=
+  b.innerHTML=
   "■ 追跡停止";
 
-  trackButton.style.background=
+  b.style.background=
   "#a06400";
 
 
@@ -1659,7 +913,10 @@ trackButton.onclick=()=>{
 
   navigator.geolocation.watchPosition(
 
-   p=>showGPS(p,true),
+   p=>displayGPS(
+    p,
+    true
+   ),
 
    ()=>{},
 
@@ -1689,10 +946,10 @@ trackButton.onclick=()=>{
   watchId=null;
 
 
-  trackButton.innerHTML=
+  b.innerHTML=
   "▶ 移動追跡";
 
-  trackButton.style.background=
+  b.style.background=
   "#08752e";
 
  }
@@ -1701,8 +958,11 @@ trackButton.onclick=()=>{
 
 
 /* =====================================================
-   MAP TAP
+ MAP TAP
 ===================================================== */
+
+let selectedMarker=null;
+
 
 map.on(
  "click",
@@ -1715,23 +975,40 @@ map.on(
   e.latlng.lng;
 
 
-  const result=
-
-  await evaluatePoint(
+  const ad=
+  await reverseGeocode(
    lat,
-   lng,
-   "tap"
+   lng
   );
 
 
-  if(!result)
-   return;
+  let place=
+  "住所不明";
 
 
-  if(selectedMarker)
+  if(ad){
+
+   place=
+   (
+    municipalityNames[ad.code]||
+    "対象7市町村外"
+   )+
+   (
+    ad.town
+    ?" "+ad.town
+    :""
+   );
+
+  }
+
+
+  if(selectedMarker){
+
    map.removeLayer(
     selectedMarker
    );
+
+  }
 
 
   selectedMarker=
@@ -1742,27 +1019,37 @@ map.on(
     radius:8,
     color:"#fff",
     weight:3,
-    fillColor:
-    markerColor(
-     result.ev.type
-    ),
+    fillColor:"#e28a00",
     fillOpacity:1
    }
   )
   .addTo(map)
   .bindPopup(
-   "<b>"+
-   result.place+
-   "</b>"
+   "<b>"+place+"</b>"
   )
   .openPopup();
+
+
+  document
+  .getElementById("status")
+  .innerHTML=
+
+  '<div class="place">'+
+  '👆 '+place+
+  '</div>'+
+
+  '<div class="coords">'+
+  lat.toFixed(6)+
+  ', '+
+  lng.toFixed(6)+
+  '</div>';
 
  }
 );
 
 
 /* =====================================================
-   OFFICIAL DOCUMENTS
+ OFFICIAL
 ===================================================== */
 
 document
@@ -1778,18 +1065,18 @@ document
 
 
 /* =====================================================
-   LEGEND
+ LEGEND
 ===================================================== */
 
-const legend =
+const legend=
 L.control({
- position:"bottomright"
+ position:"topright"
 });
 
 
 legend.onAdd=function(){
 
- const d =
+ const d=
  L.DomUtil.create(
   "div",
   "legend"
@@ -1798,13 +1085,13 @@ legend.onAdd=function(){
 
  d.innerHTML=
 
- '<b>最終レイヤー</b><br>'+
- '🔴 帰還困難区域<br>'+
- '🟣 特定帰還居住区域<br>'+
+ '<b>完成版予定</b><br>'+
+ '🔴 帰還困難<br>'+
+ '🟣 特定帰還居住<br>'+
  '▧ 立入規制緩和<br>'+
- '🟢 避難指示解除<br>'+
- '⬛ 中間貯蔵施設等<br>'+
- '🔵 GPS現在地';
+ '🟢 解除済み<br>'+
+ '⬛ 中間貯蔵<br>'+
+ '🔵 GPS';
 
 
  return d;
@@ -1815,7 +1102,14 @@ legend.onAdd=function(){
 legend.addTo(map);
 
 
-updateCalValues();
+/* =====================================================
+ INITIAL
+===================================================== */
+
+setTimeout(
+ ()=>focusAnchor("ic"),
+ 500
+);
 
 </script>
 
