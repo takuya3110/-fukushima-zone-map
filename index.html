@@ -24,26 +24,25 @@ html,body{
 }
 
 header{
- background:#fff;
- padding:8px 10px;
+ padding:9px 11px;
+ background:white;
  border-bottom:1px solid #ddd;
- z-index:1000;
 }
 
 h1{
  margin:0;
- font-size:19px;
+ font-size:20px;
 }
 
 .sub{
+ margin-top:2px;
  font-size:10px;
  color:#666;
- margin-top:2px;
 }
 
 #status{
- margin-top:6px;
- padding:8px;
+ margin-top:7px;
+ padding:8px 9px;
  border-radius:9px;
  background:#eef3f8;
  font-size:11px;
@@ -53,27 +52,27 @@ h1{
 #mapWrap{
  position:relative;
  flex:1;
- min-height:310px;
+ min-height:330px;
 }
 
 #map{
- height:100%;
  width:100%;
+ height:100%;
 }
 
 #panel{
  position:absolute;
  left:7px;
  right:7px;
- bottom:7px;
- z-index:2000;
+ bottom:8px;
+ z-index:1000;
  background:rgba(255,255,255,.95);
- border-radius:10px;
  padding:7px;
- box-shadow:0 2px 10px rgba(0,0,0,.28);
+ border-radius:11px;
+ box-shadow:0 2px 10px rgba(0,0,0,.3);
 }
 
-.title{
+.panelTitle{
  font-size:10px;
  font-weight:bold;
  margin-bottom:5px;
@@ -94,97 +93,115 @@ h1{
 
 button{
  border:0;
- border-radius:7px;
- padding:8px 2px;
- color:#fff;
+ border-radius:8px;
+ padding:9px 2px;
+ color:white;
+ font-weight:bold;
  font-size:10px;
- font-weight:700;
 }
 
 .zone{
  background:#70418b;
 }
 
-#opacity{
- background:#596b77;
+.zone.active{
+ background:#9d35c3;
+ outline:2px solid #4d1761;
 }
 
-#off{
+#opacity{
+ background:#607681;
+}
+
+#imageOff{
  background:#555;
 }
 
-.controls{
+.bottom{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:5px;
+ padding:6px;
  background:#fff;
  border-top:1px solid #ddd;
- padding:6px;
 }
 
 #gps{
  background:#1769e0;
 }
 
-#whole{
- background:#7d5900;
+#track{
+ background:#08752e;
 }
 
-.note{
+#official{
+ background:#6c5200;
+}
+
+#reset{
+ background:#555;
+}
+
+.warning{
  grid-column:1/3;
  font-size:8px;
  color:#666;
- line-height:1.4;
-}
-
-.anchor{
- width:18px;
- height:18px;
- border-radius:50%;
- border:2px solid #000;
- background:#fff;
- position:relative;
- box-sizing:border-box;
-}
-
-.anchor:before{
- content:"";
- position:absolute;
- left:7px;
- top:-7px;
- width:2px;
- height:28px;
- background:#000;
-}
-
-.anchor:after{
- content:"";
- position:absolute;
- top:7px;
- left:-7px;
- width:28px;
- height:2px;
- background:#000;
-}
-
-.anchorLabel{
- background:white;
- border:1px solid #222;
- color:#000;
+ line-height:1.45;
  padding:1px 3px;
- border-radius:3px;
- font-size:8px;
- font-weight:bold;
- white-space:nowrap;
 }
 
 .legend{
- background:rgba(255,255,255,.94);
+ background:rgba(255,255,255,.95);
  padding:6px 7px;
- border-radius:6px;
- box-shadow:0 1px 5px rgba(0,0,0,.3);
+ border-radius:7px;
+ box-shadow:0 1px 6px rgba(0,0,0,.3);
  font-size:9px;
+ line-height:1.5;
+}
+
+.gpsPopup{
+ font-size:11px;
  line-height:1.45;
+}
+
+.badge{
+ display:inline-block;
+ margin-top:3px;
+ padding:2px 5px;
+ border-radius:8px;
+ background:#fff2ba;
+ color:#6e5500;
+ font-size:9px;
+ font-weight:bold;
+}
+
+.cross{
+ width:14px;
+ height:14px;
+ border-radius:50%;
+ border:2px solid #000;
+ background:#fff;
+ box-sizing:border-box;
+}
+
+.cross:before{
+ content:"";
+ position:absolute;
+ width:2px;
+ height:24px;
+ background:#000;
+ left:6px;
+ top:-5px;
+}
+
+.cross:after{
+ content:"";
+ position:absolute;
+ height:2px;
+ width:24px;
+ background:#000;
+ top:6px;
+ left:-5px;
 }
 </style>
 </head>
@@ -194,16 +211,19 @@ button{
 <div id="app">
 
 <header>
+
 <h1>福島・規制区域マップ</h1>
 
 <div class="sub">
-v27｜大熊町・公式詳細区域図 地理参照
+v28｜大熊町・公式規制図＋GPS実用版
 </div>
 
 <div id="status">
-<b>①～③の公式詳細図を個別に確認します。</b><br>
-今回は区域判定ではなく、GeoJSON化のための位置合わせです。
+<b>🟢 2026年6月22日 立入規制緩和区域</b><br>
+公式区域図を地理院地図と重ねて確認できます。
+GPS位置も同じ地図上に表示します。
 </div>
+
 </header>
 
 
@@ -213,24 +233,30 @@ v27｜大熊町・公式詳細区域図 地理参照
 
 <div id="panel">
 
-<div class="title">
-🗺 2026年6月22日 立入規制緩和詳細図
+<div class="panelTitle">
+🗺 大熊町公式・立入規制緩和区域図
 </div>
 
 <div class="grid3">
 
-<button class="zone"
-onclick="showZone(1)">
+<button
+ id="z1"
+ class="zone"
+ onclick="showZone(1)">
 ① 野上・下野上
 </button>
 
-<button class="zone"
-onclick="showZone(2)">
+<button
+ id="z2"
+ class="zone"
+ onclick="showZone(2)">
 ② 熊2・熊3
 </button>
 
-<button class="zone"
-onclick="showZone(3)">
+<button
+ id="z3"
+ class="zone"
+ onclick="showZone(3)">
 ③ 熊2・町区
 </button>
 
@@ -238,13 +264,15 @@ onclick="showZone(3)">
 
 <div class="grid2">
 
-<button id="opacity"
-onclick="cycleOpacity()">
+<button
+ id="opacity"
+ onclick="changeOpacity()">
 👁 透明度45%
 </button>
 
-<button id="off"
-onclick="hideOverlay()">
+<button
+ id="imageOff"
+ onclick="hideImage()">
 画像OFF
 </button>
 
@@ -255,20 +283,27 @@ onclick="hideOverlay()">
 </div>
 
 
-<div class="controls">
+<div class="bottom">
 
 <button id="gps">
 📍 現在地
 </button>
 
-<button id="whole">
-🗾 大熊町
+<button id="track">
+▶ 移動追跡
 </button>
 
-<div class="note">
-⚠️ この画像位置は地理参照作業中です。
-まだGPSによる区域判定には使用しません。
-次工程で画像の緑輪郭をGeoJSON化します。
+<button id="official">
+🏛 大熊町公式
+</button>
+
+<button id="reset">
+🗾 全体表示
+</button>
+
+<div class="warning">
+⚠️ 緑色＝大熊町公式図の立入規制緩和区域。
+画像は位置確認用です。地番境界・GPSによる法的な区域内外判定には使用しません。
 </div>
 
 </div>
@@ -276,13 +311,15 @@ onclick="hideOverlay()">
 </div>
 
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
 
 <script>
 
-/* =====================================================
+/* =========================================
  MAP
-===================================================== */
+========================================= */
 
 const map=L.map("map").setView(
  [37.400,140.985],
@@ -298,9 +335,9 @@ L.tileLayer(
 ).addTo(map);
 
 
-/* =====================================================
- FUKUSHIMA DAIICHI
-===================================================== */
+/* =========================================
+ DAIICHI
+========================================= */
 
 L.circleMarker(
  [37.4211,141.0328],
@@ -313,42 +350,38 @@ L.circleMarker(
  }
 )
 .addTo(map)
-.bindPopup("福島第一原子力発電所");
+.bindPopup(
+ "<b>福島第一原子力発電所</b>"
+);
 
 
-/* =====================================================
- OFFICIAL DETAIL IMAGES
+/* =========================================
+ OFFICIAL MAPS
+========================================= */
 
- ① 野上2区・下野上1区
- ② 熊2区・熊3区
- ③ 熊2区・町区
-===================================================== */
-
-const zoneData={
+const zones={
 
  1:{
   name:"① 野上2区・下野上1区",
-
   image:
   "https://www.town.okuma.fukushima.jp/uploaded/image/18395.jpg",
 
-  /*
-   仮地理参照範囲。
-   v27では道路・ICとの照合用。
-  */
   bounds:[
    [37.3990,140.9400],
    [37.4235,140.9850]
   ],
 
-  view:[37.4115,140.9635],
+  view:[
+   37.4115,
+   140.9635
+  ],
+
   zoom:15
  },
 
 
  2:{
   name:"② 熊2区・熊3区の一部",
-
   image:
   "https://www.town.okuma.fukushima.jp/uploaded/image/18400.jpg",
 
@@ -357,14 +390,17 @@ const zoneData={
    [37.4000,141.0250]
   ],
 
-  view:[37.3845,141.0060],
+  view:[
+   37.3845,
+   141.0060
+  ],
+
   zoom:15
  },
 
 
  3:{
   name:"③ 熊2区・町区の一部",
-
   image:
   "https://www.town.okuma.fukushima.jp/uploaded/image/18397.jpg",
 
@@ -373,21 +409,25 @@ const zoneData={
    [37.3980,141.0320]
   ],
 
-  view:[37.3830,141.0130],
+  view:[
+   37.3830,
+   141.0130
+  ],
+
   zoom:15
  }
 
 };
 
 
-/* =====================================================
- OVERLAY
-===================================================== */
+/* =========================================
+ IMAGE CONTROL
+========================================= */
 
-let currentOverlay=null;
-let currentZone=1;
+let overlay=null;
+let activeZone=1;
 
-const opacityValues=[
+const opacities=[
  .25,
  .45,
  .65,
@@ -397,107 +437,24 @@ const opacityValues=[
 let opacityIndex=1;
 
 
-/* =====================================================
- CONTROL POINTS
-===================================================== */
+function showZone(n){
 
-const anchors=[
+ activeZone=n;
 
- {
-  name:"大熊IC",
-  lat:37.412372,
-  lng:140.963952
- },
+ const z=zones[n];
 
- {
-  name:"大野駅",
-  lat:37.409384,
-  lng:140.984313
- },
 
- {
-  name:"野上",
-  lat:37.410516,
-  lng:140.958734
- },
-
- {
-  name:"下野上",
-  lat:37.413843,
-  lng:140.975327
- },
-
- {
-  name:"熊町",
-  lat:37.381742,
-  lng:141.007522
- },
-
- {
-  name:"西大和久",
-  lat:37.405128,
-  lng:141.000187
+ if(overlay){
+  map.removeLayer(overlay);
  }
 
-];
 
-
-const anchorLayer=
-L.layerGroup().addTo(map);
-
-
-anchors.forEach(a=>{
-
- const icon=L.divIcon({
-  className:"",
-  html:'<div class="anchor"></div>',
-  iconSize:[18,18],
-  iconAnchor:[9,9]
- });
-
- const m=L.marker(
-  [a.lat,a.lng],
-  {
-   icon,
-   zIndexOffset:3000
-  }
- )
- .addTo(anchorLayer);
-
- m.bindTooltip(
-  a.name,
-  {
-   permanent:true,
-   direction:"top",
-   offset:[0,-11],
-   className:"anchorLabel"
-  }
- );
-
-});
-
-
-/* =====================================================
- SHOW ZONE
-===================================================== */
-
-function showZone(number){
-
- currentZone=number;
-
- const z=zoneData[number];
-
- if(currentOverlay){
-  map.removeLayer(currentOverlay);
- }
-
- currentOverlay=
- L.imageOverlay(
+ overlay=L.imageOverlay(
   z.image,
   z.bounds,
   {
    opacity:
-   opacityValues[opacityIndex],
+   opacities[opacityIndex],
 
    zIndex:450,
 
@@ -505,7 +462,9 @@ function showZone(number){
   }
  );
 
- currentOverlay.addTo(map);
+
+ overlay.addTo(map);
+
 
  map.setView(
   z.view,
@@ -515,71 +474,178 @@ function showZone(number){
   }
  );
 
+
+ document
+ .querySelectorAll(".zone")
+ .forEach(
+  b=>b.classList.remove("active")
+ );
+
+
+ document
+ .getElementById("z"+n)
+ .classList.add("active");
+
+
  document
  .getElementById("status")
  .innerHTML=
 
- "<b>"+z.name+"</b><br>"+
- "黒い十字は既知の実座標です。"+
- "公式図の道路・IC・駅・河川との位置関係を確認します。";
+ "<b>🟢 "+
+ z.name+
+ "</b><br>"+
+ "緑色部分が2026年6月22日からの立入規制緩和区域です。"+
+ "<br><span class='badge'>公式区域図・参考表示</span>";
 
 }
 
 
-/* =====================================================
- OPACITY
-===================================================== */
-
-function cycleOpacity(){
+function changeOpacity(){
 
  opacityIndex=
  (opacityIndex+1)%
- opacityValues.length;
+ opacities.length;
 
- const value=
- opacityValues[opacityIndex];
 
- if(currentOverlay){
-  currentOverlay.setOpacity(value);
+ const o=
+ opacities[opacityIndex];
+
+
+ if(overlay){
+  overlay.setOpacity(o);
  }
+
 
  document
  .getElementById("opacity")
  .innerHTML=
  "👁 透明度"+
- Math.round(value*100)+"%";
+ Math.round(o*100)+"%";
 
 }
 
 
-/* =====================================================
- HIDE
-===================================================== */
+function hideImage(){
 
-function hideOverlay(){
+ if(overlay){
 
- if(currentOverlay){
-
-  map.removeLayer(currentOverlay);
-  currentOverlay=null;
+  map.removeLayer(overlay);
+  overlay=null;
 
  }
 
  document
  .getElementById("status")
  .innerHTML=
- "<b>公式詳細図を非表示にしました。</b>";
+ "<b>公式区域図を非表示にしました。</b><br>"+
+ "地理院地図のみ表示しています。";
 
 }
 
 
-/* =====================================================
+/* =========================================
  GPS
-===================================================== */
+========================================= */
 
 let gpsMarker=null;
-let accCircle=null;
+let accuracyCircle=null;
 
+
+function drawGPS(pos,follow){
+
+ const lat=
+ pos.coords.latitude;
+
+ const lng=
+ pos.coords.longitude;
+
+ const accuracy=
+ pos.coords.accuracy;
+
+
+ if(gpsMarker){
+  map.removeLayer(gpsMarker);
+ }
+
+ if(accuracyCircle){
+  map.removeLayer(accuracyCircle);
+ }
+
+
+ gpsMarker=
+ L.circleMarker(
+  [lat,lng],
+  {
+   radius:9,
+   color:"#fff",
+   weight:3,
+   fillColor:"#1677ff",
+   fillOpacity:1,
+   zIndexOffset:5000
+  }
+ )
+ .addTo(map);
+
+
+ accuracyCircle=
+ L.circle(
+  [lat,lng],
+  {
+   radius:accuracy,
+   color:"#1677ff",
+   weight:1,
+   fillColor:"#1677ff",
+   fillOpacity:.08
+  }
+ )
+ .addTo(map);
+
+
+ gpsMarker.bindPopup(
+
+  "<div class='gpsPopup'>"+
+  "<b>📍 GPS現在地</b><br>"+
+  lat.toFixed(6)+
+  ", "+
+  lng.toFixed(6)+
+  "<br>GPS精度 約±"+
+  Math.round(accuracy)+
+  "m"+
+  "<br><span class='badge'>区域内外は自動判定しません</span>"+
+  "</div>"
+
+ ).openPopup();
+
+
+ if(follow){
+
+  map.setView(
+   [lat,lng],
+   16
+  );
+
+ }
+
+
+ document
+ .getElementById("status")
+ .innerHTML=
+
+ "<b>📍 GPS現在地</b><br>"+
+ lat.toFixed(6)+
+ ", "+
+ lng.toFixed(6)+
+ "　精度 約±"+
+ Math.round(accuracy)+
+ "m<br>"+
+ "<span class='badge'>公式区域図と目視で確認</span>";
+
+}
+
+
+/* =========================================
+ GPS BUTTON
+========================================= */
 
 document
 .getElementById("gps")
@@ -593,84 +659,21 @@ document
 
  navigator.geolocation.getCurrentPosition(
 
-  pos=>{
-
-   const lat=
-   pos.coords.latitude;
-
-   const lng=
-   pos.coords.longitude;
-
-   const acc=
-   pos.coords.accuracy;
-
-
-   if(gpsMarker)
-    map.removeLayer(gpsMarker);
-
-   if(accCircle)
-    map.removeLayer(accCircle);
-
-
-   gpsMarker=
-   L.circleMarker(
-    [lat,lng],
-    {
-     radius:9,
-     color:"#fff",
-     weight:3,
-     fillColor:"#1677ff",
-     fillOpacity:1
-    }
-   ).addTo(map);
-
-
-   accCircle=
-   L.circle(
-    [lat,lng],
-    {
-     radius:acc,
-     color:"#1677ff",
-     weight:1,
-     fillColor:"#1677ff",
-     fillOpacity:.07
-    }
-   ).addTo(map);
-
-
-   map.setView(
-    [lat,lng],
-    16
-   );
-
-
-   document
-   .getElementById("status")
-   .innerHTML=
-
-   "<b>📍 GPS現在地</b><br>"+
-   lat.toFixed(6)+
-   ", "+
-   lng.toFixed(6)+
-   "　精度±"+
-   Math.round(acc)+
-   "m";
-
-  },
+  p=>drawGPS(p,true),
 
   ()=>{
 
    document
    .getElementById("status")
    .innerHTML=
-   "現在地を取得できませんでした。";
+   "<b>現在地を取得できませんでした。</b>";
 
   },
 
   {
    enableHighAccuracy:true,
    timeout:15000,
-   maximumAge:2000
+   maximumAge:1000
   }
 
  );
@@ -678,25 +681,112 @@ document
 };
 
 
-/* =====================================================
- WHOLE OKUMA
-===================================================== */
+/* =========================================
+ TRACKING
+========================================= */
+
+let tracking=false;
+let watchId=null;
+
 
 document
-.getElementById("whole")
+.getElementById("track")
+.onclick=()=>{
+
+ const button=
+ document.getElementById("track");
+
+
+ if(!tracking){
+
+  tracking=true;
+
+  button.innerHTML=
+  "■ 追跡停止";
+
+  button.style.background=
+  "#a26b00";
+
+
+  watchId=
+  navigator.geolocation.watchPosition(
+
+   p=>drawGPS(p,true),
+
+   ()=>{},
+
+   {
+    enableHighAccuracy:true,
+    timeout:20000,
+    maximumAge:2000
+   }
+
+  );
+
+
+ }else{
+
+  tracking=false;
+
+
+  if(watchId!==null){
+
+   navigator.geolocation.clearWatch(
+    watchId
+   );
+
+  }
+
+
+  watchId=null;
+
+
+  button.innerHTML=
+  "▶ 移動追跡";
+
+  button.style.background=
+  "#08752e";
+
+ }
+
+};
+
+
+/* =========================================
+ OFFICIAL SITE
+========================================= */
+
+document
+.getElementById("official")
+.onclick=()=>{
+
+ window.open(
+  "https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html",
+  "_blank"
+ );
+
+};
+
+
+/* =========================================
+ RESET
+========================================= */
+
+document
+.getElementById("reset")
 .onclick=()=>{
 
  map.setView(
-  [37.4044,140.9834],
+  [37.400,140.985],
   13
  );
 
 };
 
 
-/* =====================================================
+/* =========================================
  LEGEND
-===================================================== */
+========================================= */
 
 const legend=
 L.control({
@@ -712,13 +802,16 @@ legend.onAdd=function(){
   "legend"
  );
 
+
  d.innerHTML=
- "<b>v27 作業用</b><br>"+
- "🟢 公式図の緑＝立入規制緩和<br>"+
- "✚ 黒十字＝地理基準点<br>"+
- "🔵 GPS<br>"+
+
+ "<b>v28</b><br>"+
+ "🟢 立入規制緩和<br>"+
+ "🔵 GPS現在地<br>"+
+ "⚫ 福島第一<br>"+
  "<hr style='margin:4px 0'>"+
- "※画像は位置合わせ中";
+ "公式図＋地理院地図";
+
 
  return d;
 
@@ -728,13 +821,13 @@ legend.onAdd=function(){
 legend.addTo(map);
 
 
-/* =====================================================
- INITIAL
-===================================================== */
+/* =========================================
+ START
+========================================= */
 
 setTimeout(
  ()=>showZone(1),
- 400
+ 350
 );
 
 </script>
