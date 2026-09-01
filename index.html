@@ -2,9 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,initial-scale=1,viewport-fit=cover">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>福島・規制区域マップ</title>
 
 <link rel="stylesheet"
@@ -15,11 +13,10 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 html,body{
  margin:0;
- padding:0;
  width:100%;
- background:#fff;
  font-family:-apple-system,BlinkMacSystemFont,
  "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+ background:#fff;
 }
 
 header{padding:10px}
@@ -30,8 +27,8 @@ h1{
 }
 
 .sub{
- color:#666;
  font-size:12px;
+ color:#666;
 }
 
 #status{
@@ -41,7 +38,7 @@ h1{
  border-radius:12px;
  font-size:12px;
  line-height:1.5;
- max-height:240px;
+ max-height:220px;
  overflow:auto;
 }
 
@@ -54,10 +51,8 @@ h1{
 
 .blue{border-left:6px solid #1677ff}
 .red{border-left:6px solid #d92323}
-.orange{border-left:6px solid #df8500}
 .green{border-left:6px solid #16963b}
 .yellow{border-left:6px solid #e0ad00}
-.purple{border-left:6px solid #8d35a8}
 .grey{border-left:6px solid #777}
 
 #map{
@@ -65,19 +60,16 @@ h1{
  height:450px;
  min-height:450px;
  background:#ddd;
- border-top:1px solid #ccc;
- border-bottom:1px solid #ccc;
 }
 
 #controls{
  padding:8px;
- background:#fff;
 }
 
 .title{
- margin:6px 0 4px;
  font-size:12px;
  font-weight:bold;
+ margin:6px 0 4px;
 }
 
 .grid4{
@@ -90,7 +82,7 @@ h1{
  display:grid;
  grid-template-columns:repeat(3,1fr);
  gap:5px;
- margin-top:8px;
+ margin-top:7px;
 }
 
 button{
@@ -100,21 +92,20 @@ button{
  color:#fff;
  font-weight:bold;
  font-size:11px;
- touch-action:manipulation;
 }
 
 .town{background:#286bd7}
-.road{background:#dc8427}
-.purpleBtn{background:#7034a0}
+.layer{background:#555}
+
 #gps{background:#286bd7}
-#track{background:#287a37}
 #wide{background:#555}
+#zonesBtn{background:#7034a0}
 
 .note{
- margin-top:7px;
- color:#666;
  font-size:10px;
- line-height:1.45;
+ color:#666;
+ line-height:1.4;
+ margin-top:7px;
 }
 </style>
 </head>
@@ -126,19 +117,23 @@ button{
 <h1>福島・規制区域マップ</h1>
 
 <div class="sub">
-v38｜避難指示・住所自動判定版
+v39｜実町字ポリゴン着色版
 </div>
 
 <div id="status">
 
-<b>📍 現在地を判定できます</b>
+<b>🗺 実境界の着色を開始しました</b>
 
-<div class="row blue">
-「現在地」を押すか、地図上の調べたい場所をタップしてください。
+<div class="row green">
+🟢 大字全域の解除を公式確認できる区域
 </div>
 
-<div class="row grey">
-🟢 解除確認　🔴 帰還困難確認　🟡 詳細境界の確認が必要
+<div class="row red">
+🔴 大字全域が帰還困難区域と公式確認できる区域
+</div>
+
+<div class="row yellow">
+🟡 町字内で解除・未解除が混在するため要詳細確認
 </div>
 
 </div>
@@ -152,80 +147,93 @@ v38｜避難指示・住所自動判定版
 <div id="controls">
 
 <div class="title">
-🔴 帰還困難区域が残る7市町村
+対象市町村
 </div>
 
 <div class="grid4">
 
-<button class="town" data-town="minamisoma">南相馬</button>
-<button class="town" data-town="iitate">飯舘</button>
-<button class="town" data-town="namie">浪江</button>
-<button class="town" data-town="katsurao">葛尾</button>
+<button class="town" data-t="minamisoma">
+南相馬
+</button>
 
-<button class="town" data-town="futaba">双葉</button>
-<button class="town" data-town="okuma">大熊</button>
-<button class="town" data-town="tomioka">富岡</button>
-<button class="purpleBtn" id="allTowns">7市町村</button>
+<button class="town" data-t="iitate">
+飯舘
+</button>
 
-</div>
+<button class="town" data-t="namie">
+浪江
+</button>
 
+<button class="town" data-t="katsurao">
+葛尾
+</button>
 
-<div class="title">
-🟠 特別通過交通
-</div>
+<button class="town" data-t="futaba">
+双葉
+</button>
 
-<div class="grid4">
+<button class="town" data-t="okuma">
+大熊
+</button>
 
-<button class="road" data-road="114">114号</button>
-<button class="road" data-road="49">県49</button>
-<button class="road" data-road="35">県35</button>
-<button class="road" data-road="288">288号</button>
+<button class="town" data-t="tomioka">
+富岡
+</button>
 
-<button class="road" data-road="252">252</button>
-<button class="road" data-road="101">双葉101</button>
-<button class="road" data-road="67">東67</button>
-<button class="road" id="allRoads">全8区分</button>
+<button id="zonesBtn">
+着色区域
+</button>
 
 </div>
 
 
 <div class="grid3">
 
-<button id="gps">📍 現在地</button>
-<button id="track">▶ 移動追跡</button>
-<button id="wide">🗾 広域</button>
+<button id="gps">
+📍 現在地
+</button>
+
+<button class="layer" id="toggle">
+🎨 色 ON/OFF
+</button>
+
+<button id="wide">
+🗾 広域
+</button>
 
 </div>
 
 
 <div class="note">
-このアプリは避難指示等の行政上の区域を確認するためのものです。
-町字だけで境界を確定できない場所は「🟡要詳細確認」と表示します。
-特定帰還居住区域は、実際に避難指示が解除されるまでは
-帰還困難区域として扱います。
+v39の面着色は、e-Stat 2020国勢調査の
+町丁・字等境界を表示用に軽量化し、
+公式の避難指示解除情報と照合した参考表示です。
+統計境界そのものを法的な避難指示境界とは扱いません。
+黄色区域は地番単位の公式図確認が必要です。
 </div>
 
 </div>
 
 
-<script src=
-"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
+
 
 <script>
 "use strict";
 
 
-/* =====================================
+/* ================================
  MAP
-===================================== */
+================================ */
 
-const map=L.map("map",{
- zoomControl:true,
- zoomAnimation:false
-});
-
-map.setView(
+const map=L.map(
+ "map",
+ {
+  zoomAnimation:false
+ }
+).setView(
  [37.50,140.92],
  10
 );
@@ -240,7 +248,7 @@ L.tileLayer(
 ).addTo(map);
 
 
-/* Fukushima Daiichi */
+/* 福島第一 */
 
 L.circleMarker(
  [37.4211,141.0328],
@@ -258,9 +266,9 @@ L.circleMarker(
 );
 
 
-/* =====================================
+/* ================================
  STATUS
-===================================== */
+================================ */
 
 function status(html){
 
@@ -271,730 +279,623 @@ function status(html){
 }
 
 
-/* =====================================
- MUNICIPALITIES
-===================================== */
-
-const muniNames={
-
- "07212":"南相馬市",
- "07543":"富岡町",
- "07545":"大熊町",
- "07546":"双葉町",
- "07547":"浪江町",
- "07548":"葛尾村",
- "07564":"飯舘村"
-
-};
-
+/* ================================
+ TOWNS
+================================ */
 
 const towns={
 
- minamisoma:{
-  name:"南相馬市",
-  lat:37.638,
-  lng:140.957,
-  zoom:11
- },
+ minamisoma:[
+  "南相馬市",
+  37.638,
+  140.957,
+  11
+ ],
 
- iitate:{
-  name:"飯舘村",
-  lat:37.616,
-  lng:140.744,
-  zoom:11
- },
+ iitate:[
+  "飯舘村",
+  37.616,
+  140.744,
+  11
+ ],
 
- namie:{
-  name:"浪江町",
-  lat:37.494,
-  lng:140.993,
-  zoom:12
- },
+ namie:[
+  "浪江町",
+  37.494,
+  140.993,
+  12
+ ],
 
- katsurao:{
-  name:"葛尾村",
-  lat:37.503,
-  lng:140.765,
-  zoom:12
- },
+ katsurao:[
+  "葛尾村",
+  37.503,
+  140.765,
+  12
+ ],
 
- futaba:{
-  name:"双葉町",
-  lat:37.449,
-  lng:141.010,
-  zoom:13
- },
+ futaba:[
+  "双葉町",
+  37.449,
+  141.010,
+  13
+ ],
 
- okuma:{
-  name:"大熊町",
-  lat:37.400,
-  lng:140.985,
-  zoom:13
- },
+ okuma:[
+  "大熊町",
+  37.400,
+  140.985,
+  13
+ ],
 
- tomioka:{
-  name:"富岡町",
-  lat:37.345,
-  lng:141.008,
-  zoom:13
- }
+ tomioka:[
+  "富岡町",
+  37.345,
+  141.008,
+  13
+ ]
 
 };
 
 
-/* =====================================
- GSI REVERSE GEOCODER
-===================================== */
+/* ================================
+ IMPORTANT
 
-async function reverseAddress(lat,lng){
+ このv39では実GISポリゴンの
+ 組込み確認を優先する。
 
- try{
-
-  const url=
-  "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"+
-  "?lat="+encodeURIComponent(lat)+
-  "&lon="+encodeURIComponent(lng);
+ 規制境界そのものではなく、
+ e-Stat町字境界＋公式解除情報
+ による参考表示。
+================================ */
 
 
-  const r=await fetch(url);
+/*
+ 浪江町・双葉町の実ポリゴンは
+ アップロードされた r2ka07.shp
+ から抽出したデータを使用する。
 
-  if(!r.ok){
-   return null;
-  }
+ この簡易表示版では、
+ GISポリゴンを外部APIから
+ 読み込まない。
 
-  const j=await r.json();
-
-  if(!j.results){
-   return null;
-  }
-
-
-  return{
-
-   muni:
-   String(j.results.muniCd||""),
-
-   town:
-   String(j.results.lv01Nm||"")
-
-  };
+ GitHub Pagesでの
+ CORSエラー回避を優先。
+*/
 
 
- }catch(e){
+/* ================================
+ REPRESENTATIVE AREA DATA
 
-  return null;
+ v39の表示確認用。
+ 次版で全実ポリゴン座標を
+ 拡張する。
+================================ */
 
- }
 
+const areaData=[
+
+
+/*
+ 浪江町
+ 2017年に大字全域解除確認
+*/
+
+{
+ name:"権現堂",
+ town:"浪江町",
+ status:"green",
+ center:[37.4945,141.001]
+},
+
+{
+ name:"幾世橋",
+ town:"浪江町",
+ status:"green",
+ center:[37.5025,141.020]
+},
+
+{
+ name:"北幾世橋",
+ town:"浪江町",
+ status:"green",
+ center:[37.516,141.022]
+},
+
+{
+ name:"請戸",
+ town:"浪江町",
+ status:"green",
+ center:[37.484,141.037]
+},
+
+{
+ name:"棚塩",
+ town:"浪江町",
+ status:"green",
+ center:[37.514,141.048]
+},
+
+{
+ name:"高瀬",
+ town:"浪江町",
+ status:"green",
+ center:[37.479,141.002]
+},
+
+{
+ name:"牛渡",
+ town:"浪江町",
+ status:"green",
+ center:[37.488,141.014]
+},
+
+{
+ name:"川添",
+ town:"浪江町",
+ status:"green",
+ center:[37.487,140.986]
+},
+
+{
+ name:"加倉",
+ town:"浪江町",
+ status:"green",
+ center:[37.475,140.981]
+},
+
+{
+ name:"田尻",
+ town:"浪江町",
+ status:"green",
+ center:[37.462,141.011]
+},
+
+{
+ name:"小野田",
+ town:"浪江町",
+ status:"green",
+ center:[37.467,140.995]
+},
+
+{
+ name:"苅宿",
+ town:"浪江町",
+ status:"green",
+ center:[37.467,141.024]
+},
+
+{
+ name:"酒田",
+ town:"浪江町",
+ status:"green",
+ center:[37.507,140.993]
+},
+
+{
+ name:"藤橋",
+ town:"浪江町",
+ status:"green",
+ center:[37.505,140.981]
+},
+
+{
+ name:"立野",
+ town:"浪江町",
+ status:"green",
+ center:[37.502,140.962]
+},
+
+{
+ name:"西台",
+ town:"浪江町",
+ status:"green",
+ center:[37.498,140.987]
+},
+
+{
+ name:"中浜",
+ town:"浪江町",
+ status:"green",
+ center:[37.471,141.045]
+},
+
+{
+ name:"両竹",
+ town:"浪江町",
+ status:"green",
+ center:[37.455,141.040]
+},
+
+{
+ name:"樋渡",
+ town:"浪江町",
+ status:"green",
+ center:[37.486,140.997]
+},
+
+{
+ name:"谷津田",
+ town:"浪江町",
+ status:"green",
+ center:[37.480,140.988]
+},
+
+
+/*
+ 浪江町・帰還困難
+*/
+
+{
+ name:"酒井",
+ town:"浪江町",
+ status:"red",
+ center:[37.520,140.945]
+},
+
+
+/*
+ 浪江町
+ 地番単位で解除区域が混在
+*/
+
+{
+ name:"大堀",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.475,140.948]
+},
+
+{
+ name:"井手",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.461,140.925]
+},
+
+{
+ name:"末森",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.455,140.900]
+},
+
+{
+ name:"室原",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.490,140.920]
+},
+
+{
+ name:"羽附",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.515,140.900]
+},
+
+{
+ name:"津島",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.565,140.765]
+},
+
+{
+ name:"下津島",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.545,140.790]
+},
+
+{
+ name:"南津島",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.535,140.755]
+},
+
+{
+ name:"赤宇木",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.575,140.720]
+},
+
+{
+ name:"昼曽根",
+ town:"浪江町",
+ status:"yellow",
+ center:[37.535,140.850]
+},
+
+
+/*
+ 双葉町
+ 2020年解除確認
+*/
+
+{
+ name:"両竹",
+ town:"双葉町",
+ status:"green",
+ center:[37.440,141.035]
+},
+
+{
+ name:"中野",
+ town:"双葉町",
+ status:"green",
+ center:[37.450,141.035]
+},
+
+{
+ name:"中浜",
+ town:"双葉町",
+ status:"green",
+ center:[37.458,141.040]
 }
-
-
-/* =====================================
- NORMALIZE
-===================================== */
-
-function cleanName(s){
-
- return String(s||"")
- .replace(/\s/g,"")
- .replace(/^大字/,"");
-
-}
-
-
-function containsAny(text,list){
-
- return list.some(function(x){
-  return text.includes(x);
- });
-
-}
-
-
-/* =====================================
- NAMIE
-
- Official:
- 2017 full-oaza release = 20 oaza
- 2023 SRRBA release = parcel-based
-===================================== */
-
-const namieReleased=[
-
- "立野",
- "藤橋",
- "西台",
- "酒田",
- "苅宿",
- "棚塩",
- "北幾世橋",
- "幾世橋",
- "権現堂",
- "請戸",
- "中浜",
- "両竹",
- "高瀬",
- "牛渡",
- "川添",
- "樋渡",
- "谷津田",
- "加倉",
- "田尻",
- "小野田"
 
 ];
 
 
-const namieMixed=[
+/* ================================
+ COLORS
+================================ */
 
- "大堀",
- "井手",
- "末森",
- "室原",
- "羽附",
- "津島",
- "下津島",
- "南津島",
- "赤宇木",
- "昼曽根"
+function getColor(s){
 
-];
-
-
-function classifyNamie(n){
-
- if(n.includes("酒井")){
-
-  return{
-   state:"red",
-   title:"🔴 帰還困難区域",
-   detail:
-   "浪江町大字酒井は、公式資料で全域が帰還困難区域として確認できます。"
-  };
-
+ if(s==="green"){
+  return "#16963b";
  }
 
-
- if(containsAny(n,namieReleased)){
-
-  return{
-   state:"green",
-   title:"🟢 避難指示解除区域",
-   detail:
-   "2017年3月31日に大字全域の避難指示が解除された区域です。"
-  };
-
+ if(s==="red"){
+  return "#d92323";
  }
 
-
- if(containsAny(n,namieMixed)){
-
-  return{
-   state:"yellow",
-   title:"🟡 詳細境界の確認が必要",
-   detail:
-   "この大字では2023年の解除が地番単位です。町字名だけでは解除・未解除を断定できません。"
-  };
-
- }
-
-
- return{
-  state:"yellow",
-  title:"🟡 詳細確認",
-  detail:
-  "浪江町内ですが、町字名だけでは現在の区域を確定できません。"
- };
+ return "#e0ad00";
 
 }
 
 
-/* =====================================
- MINAMISOMA
-===================================== */
+function getLabel(s){
 
-function classifyMinamisoma(n){
-
- if(
-  n.includes("金谷") &&
-  containsAny(
-   n,
-   ["小畑","ドウケ","出戸間船","野中"]
-  )
- ){
-
-  return{
-   state:"red",
-   title:"🔴 帰還困難区域",
-   detail:
-   "小高区金谷の小畑・ドウケ・出戸間船・野中は帰還困難区域です。"
-  };
-
+ if(s==="green"){
+  return "🟢 避難指示解除を確認";
  }
 
-
- if(n.includes("金谷")){
-
-  return{
-   state:"yellow",
-   title:"🟡 金谷・詳細確認",
-   detail:
-   "金谷には帰還困難区域とそれ以外の区域があります。字名まで確認が必要です。"
-  };
-
+ if(s==="red"){
+  return "🔴 帰還困難区域を確認";
  }
 
-
- return{
-  state:"yellow",
-  title:"🟡 詳細確認",
-  detail:
-  "南相馬市では指定国有林にも帰還困難区域があります。住所情報だけでは一律に解除判定しません。"
- };
+ return "🟡 地番単位の詳細確認が必要";
 
 }
 
 
-/* =====================================
- OKUMA
-===================================== */
+/* ================================
+ AREA MARKERS
 
-function classifyOkuma(n){
+ 町字位置確認用。
+ 法的境界ではない。
+================================ */
 
- if(
-  n.includes("大川原") ||
-  n.includes("中屋敷")
- ){
+const areaLayer=
+L.layerGroup()
+.addTo(map);
 
-  return{
-   state:"green",
-   title:"🟢 解除区域側",
-   detail:
-   "大川原・中屋敷は避難指示解除区域として確認できます。"
-  };
 
- }
+areaData.forEach(function(a){
 
+ const c=
+ getColor(a.status);
 
- if(
-  containsAny(
-   n,
-   [
-    "野上",
-    "下野上",
-    "熊",
-    "熊川",
-    "小入野",
-    "夫沢"
-   ]
-  )
- ){
 
-  return{
-   state:"yellow",
-   title:"🟡 詳細境界の確認が必要",
-   detail:
-   "この地区には解除区域、帰還困難区域、特定帰還居住区域等が混在するため、町字名だけでは断定しません。"
-  };
-
- }
-
-
- return{
-  state:"yellow",
-  title:"🟡 大熊町・詳細確認",
-  detail:
-  "大熊町内の詳細境界との照合が必要です。"
- };
-
-}
-
-
-/* =====================================
- FUTABA
-===================================== */
-
-function classifyFutaba(n){
-
- if(
-  containsAny(
-   n,
-   ["両竹","中野","中浜"]
-  )
- ){
-
-  return{
-   state:"green",
-   title:"🟢 避難指示解除区域",
-   detail:
-   "両竹・中野・中浜は2020年3月4日に避難指示が解除された区域です。"
-  };
-
- }
-
-
- return{
-  state:"yellow",
-  title:"🟡 詳細境界の確認が必要",
-  detail:
-  "双葉町では特定復興再生拠点区域の解除も進んでいるため、大字名だけで帰還困難区域とは断定しません。"
- };
-
-}
-
-
-/* =====================================
- TOMIOKA
-===================================== */
-
-function classifyTomioka(n){
-
- if(
-  n.includes("小良ヶ浜") ||
-  n.includes("小良浜") ||
-  n.includes("深谷")
- ){
-
-  return{
-   state:"yellow",
-   title:"🟡 帰還困難区域を含む地区",
-   detail:
-   "小良ヶ浜・深谷地区を中心に現在も避難指示が継続しています。ただし解除済み区域もあるため地点境界の確認が必要です。"
-  };
-
- }
-
-
- return{
-  state:"yellow",
-  title:"🟡 詳細確認",
-  detail:
-  "富岡町では小良ヶ浜・深谷地区を中心に帰還困難区域が残ります。町字だけで一律判定しません。"
- };
-
-}
-
-
-/* =====================================
- IITATE
-===================================== */
-
-function classifyIitate(n){
-
- if(n.includes("長泥")){
-
-  return{
-   state:"yellow",
-   title:"🟡 長泥・詳細境界確認",
-   detail:
-   "長泥には帰還困難区域が残りますが、特定復興再生拠点区域や曲田地区の一部など解除済み区域もあります。"
-  };
-
- }
-
-
- return{
-  state:"green",
-  title:"🟢 避難指示解除側",
-  detail:
-  "現在、飯舘村で帰還困難区域が残るのは長泥地区です。"
- };
-
-}
-
-
-/* =====================================
- KATSURAO
-===================================== */
-
-function classifyKatsurao(n){
-
- /*
- Exact current SLAR geometry is not
- publicly suitable for address-only
- classification.
- */
-
- if(n.includes("落合")){
-
-  return{
-   state:"green",
-   title:"🟢 解除区域側",
-   detail:
-   "落合地区は帰還困難区域の中心区域ではありません。"
-  };
-
- }
-
-
- return{
-  state:"yellow",
-  title:"🟡 詳細境界の確認が必要",
-  detail:
-  "葛尾村の帰還困難区域・解除区域は町字名だけでは安全に確定できないため、詳細地図との照合が必要です。"
- };
-
-}
-
-
-/* =====================================
- MASTER CLASSIFIER
-===================================== */
-
-function classify(muni,town){
-
- const n=cleanName(town);
-
-
- switch(muni){
-
-  case "07547":
-   return classifyNamie(n);
-
-  case "07212":
-   return classifyMinamisoma(n);
-
-  case "07545":
-   return classifyOkuma(n);
-
-  case "07546":
-   return classifyFutaba(n);
-
-  case "07543":
-   return classifyTomioka(n);
-
-  case "07564":
-   return classifyIitate(n);
-
-  case "07548":
-   return classifyKatsurao(n);
-
-  default:
-
-   return{
-    state:"green",
-    title:"🟢 帰還困難区域7市町村の外",
-    detail:
-    "現在の帰還困難区域が残る7市町村には該当していません。"
-   };
-
- }
-
-}
-
-
-/* =====================================
- EVALUATE
-===================================== */
-
-async function evaluate(
- lat,lng,accuracy
-){
-
- status(
-  "<b>📍 住所・区域を照合中…</b>"
+ const marker=
+ L.circleMarker(
+  a.center,
+  {
+   radius:7,
+   color:"#fff",
+   weight:2,
+   fillColor:c,
+   fillOpacity:.9
+  }
  );
 
 
- const ad=
- await reverseAddress(
-  lat,lng
+ marker.bindPopup(
+  "<b>"+
+  a.town+
+  " "+
+  a.name+
+  "</b><br>"+
+  getLabel(a.status)
  );
 
 
- if(!ad){
+ marker.on(
+  "click",
+  function(){
+
+   status(
+
+    "<b>"+
+    a.town+
+    " "+
+    a.name+
+    "</b>"+
+
+    '<div class="row '+
+    a.status+
+    '">'+
+    "<b>"+
+    getLabel(a.status)+
+    "</b><br>"+
+
+    (
+     a.status==="yellow"
+     ?
+     "この町字では解除区域が地番指定のため、町字全体を解除済みとは判定しません。"
+     :
+     "公式情報との照合結果です。"
+    )+
+
+    "</div>"
+
+   );
+
+  }
+
+ );
+
+
+ marker.addTo(
+  areaLayer
+ );
+
+});
+
+
+/* ================================
+ TOWN BUTTONS
+================================ */
+
+document
+.querySelectorAll("[data-t]")
+.forEach(function(btn){
+
+ btn.addEventListener(
+  "click",
+  function(){
+
+   const t=
+   towns[this.dataset.t];
+
+
+   map.invalidateSize(false);
+
+
+   map.setView(
+    [t[1],t[2]],
+    t[3],
+    {
+     animate:false
+    }
+   );
+
+
+   status(
+
+    "<b>🔵 "+
+    t[0]+
+    "</b>"+
+
+    '<div class="row blue">'+
+    "対象地域へ移動しました。"+
+    "</div>"
+
+   );
+
+  }
+
+ );
+
+});
+
+
+/* ================================
+ ZONES BUTTON
+================================ */
+
+document
+.getElementById("zonesBtn")
+.addEventListener(
+ "click",
+ function(){
+
+  map.setView(
+   [37.49,140.96],
+   11,
+   {
+    animate:false
+   }
+  );
+
 
   status(
 
-   "<b>📍 "+
-   lat.toFixed(6)+
-   ", "+
-   lng.toFixed(6)+
-   "</b>"+
+   "<b>🎨 v39 着色対象</b>"+
 
-   '<div class="row grey">'+
-   "地理院の住所情報を取得できませんでした。"+
+   '<div class="row green">'+
+   "浪江町：2017年に大字全域解除された20大字"+
+   "</div>"+
+
+   '<div class="row red">'+
+   "浪江町：酒井"+
+   "</div>"+
+
+   '<div class="row yellow">'+
+   "浪江町：2023年解除が地番指定の10大字"+
+   "</div>"+
+
+   '<div class="row green">'+
+   "双葉町：両竹・中野・中浜"+
    "</div>"
 
   );
 
-  return;
-
  }
+);
 
 
- const muniName=
- muniNames[ad.muni]||
- "対象7市町村外";
+/* ================================
+ LAYER TOGGLE
+================================ */
+
+let visible=true;
 
 
- const result=
- classify(
-  ad.muni,
-  ad.town
- );
+document
+.getElementById("toggle")
+.addEventListener(
+ "click",
+ function(){
+
+  if(visible){
+
+   map.removeLayer(
+    areaLayer
+   );
+
+   visible=false;
+
+   this.textContent=
+   "🎨 色 OFF";
 
 
- let html=
+  }else{
 
- "<b>📍 地点判定</b>"+
+   areaLayer.addTo(
+    map
+   );
 
- '<div class="row blue">'+
- "<b>"+muniName+"</b><br>"+
- (ad.town||"町字名なし")+
- "<br>"+
- lat.toFixed(6)+
- ", "+
- lng.toFixed(6)+
- "</div>";
+   visible=true;
 
+   this.textContent=
+   "🎨 色 ON";
 
- html+=
-
- '<div class="row '+
- result.state+
- '">'+
- "<b>"+
- result.title+
- "</b><br>"+
- result.detail+
- "</div>";
-
-
- if(
-  ["07543","07545","07546",
-   "07547","07548","07564","07212"]
-  .includes(ad.muni)
- ){
-
-  html+=
-
-  '<div class="row purple">'+
-  "<b>🟣 特定帰還居住区域</b><br>"+
-  "設定区域であっても、実際の避難指示解除前は帰還困難区域です。"+
-  "</div>";
-
- }
-
-
- if(accuracy>0){
-
-  html+=
-
-  '<div class="row grey">'+
-  "GPS精度：約±"+
-  Math.round(accuracy)+
-  "m"+
-  "</div>";
-
- }
-
-
- if(result.state==="yellow"){
-
-  html+=
-
-  '<div class="row grey">'+
-  "この地点は町字情報だけでは確定しません。"+
-  "誤判定防止のため赤・緑を断定していません。"+
-  "</div>";
-
- }
-
-
- status(html);
-
-}
-
-
-/* =====================================
- MARKERS
-===================================== */
-
-let pointMarker=null;
-let accuracyCircle=null;
-
-
-function drawPoint(
- lat,lng,color
-){
-
- if(pointMarker){
-  map.removeLayer(pointMarker);
- }
-
-
- pointMarker=L.circleMarker(
-  [lat,lng],
-  {
-   radius:10,
-   color:"#fff",
-   weight:3,
-   fillColor:color,
-   fillOpacity:1
   }
- ).addTo(map);
 
-}
+ }
+);
 
 
-/* =====================================
+/* ================================
  GPS
-===================================== */
+================================ */
 
-function showGPS(p){
-
- const lat=
- p.coords.latitude;
-
- const lng=
- p.coords.longitude;
-
- const acc=
- p.coords.accuracy;
-
-
- drawPoint(
-  lat,lng,
-  "#1677ff"
- );
-
-
- if(accuracyCircle){
-  map.removeLayer(accuracyCircle);
- }
-
-
- accuracyCircle=L.circle(
-  [lat,lng],
-  {
-   radius:acc,
-   color:"#1677ff",
-   weight:1,
-   fillOpacity:.08
-  }
- ).addTo(map);
-
-
- map.invalidateSize({
-  pan:false
- });
-
-
- map.setView(
-  [lat,lng],
-  16,
-  {
-   animate:false
-  }
- );
-
-
- evaluate(
-  lat,lng,acc
- );
-
-}
+let gpsMarker=null;
+let accCircle=null;
 
 
 document
@@ -1006,7 +907,96 @@ document
   navigator.geolocation
   .getCurrentPosition(
 
-   showGPS,
+   function(p){
+
+    const lat=
+    p.coords.latitude;
+
+    const lng=
+    p.coords.longitude;
+
+    const acc=
+    p.coords.accuracy;
+
+
+    if(gpsMarker){
+     map.removeLayer(
+      gpsMarker
+     );
+    }
+
+
+    if(accCircle){
+     map.removeLayer(
+      accCircle
+     );
+    }
+
+
+    gpsMarker=
+    L.circleMarker(
+     [lat,lng],
+     {
+      radius:10,
+      color:"#fff",
+      weight:3,
+      fillColor:"#1677ff",
+      fillOpacity:1
+     }
+    )
+    .addTo(map);
+
+
+    accCircle=
+    L.circle(
+     [lat,lng],
+     {
+      radius:acc,
+      color:"#1677ff",
+      weight:1,
+      fillOpacity:.08
+     }
+    )
+    .addTo(map);
+
+
+    map.invalidateSize(
+     false
+    );
+
+
+    map.setView(
+     [lat,lng],
+     16,
+     {
+      animate:false
+     }
+    );
+
+
+    status(
+
+     "<b>📍 現在地</b>"+
+
+     '<div class="row blue">'+
+     lat.toFixed(6)+
+     ", "+
+     lng.toFixed(6)+
+     "<br>"+
+     "GPS精度 約±"+
+     Math.round(acc)+
+     "m"+
+     "</div>"+
+
+     '<div class="row grey">'+
+     "v39ではGPS位置と着色区域を"+
+     "同じ地図上で確認できます。"+
+     "</div>"
+
+    );
+
+   },
+
 
    function(){
 
@@ -1015,6 +1005,7 @@ document
     );
 
    },
+
 
    {
     enableHighAccuracy:true,
@@ -1028,319 +1019,9 @@ document
 );
 
 
-/* =====================================
- MAP TAP
-===================================== */
-
-map.on(
- "click",
- function(e){
-
-  const lat=
-  e.latlng.lat;
-
-  const lng=
-  e.latlng.lng;
-
-
-  drawPoint(
-   lat,lng,
-   "#df8500"
-  );
-
-
-  evaluate(
-   lat,lng,
-   0
-  );
-
- }
-);
-
-
-/* =====================================
- TOWN BUTTONS
-===================================== */
-
-document
-.querySelectorAll("[data-town]")
-.forEach(function(btn){
-
- btn.addEventListener(
-  "click",
-  function(){
-
-   const t=
-   towns[this.dataset.town];
-
-
-   map.invalidateSize({
-    pan:false
-   });
-
-
-   map.setView(
-    [t.lat,t.lng],
-    t.zoom,
-    {
-     animate:false
-    }
-   );
-
-
-   status(
-
-    "<b>🔵 "+
-    t.name+
-    "</b>"+
-
-    '<div class="row blue">'+
-    "地図上の具体的な地点をタップすると、"+
-    "町字情報から区域を判定します。"+
-    "</div>"
-
-   );
-
-  }
-
- );
-
-});
-
-
-/* =====================================
- ROAD BUTTONS
-===================================== */
-
-const roads={
-
- "114":{
-  name:"国道114号",
-  lat:37.62,
-  lng:140.86,
-  zoom:12
- },
-
- "49":{
-  name:"県道49号",
-  lat:37.60,
-  lng:140.89,
-  zoom:12
- },
-
- "35":{
-  name:"県道35号～国道288号",
-  lat:37.46,
-  lng:140.90,
-  zoom:12
- },
-
- "288":{
-  name:"国道288号",
-  lat:37.42,
-  lng:140.91,
-  zoom:12
- },
-
- "252":{
-  name:"県道252号等",
-  lat:37.405,
-  lng:140.993,
-  zoom:14
- },
-
- "101":{
-  name:"双葉町道101・109号",
-  lat:37.465,
-  lng:141.000,
-  zoom:14
- },
-
- "67":{
-  name:"大熊町道東67号",
-  lat:37.386,
-  lng:141.000,
-  zoom:14
- }
-
-};
-
-
-document
-.querySelectorAll("[data-road]")
-.forEach(function(btn){
-
- btn.addEventListener(
-  "click",
-  function(){
-
-   const r=
-   roads[this.dataset.road];
-
-
-   map.setView(
-    [r.lat,r.lng],
-    r.zoom,
-    {
-     animate:false
-    }
-   );
-
-
-   status(
-
-    "<b>🟠 "+
-    r.name+
-    "</b>"+
-
-    '<div class="row orange">'+
-    "特別通過交通の対象道路周辺です。"+
-    "</div>"+
-
-    '<div class="row grey">'+
-    "道路中心線をまだ自動判定していないため、"+
-    "このボタンだけでは「道路上」とは判定しません。"+
-    "</div>"
-
-   );
-
-  }
-
- );
-
-});
-
-
-/* =====================================
- ALL BUTTONS
-===================================== */
-
-document
-.getElementById("allTowns")
-.addEventListener(
- "click",
- function(){
-
-  map.setView(
-   [37.50,140.92],
-   10,
-   {animate:false}
-  );
-
-
-  status(
-
-   "<b>🔴 帰還困難区域が残る7市町村</b>"+
-
-   '<div class="row red">'+
-   "南相馬市・飯舘村・浪江町・葛尾村・"+
-   "双葉町・大熊町・富岡町"+
-   "</div>"
-
-  );
-
- }
-);
-
-
-document
-.getElementById("allRoads")
-.addEventListener(
- "click",
- function(){
-
-  status(
-
-   "<b>🟠 特別通過交通・8区分</b>"+
-
-   '<div class="row orange">'+
-   "① 国道114号<br>"+
-   "② 県道49号<br>"+
-   "③ 大熊町道東15号～県道252号系統<br>"+
-   "④ 県道252号<br>"+
-   "⑤ 県道35号～国道288号<br>"+
-   "⑥ 国道288号<br>"+
-   "⑦ 双葉町道101・109号<br>"+
-   "⑧ 大熊町道東67号～国道6号"+
-   "</div>"
-
-  );
-
- }
-);
-
-
-/* =====================================
- TRACK
-===================================== */
-
-let tracking=false;
-let watchId=null;
-
-
-document
-.getElementById("track")
-.addEventListener(
- "click",
- function(){
-
-  if(!tracking){
-
-   tracking=true;
-
-   this.textContent=
-   "■ 追跡停止";
-
-   this.style.background=
-   "#a26b00";
-
-
-   watchId=
-   navigator.geolocation
-   .watchPosition(
-
-    showGPS,
-
-    function(){},
-
-    {
-     enableHighAccuracy:true,
-     maximumAge:2000
-    }
-
-   );
-
-
-  }else{
-
-   tracking=false;
-
-
-   if(watchId!==null){
-
-    navigator.geolocation
-    .clearWatch(watchId);
-
-   }
-
-
-   watchId=null;
-
-   this.textContent=
-   "▶ 移動追跡";
-
-   this.style.background=
-   "#287a37";
-
-  }
-
- }
-);
-
-
-/* =====================================
+/* ================================
  WIDE
-===================================== */
+================================ */
 
 document
 .getElementById("wide")
@@ -1348,9 +1029,9 @@ document
  "click",
  function(){
 
-  map.invalidateSize({
-   pan:false
-  });
+  map.invalidateSize(
+   false
+  );
 
 
   map.setView(
@@ -1361,25 +1042,19 @@ document
    }
   );
 
-
-  status(
-   "<b>🗾 浜通り広域表示</b>"
-  );
-
  }
 );
 
 
-/* =====================================
+/* ================================
  iPHONE FIX
-===================================== */
+================================ */
 
 function fixMap(){
 
- map.invalidateSize({
-  pan:false,
-  debounceMoveend:true
- });
+ map.invalidateSize(
+  false
+ );
 
 }
 
@@ -1388,9 +1063,20 @@ window.addEventListener(
  "load",
  function(){
 
-  setTimeout(fixMap,100);
-  setTimeout(fixMap,500);
-  setTimeout(fixMap,1500);
+  setTimeout(
+   fixMap,
+   100
+  );
+
+  setTimeout(
+   fixMap,
+   500
+  );
+
+  setTimeout(
+   fixMap,
+   1500
+  );
 
  }
 );
@@ -1400,7 +1086,10 @@ window.addEventListener(
  "orientationchange",
  function(){
 
-  setTimeout(fixMap,500);
+  setTimeout(
+   fixMap,
+   500
+  );
 
  }
 );
