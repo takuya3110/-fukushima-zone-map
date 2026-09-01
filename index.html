@@ -7,115 +7,164 @@
 <title>福島・規制区域マップ</title>
 
 <link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
+
 html,body{
  margin:0;height:100%;
  font-family:-apple-system,BlinkMacSystemFont,
  "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
 }
-#app{height:100%;display:flex;flex-direction:column}
+
+#app{
+ height:100%;
+ display:flex;
+ flex-direction:column;
+}
+
 header{
- padding:8px 10px;background:#fff;
+ padding:8px 10px;
+ background:#fff;
  border-bottom:1px solid #ddd;
 }
-h1{margin:0;font-size:19px}
-.sub{font-size:10px;color:#666;margin-top:2px}
+
+h1{
+ margin:0;
+ font-size:19px;
+}
+
+.sub{
+ font-size:10px;
+ color:#666;
+ margin-top:2px;
+}
 
 #status{
- margin-top:6px;padding:7px 8px;
- border-radius:9px;background:#eef3f8;
- font-size:10px;line-height:1.4;
+ margin-top:6px;
+ padding:7px 8px;
+ border-radius:9px;
+ background:#eef3f8;
+ font-size:10px;
+ line-height:1.45;
 }
 
 .row{
- margin-top:4px;padding:5px 7px;
- background:#fff;border-radius:6px;
+ margin-top:4px;
+ padding:5px 7px;
+ background:#fff;
+ border-radius:6px;
 }
-.r{border-left:5px solid #d92323}
-.p{border-left:5px solid #9d28c2}
-.g{border-left:5px solid #18a83c}
-.x{border-left:5px solid #777}
 
-#mapWrap{position:relative;flex:1;min-height:300px}
-#map{height:100%;width:100%}
+.blue{border-left:5px solid #1677ff}
+.red{border-left:5px solid #d92323}
+.purple{border-left:5px solid #9d28c2}
+.green{border-left:5px solid #18a83c}
+.grey{border-left:5px solid #777}
+
+#mapWrap{
+ position:relative;
+ flex:1;
+ min-height:300px;
+}
+
+#map{
+ height:100%;
+ width:100%;
+}
 
 #panel{
  position:absolute;
- left:6px;right:6px;bottom:7px;
+ left:6px;
+ right:6px;
+ bottom:7px;
  z-index:1000;
+
  padding:7px;
+
  background:rgba(255,255,255,.96);
+
  border-radius:10px;
- box-shadow:0 2px 10px rgba(0,0,0,.3);
+
+ box-shadow:
+ 0 2px 10px rgba(0,0,0,.3);
 }
 
-.ptitle{font-size:9px;font-weight:bold;margin-bottom:4px}
+.ptitle{
+ font-size:9px;
+ font-weight:bold;
+ margin-bottom:4px;
+}
 
-.layers{
+.buttons{
  display:grid;
  grid-template-columns:1fr 1fr 1fr;
  gap:4px;
 }
 
-.details{
- display:grid;
- grid-template-columns:1fr 1fr 1fr;
- gap:4px;margin-top:4px;
-}
-
-.tools{
+.buttons2{
  display:grid;
  grid-template-columns:1fr 1fr;
- gap:4px;margin-top:4px;
+ gap:4px;
+ margin-top:4px;
 }
 
 button{
- border:0;border-radius:7px;
- padding:8px 2px;color:white;
- font-size:9px;font-weight:bold;
+ border:0;
+ border-radius:7px;
+ padding:8px 2px;
+ color:#fff;
+ font-size:9px;
+ font-weight:bold;
 }
 
-#redLayer{background:#c82323}
-#purpleLayer{background:#8526a7}
-#greenLayer{background:#148d35}
+#townBtn{background:#1769e0}
+#addressBtn{background:#506070}
+#officialBtn{background:#8526a7}
 
-.detail{background:#665174}
+.detail{background:#148d35}
 .tool{background:#586b76}
-
-.active{
- outline:3px solid #111;
- outline-offset:-2px;
-}
 
 .bottom{
  display:grid;
  grid-template-columns:1fr 1fr;
- gap:5px;padding:6px;
+ gap:5px;
+
+ padding:6px;
+
  border-top:1px solid #ddd;
  background:#fff;
 }
 
 #gps{background:#1769e0}
 #track{background:#08752e}
-#official{background:#705500}
+#source{background:#705500}
 #reset{background:#555}
 
 .note{
  grid-column:1/3;
- font-size:8px;color:#666;
+ font-size:8px;
+ color:#666;
  line-height:1.4;
 }
 
 .legend{
  background:rgba(255,255,255,.95);
- padding:6px;border-radius:7px;
- box-shadow:0 1px 5px rgba(0,0,0,.3);
- font-size:9px;line-height:1.5;
+
+ padding:6px;
+
+ border-radius:7px;
+
+ box-shadow:
+ 0 1px 5px rgba(0,0,0,.3);
+
+ font-size:9px;
+ line-height:1.5;
 }
+
 </style>
 </head>
+
 
 <body>
 
@@ -126,26 +175,17 @@ button{
 <h1>福島・規制区域マップ</h1>
 
 <div class="sub">
-v30｜規制レイヤー分離版
+v32｜町字・住所判定エンジン
 </div>
+
 
 <div id="status">
 
-<b>大熊町・制度状態</b>
+<b>📍 地点を選択してください</b>
 
-<div class="row r">
-🔴 <b>避難指示</b>：
-帰還困難区域が町内に残っています
-</div>
-
-<div class="row p">
-🟣 <b>特定帰還居住区域</b>：
-帰還困難区域内に設定
-</div>
-
-<div class="row g">
-🟩 <b>立入規制緩和</b>：
-2026年6月22日から一部で実施
+<div class="row blue">
+地図をタップするか、
+「現在地判定」を押してください。
 </div>
 
 </div>
@@ -157,65 +197,72 @@ v30｜規制レイヤー分離版
 
 <div id="map"></div>
 
+
 <div id="panel">
 
 <div class="ptitle">
-表示する制度レイヤー
-</div>
-
-<div class="layers">
-
-<button id="redLayer"
- onclick="showRed()">
-🔴 帰還困難
-</button>
-
-<button id="purpleLayer"
- onclick="showPurple()">
-🟣 帰還居住
-</button>
-
-<button id="greenLayer"
- onclick="showGreen()">
-🟩 立入緩和
-</button>
-
+判定・表示
 </div>
 
 
-<div class="ptitle" style="margin-top:6px">
-立入規制緩和・詳細図
+<div class="buttons">
+
+<button id="townBtn"
+onclick="toggleTown()">
+🔵 町境界
+</button>
+
+<button id="addressBtn"
+onclick="showLastAddress()">
+🏠 住所
+</button>
+
+<button id="officialBtn"
+onclick="showWholeMap()">
+🟣 公式区域図
+</button>
+
 </div>
 
-<div class="details">
+
+<div class="ptitle"
+style="margin-top:6px">
+
+2026年6月22日
+立入規制緩和図
+
+</div>
+
+
+<div class="buttons">
 
 <button class="detail"
- onclick="showGreenDetail(1)">
+onclick="showGreen(1)">
 ① 野上
 </button>
 
 <button class="detail"
- onclick="showGreenDetail(2)">
+onclick="showGreen(2)">
 ② 熊2・3
 </button>
 
 <button class="detail"
- onclick="showGreenDetail(3)">
+onclick="showGreen(3)">
 ③ 町区
 </button>
 
 </div>
 
 
-<div class="tools">
+<div class="buttons2">
 
 <button class="tool"
- onclick="changeOpacity()">
+onclick="changeOpacity()">
 👁 透明度
 </button>
 
 <button class="tool"
- onclick="hideOverlay()">
+onclick="hideOverlay()">
 画像OFF
 </button>
 
@@ -236,36 +283,47 @@ v30｜規制レイヤー分離版
 ▶ 移動追跡
 </button>
 
-<button id="official">
+<button id="source">
 🏛 公式情報
 </button>
 
 <button id="reset">
-🗾 大熊町
+🗾 大熊町全体
 </button>
 
+
 <div class="note">
-赤・紫・緑は別の制度です。
-🟣や🟩でも避難指示が解除されたとは限りません。
-公式図は参考表示で、地番境界の法的判定には使用しません。
-</div>
+
+v32は「町字・住所」と「規制区域」を
+別データとして扱います。
+
+町字境界だけを根拠に
+帰還困難区域とは判定しません。
 
 </div>
 
 </div>
 
+</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
 
 <script>
 
-/* ==============================
+/* ===================================
  MAP
-============================== */
+=================================== */
 
-const map=L.map("map").setView(
- [37.400,140.985],13
+const map=
+L.map("map").setView(
+ [37.400,140.985],
+ 13
 );
+
 
 L.tileLayer(
  "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
@@ -276,7 +334,7 @@ L.tileLayer(
 ).addTo(map);
 
 
-/* Daiichi */
+/* Fukushima Daiichi */
 
 L.circleMarker(
  [37.4211,141.0328],
@@ -289,77 +347,253 @@ L.circleMarker(
  }
 )
 .addTo(map)
-.bindPopup("福島第一原子力発電所");
+.bindPopup(
+ "福島第一原子力発電所"
+);
 
 
-/* ==============================
- OFFICIAL MAPS
-============================== */
+/* ===================================
+ OKUMA MUNICIPAL BOUNDARY
+=================================== */
 
-/*
- red/purple:
- current official whole-town map.
+const okuma=[
 
- This is reference imagery,
- NOT vector GIS.
-*/
+[37.433334,140.894699],
+[37.430065,140.895294],
+[37.426800,140.898499],
+[37.426735,140.901108],
+[37.424068,140.907196],
+[37.424400,140.915100],
+[37.425266,140.916702],
+[37.424068,140.923096],
+[37.424198,140.924896],
+[37.422134,140.938095],
+[37.422199,140.941299],
+[37.419132,140.947495],
+[37.416664,140.959000],
+[37.419399,140.981995],
+[37.418266,140.988602],
+[37.419868,140.994003],
+[37.422798,140.993607],
+[37.425533,140.996796],
+[37.425201,140.998993],
+[37.433601,141.004593],
+[37.432934,141.006805],
+[37.427067,141.018707],
+[37.427067,141.034897],
+[37.424267,141.036102],
+[37.419998,141.036804],
+[37.420132,141.037506],
+[37.422001,141.039993],
+[37.421799,141.040405],
+[37.419868,141.037704],
+[37.419399,141.035095],
+[37.385799,141.034607],
+[37.382267,141.037292],
+[37.373199,141.035599],
+[37.372868,141.034393],
+[37.375935,141.024002],
+[37.376534,141.017899],
+[37.373669,141.015701],
+[37.375534,141.007996],
+[37.374466,141.003296],
+[37.374733,140.999695],
+[37.375267,140.997894],
+[37.375134,140.993408],
+[37.374535,140.991608],
+[37.379002,140.986206],
+[37.380600,140.975708],
+[37.380333,140.958206],
+[37.380798,140.950897],
+[37.383732,140.948792],
+[37.383865,140.947495],
+[37.378532,140.933197],
+[37.379467,140.931900],
+[37.379333,140.927597],
+[37.375599,140.922302],
+[37.373798,140.922394],
+[37.374802,140.914505],
+[37.373734,140.910095],
+[37.375999,140.904694],
+[37.377666,140.888000],
+[37.383934,140.877396],
+[37.381466,140.871994],
+[37.382069,140.871796],
+[37.384602,140.864105],
+[37.384468,140.861206],
+[37.387333,140.859894],
+[37.396667,140.858795],
+[37.404865,140.859894],
+[37.406399,140.858597],
+[37.411533,140.862106],
+[37.414932,140.858002],
+[37.421600,140.853806],
+[37.421001,140.856995],
+[37.422066,140.860107],
+[37.421799,140.863007],
+[37.419868,140.868500],
+[37.421131,140.871796],
+[37.426933,140.876999],
+[37.430065,140.880493],
+[37.429668,140.883896],
+[37.433334,140.894699]
+
+];
+
+
+const townPolygon=
+L.polygon(
+ okuma,
+ {
+  color:"#1769e0",
+  weight:3,
+  dashArray:"8,5",
+  fillColor:"#1769e0",
+  fillOpacity:.025
+ }
+)
+.addTo(map);
+
+
+let townVisible=true;
+
+
+/* ===================================
+ POINT IN POLYGON
+=================================== */
+
+function pointInPolygon(
+ lat,lng,poly
+){
+
+ let inside=false;
+
+
+ for(
+  let i=0,j=poly.length-1;
+  i<poly.length;
+  j=i++
+ ){
+
+  const yi=poly[i][0];
+  const xi=poly[i][1];
+
+  const yj=poly[j][0];
+  const xj=poly[j][1];
+
+
+  const intersect=
+
+  ((yi>lat)!=(yj>lat))
+
+  &&
+
+  (
+   lng<
+   (xj-xi)*
+   (lat-yi)/
+   (yj-yi)+xi
+  );
+
+
+  if(intersect)
+   inside=!inside;
+
+ }
+
+
+ return inside;
+
+}
+
+
+/* ===================================
+ OFFICIAL REFERENCE MAPS
+=================================== */
 
 const wholeOfficial=
+
 "https://www.town.okuma.fukushima.jp/uploaded/image/18390.jpg";
 
 
 const wholeBounds=[
+
  [37.3600,140.8300],
  [37.4470,141.0600]
+
 ];
 
 
-/*
- green detailed maps
-*/
-
 const greenMaps={
 
+
 1:{
- name:"野上2区・下野上1区",
+
+ name:
+ "野上2区・下野上1区",
+
  image:
  "https://www.town.okuma.fukushima.jp/uploaded/image/18395.jpg",
+
  bounds:[
   [37.3990,140.9400],
   [37.4235,140.9850]
  ],
- view:[37.4115,140.9635],
+
+ view:
+ [37.4115,140.9635],
+
  zoom:15
+
 },
 
+
 2:{
- name:"熊2区・熊3区の一部",
+
+ name:
+ "熊2区・熊3区の一部",
+
  image:
  "https://www.town.okuma.fukushima.jp/uploaded/image/18400.jpg",
+
  bounds:[
   [37.3690,140.9850],
   [37.4000,141.0250]
  ],
- view:[37.3845,141.0060],
+
+ view:
+ [37.3845,141.0060],
+
  zoom:15
+
 },
 
+
 3:{
- name:"熊2区・町区の一部",
+
+ name:
+ "熊2区・町区の一部",
+
  image:
  "https://www.town.okuma.fukushima.jp/uploaded/image/18397.jpg",
+
  bounds:[
   [37.3680,140.9950],
   [37.3980,141.0320]
  ],
- view:[37.3830,141.0130],
+
+ view:
+ [37.3830,141.0130],
+
  zoom:15
+
 }
 
 };
 
 
 let overlay=null;
+
 
 const opacities=[
  .25,.45,.65,.80
@@ -368,229 +602,25 @@ const opacities=[
 let opacityIndex=1;
 
 
-/* ==============================
- STATUS HELPERS
-============================== */
+/* ===================================
+ STATUS
+=================================== */
 
-function status(
- title,
- body
-){
+function setStatus(html){
 
  document
  .getElementById("status")
- .innerHTML=
- "<b>"+title+"</b><br>"+body;
+ .innerHTML=html;
 
 }
 
 
-function clearButtons(){
+/* ===================================
+ ADDRESS
+=================================== */
 
- document
- .querySelectorAll(
-  "#redLayer,#purpleLayer,#greenLayer"
- )
- .forEach(
-  b=>b.classList.remove("active")
- );
+let lastAddress=null;
 
-}
-
-
-/* ==============================
- RED
-============================== */
-
-function showRed(){
-
- hideOverlay();
-
- clearButtons();
-
- document
- .getElementById("redLayer")
- .classList.add("active");
-
-
- overlay=
- L.imageOverlay(
-  wholeOfficial,
-  wholeBounds,
-  {
-   opacity:
-   opacities[opacityIndex],
-   zIndex:400
-  }
- )
- .addTo(map);
-
-
- map.setView(
-  [37.400,140.985],
-  13
- );
-
-
- status(
-  "🔴 帰還困難区域",
-  "大熊町公式区域図を表示しています。"+
-  "<br>赤系統の区域は避難指示が継続している区域です。"+
-  "<br>※画像位置は参考表示。"
- );
-
-}
-
-
-/* ==============================
- PURPLE
-============================== */
-
-function showPurple(){
-
- hideOverlay();
-
- clearButtons();
-
- document
- .getElementById("purpleLayer")
- .classList.add("active");
-
-
- overlay=
- L.imageOverlay(
-  wholeOfficial,
-  wholeBounds,
-  {
-   opacity:
-   opacities[opacityIndex],
-   zIndex:400
-  }
- )
- .addTo(map);
-
-
- map.setView(
-  [37.400,140.985],
-  13
- );
-
-
- status(
-  "🟣 特定帰還居住区域",
-  "2026年3月24日の変更認定で"+
-  "10行政区・約570ha。"+
-  "<br>避難指示解除を目指して"+
-  "除染・インフラ復旧を進める区域です。"+
-  "<br>※まだ避難指示解除済みという意味ではありません。"
- );
-
-}
-
-
-/* ==============================
- GREEN
-============================== */
-
-function showGreen(){
-
- clearButtons();
-
- document
- .getElementById("greenLayer")
- .classList.add("active");
-
- showGreenDetail(1);
-
-}
-
-
-function showGreenDetail(n){
-
- hideOverlay();
-
- const z=
- greenMaps[n];
-
-
- overlay=
- L.imageOverlay(
-  z.image,
-  z.bounds,
-  {
-   opacity:
-   opacities[opacityIndex],
-   zIndex:450
-  }
- )
- .addTo(map);
-
-
- map.setView(
-  z.view,
-  z.zoom,
-  {animate:false}
- );
-
-
- status(
-  "🟩 立入規制緩和区域",
-  z.name+
-  "<br>2026年6月22日から緩和。"+
-  "<br>公式図の緑色部分は"+
-  "バリケードがなくなり、"+
-  "自由に立入り可能とされています。"
- );
-
-}
-
-
-/* ==============================
- IMAGE CONTROL
-============================== */
-
-function hideOverlay(){
-
- if(overlay){
-
-  map.removeLayer(overlay);
-  overlay=null;
-
- }
-
-}
-
-
-function changeOpacity(){
-
- opacityIndex=
- (opacityIndex+1)%
- opacities.length;
-
-
- if(overlay){
-
-  overlay.setOpacity(
-   opacities[opacityIndex]
-  );
-
- }
-
-
- status(
-  "👁 表示透明度",
-  Math.round(
-   opacities[opacityIndex]*100
-  )+
-  "%"
- );
-
-}
-
-
-/* ==============================
- GSI ADDRESS
-============================== */
 
 async function reverseAddress(
  lat,lng
@@ -598,12 +628,17 @@ async function reverseAddress(
 
  try{
 
+  const url=
+
+  "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"+
+  "?lat="+
+  encodeURIComponent(lat)+
+  "&lon="+
+  encodeURIComponent(lng);
+
+
   const r=
-  await fetch(
-   "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"+
-   "?lat="+lat+
-   "&lon="+lng
-  );
+  await fetch(url);
 
 
   const j=
@@ -636,17 +671,233 @@ async function reverseAddress(
 }
 
 
-/* ==============================
- GPS STATUS
+/* ===================================
+ CLASSIFICATION ENGINE
+=================================== */
 
- Conservative:
- do not claim polygon membership
- without verified vector boundary.
-============================== */
+function classifyAddress(ad){
+
+ if(!ad){
+
+  return{
+
+   evac:
+   "⚠️ 住所を取得できません",
+
+   evacClass:"grey",
+
+   slar:
+   "⚠️ 未判定",
+
+   slarClass:"grey",
+
+   entry:
+   "⚠️ 未判定",
+
+   entryClass:"grey",
+
+   reason:
+   "住所情報なし"
+
+  };
+
+ }
+
+
+ const name=
+ ad.town||"";
+
+
+ /*
+  OFFICIALLY CLEAR RELEASED-SIDE
+  ADDRESS GROUPS
+
+  Deliberately conservative.
+ */
+
+
+ if(
+  name.includes("大川原") ||
+  name.includes("中屋敷")
+ ){
+
+  return{
+
+   evac:
+   "🟢 避難指示解除側",
+
+   evacClass:"green",
+
+   slar:
+   "― 特定帰還居住区域ではない側",
+
+   slarClass:"grey",
+
+   entry:
+   "🟢 解除区域",
+
+   entryClass:"green",
+
+   reason:
+   "全域解除行政区側の住所情報から判定"
+
+  };
+
+ }
+
+
+ /*
+  IMPORTANT
+
+  These oaza contain mixed
+  regulatory states.
+
+  Therefore no automatic red.
+ */
+
+
+ if(
+  name.includes("野上") ||
+  name.includes("下野上") ||
+  name.includes("熊") ||
+  name.includes("熊川") ||
+  name.includes("夫沢")
+ ){
+
+  return{
+
+   evac:
+   "⚠️ 帰還困難・解除区域が混在",
+
+   evacClass:"grey",
+
+   slar:
+   "⚠️ 特定帰還居住区域を含む可能性",
+
+   slarClass:"purple",
+
+   entry:
+   "⚠️ 立入規制緩和区域を含む可能性",
+
+   entryClass:"green",
+
+   reason:
+   "行政区内で制度区域が混在するため位置だけでは確定しません"
+
+  };
+
+ }
+
+
+ /*
+  OIRINO
+
+  Public information says
+  all of Oirino administrative
+  district is DTRZ.
+
+  But oaza and administrative
+  district are not automatically
+  assumed identical.
+
+  Therefore still conservative.
+ */
+
+
+ if(
+  name.includes("小入野")
+ ){
+
+  return{
+
+   evac:
+   "⚠️ 帰還困難区域側の可能性が高い",
+
+   evacClass:"red",
+
+   slar:
+   "⚠️ 詳細境界未判定",
+
+   slarClass:"grey",
+
+   entry:
+   "⚠️ 詳細境界未判定",
+
+   entryClass:"grey",
+
+   reason:
+   "小入野区は全域帰還困難区域ですが、町字境界と行政区境界の一致を未確認のため確定表示しません"
+
+  };
+
+ }
+
+
+ return{
+
+  evac:
+  "⚠️ 詳細境界未判定",
+
+  evacClass:"grey",
+
+  slar:
+  "⚠️ 詳細境界未判定",
+
+  slarClass:"grey",
+
+  entry:
+  "⚠️ 詳細境界未判定",
+
+  entryClass:"grey",
+
+  reason:
+  "町字名だけでは制度境界を確定できません"
+
+ };
+
+}
+
+
+/* ===================================
+ EVALUATE
+=================================== */
 
 async function evaluate(
  lat,lng,accuracy
 ){
+
+ const inOkuma=
+
+ pointInPolygon(
+  lat,lng,okuma
+ );
+
+
+ if(!inOkuma){
+
+  setStatus(
+
+   "<b>📍 大熊町外</b><br>"+
+
+   lat.toFixed(6)+
+   ", "+
+   lng.toFixed(6)+
+
+   '<div class="row grey">'+
+   "v32では大熊町を詳細判定中です。"+
+   "</div>"
+
+  );
+
+  return;
+
+ }
+
+
+ setStatus(
+  "<b>📍 住所・区域を照合しています…</b>"
+ );
+
 
  const ad=
  await reverseAddress(
@@ -654,130 +905,102 @@ async function evaluate(
  );
 
 
- let place=
+ lastAddress=ad;
+
+
+ const c=
+ classifyAddress(ad);
+
+
+ let place="大熊町";
+
+
+ if(ad && ad.town){
+
+  place+=" "+ad.town;
+
+ }
+
+
+ let html=
+
+ "<b>📍 "+
+ place+
+ "</b><br>"+
+
  lat.toFixed(6)+
  ", "+
  lng.toFixed(6);
 
 
- if(ad){
+ html+=
 
-  if(ad.muni==="07545"){
-
-   place=
-   "大熊町 "+
-   ad.town+
-   "<br>"+
-   place;
-
-  }else{
-
-   place=
-   ad.town+
-   "<br>"+
-   place;
-
-  }
-
- }
+ '<div class="row blue">'+
+ '<b>市町村</b><br>'+
+ '🔵 大熊町内（ベクトル判定）'+
+ '</div>';
 
 
- if(!ad || ad.muni!=="07545"){
+ html+=
 
-  document
-  .getElementById("status")
-  .innerHTML=
-
-  "<b>📍 "+place+"</b>"+
-
-  '<div class="row x">'+
-  'v30の自動判定対象は大熊町です。'+
-  '</div>';
-
-  return;
-
- }
+ '<div class="row '+c.evacClass+'">'+
+ '<b>避難指示</b><br>'+
+ c.evac+
+ '</div>';
 
 
- /*
- only fully released-side
- address names are conservatively
- recognized.
- */
+ html+=
 
- const clearlyReleased=
- (
-  ad.town.includes("大川原")||
-  ad.town.includes("中屋敷")
- );
+ '<div class="row '+c.slarClass+'">'+
+ '<b>特定帰還居住区域</b><br>'+
+ c.slar+
+ '</div>';
 
 
- let html=
- "<b>📍 "+place+"</b>";
+ html+=
+
+ '<div class="row '+c.entryClass+'">'+
+ '<b>立入規制</b><br>'+
+ c.entry+
+ '</div>';
 
 
- if(clearlyReleased){
+ html+=
+
+ '<div style="'+
+ 'font-size:8px;'+
+ 'color:#666;'+
+ 'margin-top:4px'+
+ '">'+
+
+ c.reason;
+
+
+ if(accuracy>0){
 
   html+=
-
-  '<div class="row g">'+
-  '<b>避難指示</b><br>'+
-  '🟢 解除側として判定'+
-  '</div>'+
-
-  '<div class="row x">'+
-  '<b>特定帰還居住区域</b><br>'+
-  '― 該当しないと考えられる'+
-  '</div>'+
-
-  '<div class="row g">'+
-  '<b>立入規制</b><br>'+
-  '🟢 通常の解除区域'+
-  '</div>';
-
- }else{
-
-  html+=
-
-  '<div class="row x">'+
-  '<b>避難指示</b><br>'+
-  '⚠️ 境界データ未確定のため未判定'+
-  '</div>'+
-
-  '<div class="row x">'+
-  '<b>特定帰還居住区域</b><br>'+
-  '⚠️ 境界データ未確定のため未判定'+
-  '</div>'+
-
-  '<div class="row x">'+
-  '<b>立入規制</b><br>'+
-  '⚠️ 公式詳細図で確認してください'+
-  '</div>';
+  "<br>GPS精度 約±"+
+  Math.round(accuracy)+
+  "m";
 
  }
 
 
  html+=
- '<div style="font-size:8px;color:#666;margin-top:4px">'+
- 'GPS精度 約±'+
- Math.round(accuracy)+
- 'm'+
- '</div>';
+ "</div>";
 
 
- document
- .getElementById("status")
- .innerHTML=html;
+ setStatus(html);
 
 }
 
 
-/* ==============================
+/* ===================================
  GPS
-============================== */
+=================================== */
 
 let gpsMarker=null;
-let accCircle=null;
+let accuracyCircle=null;
 
 
 function drawGPS(
@@ -797,11 +1020,13 @@ function drawGPS(
  if(gpsMarker)
   map.removeLayer(gpsMarker);
 
- if(accCircle)
-  map.removeLayer(accCircle);
+
+ if(accuracyCircle)
+  map.removeLayer(accuracyCircle);
 
 
  gpsMarker=
+
  L.circleMarker(
   [lat,lng],
   {
@@ -815,7 +1040,8 @@ function drawGPS(
  .addTo(map);
 
 
- accCircle=
+ accuracyCircle=
+
  L.circle(
   [lat,lng],
   {
@@ -846,15 +1072,12 @@ function drawGPS(
 }
 
 
-/* GPS button */
-
 document
 .getElementById("gps")
 .onclick=()=>{
 
- status(
-  "📍 現在地",
-  "取得しています…"
+ setStatus(
+  "<b>📍 現在地を取得しています…</b>"
  );
 
 
@@ -863,9 +1086,8 @@ document
 
   p=>drawGPS(p,true),
 
-  ()=>status(
-   "GPS",
-   "現在地を取得できませんでした。"
+  ()=>setStatus(
+   "<b>現在地を取得できませんでした。</b>"
   ),
 
   {
@@ -879,9 +1101,9 @@ document
 };
 
 
-/* ==============================
+/* ===================================
  TRACKING
-============================== */
+=================================== */
 
 let tracking=false;
 let watchId=null;
@@ -907,6 +1129,7 @@ document
 
 
   watchId=
+
   navigator.geolocation
   .watchPosition(
 
@@ -938,6 +1161,7 @@ document
 
   watchId=null;
 
+
   b.innerHTML=
   "▶ 移動追跡";
 
@@ -949,9 +1173,9 @@ document
 };
 
 
-/* ==============================
+/* ===================================
  MAP TAP
-============================== */
+=================================== */
 
 let tapMarker=null;
 
@@ -965,6 +1189,7 @@ map.on(
 
 
   tapMarker=
+
   L.circleMarker(
    e.latlng,
    {
@@ -988,17 +1213,206 @@ map.on(
 );
 
 
-/* ==============================
- BUTTONS
-============================== */
+/* ===================================
+ MAP OVERLAYS
+=================================== */
+
+function hideOverlay(){
+
+ if(overlay){
+
+  map.removeLayer(overlay);
+
+  overlay=null;
+
+ }
+
+}
+
+
+function showWholeMap(){
+
+ hideOverlay();
+
+
+ overlay=
+
+ L.imageOverlay(
+  wholeOfficial,
+  wholeBounds,
+  {
+   opacity:
+   opacities[opacityIndex],
+   zIndex:400
+  }
+ )
+ .addTo(map);
+
+
+ map.setView(
+  [37.400,140.985],
+  13
+ );
+
+
+ setStatus(
+
+  "<b>🟣 大熊町公式区域図</b><br>"+
+  "特定帰還居住区域等の位置を確認できます。<br>"+
+  "画像の位置合わせは参考表示です。"
+
+ );
+
+}
+
+
+function showGreen(n){
+
+ hideOverlay();
+
+
+ const z=
+ greenMaps[n];
+
+
+ overlay=
+
+ L.imageOverlay(
+  z.image,
+  z.bounds,
+  {
+   opacity:
+   opacities[opacityIndex],
+   zIndex:450
+  }
+ )
+ .addTo(map);
+
+
+ map.setView(
+  z.view,
+  z.zoom,
+  {animate:false}
+ );
+
+
+ setStatus(
+
+  "<b>🟩 立入規制緩和区域</b><br>"+
+  z.name+
+  "<br>"+
+  "2026年6月22日から。"+
+  "<br>"+
+  "公式図の緑部分を参考表示しています。"
+
+ );
+
+}
+
+
+function changeOpacity(){
+
+ opacityIndex=
+
+ (opacityIndex+1)%
+ opacities.length;
+
+
+ if(overlay){
+
+  overlay.setOpacity(
+   opacities[opacityIndex]
+  );
+
+ }
+
+
+ setStatus(
+
+  "<b>👁 画像透明度 "+
+  Math.round(
+   opacities[opacityIndex]*100
+  )+
+  "%</b>"
+
+ );
+
+}
+
+
+/* ===================================
+ TOWN
+=================================== */
+
+function toggleTown(){
+
+ if(townVisible){
+
+  map.removeLayer(
+   townPolygon
+  );
+
+  townVisible=false;
+
+ }else{
+
+  townPolygon.addTo(map);
+
+  townVisible=true;
+
+ }
+
+}
+
+
+/* ===================================
+ ADDRESS BUTTON
+=================================== */
+
+function showLastAddress(){
+
+ if(!lastAddress){
+
+  setStatus(
+   "<b>🏠 まだ地点を選択していません。</b>"
+  );
+
+  return;
+
+ }
+
+
+ setStatus(
+
+  "<b>🏠 地理院住所情報</b><br>"+
+  "市町村コード："+
+  lastAddress.muni+
+  "<br>"+
+  "町字："+
+  (
+   lastAddress.town||
+   "取得できません"
+  )
+
+ );
+
+}
+
+
+/* ===================================
+ OTHER BUTTONS
+=================================== */
 
 document
-.getElementById("official")
+.getElementById("source")
 .onclick=()=>{
 
  window.open(
-  "https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html",
-  "_blank"
+
+ "https://www.town.okuma.fukushima.jp/soshiki/somu/1534.html",
+
+ "_blank"
+
  );
 
 };
@@ -1008,19 +1422,22 @@ document
 .getElementById("reset")
 .onclick=()=>{
 
- map.setView(
-  [37.400,140.985],
-  13
+ map.fitBounds(
+  townPolygon.getBounds(),
+  {
+   padding:[15,15]
+  }
  );
 
 };
 
 
-/* ==============================
+/* ===================================
  LEGEND
-============================== */
+=================================== */
 
 const legend=
+
 L.control({
  position:"topright"
 });
@@ -1029,6 +1446,7 @@ L.control({
 legend.onAdd=function(){
 
  const d=
+
  L.DomUtil.create(
   "div",
   "legend"
@@ -1037,12 +1455,19 @@ legend.onAdd=function(){
 
  d.innerHTML=
 
- "<b>v30</b><br>"+
- "🔴 帰還困難区域<br>"+
- "🟣 特定帰還居住区域<br>"+
+ "<b>v32</b><br>"+
+
+ "🔵 大熊町境界<br>"+
+
+ "🔴 帰還困難<br>"+
+
+ "🟣 特定帰還居住<br>"+
+
  "🟩 立入規制緩和<br>"+
+
  "🟢 避難指示解除<br>"+
- "🔵 GPS現在地";
+
+ "📍 GPS";
 
 
  return d;
@@ -1053,12 +1478,21 @@ legend.onAdd=function(){
 legend.addTo(map);
 
 
-/* ==============================
+/* ===================================
  START
-============================== */
+=================================== */
 
 setTimeout(
- ()=>showGreen(),
+ ()=>{
+
+  map.fitBounds(
+   townPolygon.getBounds(),
+   {
+    padding:[12,12]
+   }
+  );
+
+ },
  350
 );
 
