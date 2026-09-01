@@ -10,7 +10,6 @@
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-
 html,body{
  margin:0;height:100%;
  font-family:-apple-system,BlinkMacSystemFont,
@@ -69,8 +68,8 @@ h1{
 }
 
 #map{
- height:100%;
  width:100%;
+ height:100%;
 }
 
 #panel{
@@ -80,9 +79,9 @@ h1{
  bottom:7px;
  z-index:1000;
 
- padding:7px;
-
  background:rgba(255,255,255,.96);
+
+ padding:7px;
 
  border-radius:10px;
 
@@ -90,19 +89,19 @@ h1{
  0 2px 10px rgba(0,0,0,.3);
 }
 
-.ptitle{
+.title{
  font-size:9px;
  font-weight:bold;
  margin-bottom:4px;
 }
 
-.buttons{
+.grid3{
  display:grid;
  grid-template-columns:1fr 1fr 1fr;
  gap:4px;
 }
 
-.buttons2{
+.grid2{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:4px;
@@ -119,11 +118,11 @@ button{
 }
 
 #townBtn{background:#1769e0}
-#addressBtn{background:#506070}
+#azaBtn{background:#315d7d}
 #officialBtn{background:#8526a7}
 
-.detail{background:#148d35}
-.tool{background:#586b76}
+.greenBtn{background:#148d35}
+.tool{background:#596a74}
 
 .bottom{
  display:grid;
@@ -150,21 +149,14 @@ button{
 
 .legend{
  background:rgba(255,255,255,.95);
-
  padding:6px;
-
  border-radius:7px;
-
- box-shadow:
- 0 1px 5px rgba(0,0,0,.3);
-
  font-size:9px;
  line-height:1.5;
+ box-shadow:0 1px 5px rgba(0,0,0,.3);
 }
-
 </style>
 </head>
-
 
 <body>
 
@@ -175,17 +167,15 @@ button{
 <h1>福島・規制区域マップ</h1>
 
 <div class="sub">
-v32｜町字・住所判定エンジン
+v33｜大熊町30町字データ照合版
 </div>
-
 
 <div id="status">
 
 <b>📍 地点を選択してください</b>
 
 <div class="row blue">
-地図をタップするか、
-「現在地判定」を押してください。
+現在地判定、または地図をタップしてください。
 </div>
 
 </div>
@@ -200,53 +190,48 @@ v32｜町字・住所判定エンジン
 
 <div id="panel">
 
-<div class="ptitle">
-判定・表示
+<div class="title">
+基礎データ
 </div>
 
-
-<div class="buttons">
+<div class="grid3">
 
 <button id="townBtn"
 onclick="toggleTown()">
 🔵 町境界
 </button>
 
-<button id="addressBtn"
-onclick="showLastAddress()">
-🏠 住所
+<button id="azaBtn"
+onclick="showAzaInfo()">
+🏠 30町字
 </button>
 
 <button id="officialBtn"
-onclick="showWholeMap()">
+onclick="showOfficial()">
 🟣 公式区域図
 </button>
 
 </div>
 
 
-<div class="ptitle"
+<div class="title"
 style="margin-top:6px">
-
-2026年6月22日
 立入規制緩和図
-
 </div>
 
+<div class="grid3">
 
-<div class="buttons">
-
-<button class="detail"
+<button class="greenBtn"
 onclick="showGreen(1)">
 ① 野上
 </button>
 
-<button class="detail"
+<button class="greenBtn"
 onclick="showGreen(2)">
 ② 熊2・3
 </button>
 
-<button class="detail"
+<button class="greenBtn"
 onclick="showGreen(3)">
 ③ 町区
 </button>
@@ -254,7 +239,7 @@ onclick="showGreen(3)">
 </div>
 
 
-<div class="buttons2">
+<div class="grid2">
 
 <button class="tool"
 onclick="changeOpacity()">
@@ -293,13 +278,9 @@ onclick="hideOverlay()">
 
 
 <div class="note">
-
-v32は「町字・住所」と「規制区域」を
-別データとして扱います。
-
-町字境界だけを根拠に
-帰還困難区域とは判定しません。
-
+町字データは2020年国勢調査由来です。
+町字境界と避難指示区域は別物です。
+境界が一致すると確認できない場所は確定判定しません。
 </div>
 
 </div>
@@ -314,9 +295,9 @@ src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 
 <script>
 
-/* ===================================
+/* ==============================
  MAP
-=================================== */
+============================== */
 
 const map=
 L.map("map").setView(
@@ -334,7 +315,7 @@ L.tileLayer(
 ).addTo(map);
 
 
-/* Fukushima Daiichi */
+/* Daiichi */
 
 L.circleMarker(
  [37.4211,141.0328],
@@ -352,9 +333,9 @@ L.circleMarker(
 );
 
 
-/* ===================================
- OKUMA MUNICIPAL BOUNDARY
-=================================== */
+/* ==============================
+ OKUMA BOUNDARY
+============================== */
 
 const okuma=[
 
@@ -449,7 +430,7 @@ L.polygon(
   weight:3,
   dashArray:"8,5",
   fillColor:"#1769e0",
-  fillOpacity:.025
+  fillOpacity:.02
  }
 )
 .addTo(map);
@@ -458,9 +439,58 @@ L.polygon(
 let townVisible=true;
 
 
-/* ===================================
+/* ==============================
+ 30 AZA DATA
+
+ Geoshape / 2020 Census
+============================== */
+
+const azaData=[
+
+["07545001001","大字野上字旭ケ丘"],
+["07545001002","大字野上字湯の神"],
+["07545001003","大字野上字山神"],
+["07545001004","大字野上字諏訪"],
+["07545001005","大字野上字秋葉台"],
+
+["07545002001","大字下野上字北向"],
+["07545002002","大字下野上字大野"],
+["07545002003","大字下野上字清水"],
+["07545002004","大字下野上字大野"],
+["07545002005","大字下野上字大野"],
+
+["07545003001","大字大川原字南平"],
+["07545003002","大字熊字錦台"],
+["07545003003","大字大川原字西平"],
+
+["07545004001","大字熊字旭台"],
+["07545004002","大字熊字新町"],
+["07545004003","大字熊字新町"],
+["07545004004","大字熊字熊町"],
+["07545004005","大字熊字新町"],
+
+["07545005001","大字熊川字古舘"],
+["07545005002","大字熊川字緑ヶ丘"],
+
+["07545006001","大字小入野字向畑"],
+["07545006002","大字小入野字東平"],
+["07545006003","大字小入野字西大和久"],
+["07545006004","大字小入野字東平"],
+
+["07545007001","大字夫沢字大"],
+["07545007002","大字夫沢字長者原"],
+["07545007003","大字夫沢字中央台"],
+["07545007004","大字夫沢字北原"],
+["07545007005","大字夫沢字中央台"],
+
+["075450080","大字小良浜"]
+
+];
+
+
+/* ==============================
  POINT IN POLYGON
-=================================== */
+============================== */
 
 function pointInPolygon(
  lat,lng,poly
@@ -482,7 +512,7 @@ function pointInPolygon(
   const xj=poly[j][1];
 
 
-  const intersect=
+  const hit=
 
   ((yi>lat)!=(yj>lat))
 
@@ -496,7 +526,7 @@ function pointInPolygon(
   );
 
 
-  if(intersect)
+  if(hit)
    inside=!inside;
 
  }
@@ -507,9 +537,9 @@ function pointInPolygon(
 }
 
 
-/* ===================================
- OFFICIAL REFERENCE MAPS
-=================================== */
+/* ==============================
+ OFFICIAL IMAGES
+============================== */
 
 const wholeOfficial=
 
@@ -525,7 +555,6 @@ const wholeBounds=[
 
 
 const greenMaps={
-
 
 1:{
 
@@ -595,16 +624,16 @@ const greenMaps={
 let overlay=null;
 
 
-const opacities=[
+const opacityList=[
  .25,.45,.65,.80
 ];
 
 let opacityIndex=1;
 
 
-/* ===================================
+/* ==============================
  STATUS
-=================================== */
+============================== */
 
 function setStatus(html){
 
@@ -615,12 +644,9 @@ function setStatus(html){
 }
 
 
-/* ===================================
- ADDRESS
-=================================== */
-
-let lastAddress=null;
-
+/* ==============================
+ GSI REVERSE GEOCODER
+============================== */
 
 async function reverseAddress(
  lat,lng
@@ -671,54 +697,70 @@ async function reverseAddress(
 }
 
 
-/* ===================================
- CLASSIFICATION ENGINE
-=================================== */
+/* ==============================
+ AZA MATCHING
+============================== */
 
-function classifyAddress(ad){
+function findAza(name){
 
- if(!ad){
+ if(!name)
+  return null;
 
-  return{
 
-   evac:
-   "⚠️ 住所を取得できません",
+ /*
+ exact / longest matching
+ */
 
-   evacClass:"grey",
+ let best=null;
 
-   slar:
-   "⚠️ 未判定",
 
-   slarClass:"grey",
+ for(const a of azaData){
 
-   entry:
-   "⚠️ 未判定",
+  const n=a[1];
 
-   entryClass:"grey",
 
-   reason:
-   "住所情報なし"
+  if(
+   name===n ||
+   name.includes(n) ||
+   n.includes(name)
+  ){
 
-  };
+   if(
+    !best ||
+    n.length>best[1].length
+   ){
+
+    best=a;
+
+   }
+
+  }
 
  }
 
 
+ return best;
+
+}
+
+
+/* ==============================
+ CLASSIFY
+============================== */
+
+function classify(ad){
+
  const name=
- ad.town||"";
+ ad ? ad.town||"" : "";
 
 
  /*
-  OFFICIALLY CLEAR RELEASED-SIDE
-  ADDRESS GROUPS
-
-  Deliberately conservative.
+ Completely conservative
+ released-side recognition
  */
 
-
  if(
-  name.includes("大川原") ||
-  name.includes("中屋敷")
+  name.includes("大川原")
  ){
 
   return{
@@ -726,20 +768,20 @@ function classifyAddress(ad){
    evac:
    "🟢 避難指示解除側",
 
-   evacClass:"green",
+   ec:"green",
 
    slar:
    "― 特定帰還居住区域ではない側",
 
-   slarClass:"grey",
+   sc:"grey",
 
    entry:
    "🟢 解除区域",
 
-   entryClass:"green",
+   ic:"green",
 
-   reason:
-   "全域解除行政区側の住所情報から判定"
+   note:
+   "大川原1区・2区は全域解除とする町公式情報に基づく保守的判定"
 
   };
 
@@ -747,14 +789,8 @@ function classifyAddress(ad){
 
 
  /*
-  IMPORTANT
-
-  These oaza contain mixed
-  regulatory states.
-
-  Therefore no automatic red.
+ Mixed districts
  */
-
 
  if(
   name.includes("野上") ||
@@ -767,22 +803,22 @@ function classifyAddress(ad){
   return{
 
    evac:
-   "⚠️ 帰還困難・解除区域が混在",
+   "⚠️ 帰還困難区域と解除区域が混在",
 
-   evacClass:"grey",
+   ec:"grey",
 
    slar:
    "⚠️ 特定帰還居住区域を含む可能性",
 
-   slarClass:"purple",
+   sc:"purple",
 
    entry:
    "⚠️ 立入規制緩和区域を含む可能性",
 
-   entryClass:"green",
+   ic:"green",
 
-   reason:
-   "行政区内で制度区域が混在するため位置だけでは確定しません"
+   note:
+   "行政区内で制度境界が混在するため町字名だけでは確定しません"
 
   };
 
@@ -790,19 +826,11 @@ function classifyAddress(ad){
 
 
  /*
-  OIRINO
-
-  Public information says
-  all of Oirino administrative
-  district is DTRZ.
-
-  But oaza and administrative
-  district are not automatically
-  assumed identical.
-
-  Therefore still conservative.
+ Oirino:
+ official all-DTRZ administrative
+ district, but statistical aza
+ boundary ≠ administrative district
  */
-
 
  if(
   name.includes("小入野")
@@ -811,22 +839,22 @@ function classifyAddress(ad){
   return{
 
    evac:
-   "⚠️ 帰還困難区域側の可能性が高い",
+   "🔴 帰還困難区域側の可能性が高い",
 
-   evacClass:"red",
+   ec:"red",
 
    slar:
    "⚠️ 詳細境界未判定",
 
-   slarClass:"grey",
+   sc:"grey",
 
    entry:
    "⚠️ 詳細境界未判定",
 
-   entryClass:"grey",
+   ic:"grey",
 
-   reason:
-   "小入野区は全域帰還困難区域ですが、町字境界と行政区境界の一致を未確認のため確定表示しません"
+   note:
+   "小入野区は全域帰還困難区域。ただし統計町字境界との一致は未確認のため確定判定にはしません"
 
   };
 
@@ -838,42 +866,43 @@ function classifyAddress(ad){
   evac:
   "⚠️ 詳細境界未判定",
 
-  evacClass:"grey",
+  ec:"grey",
 
   slar:
   "⚠️ 詳細境界未判定",
 
-  slarClass:"grey",
+  sc:"grey",
 
   entry:
   "⚠️ 詳細境界未判定",
 
-  entryClass:"grey",
+  ic:"grey",
 
-  reason:
-  "町字名だけでは制度境界を確定できません"
+  note:
+  "規制区域ベクトルとの照合待ち"
 
  };
 
 }
 
 
-/* ===================================
+/* ==============================
  EVALUATE
-=================================== */
+============================== */
 
 async function evaluate(
  lat,lng,accuracy
 ){
 
- const inOkuma=
+ const inside=
 
  pointInPolygon(
-  lat,lng,okuma
+  lat,lng,
+  okuma
  );
 
 
- if(!inOkuma){
+ if(!inside){
 
   setStatus(
 
@@ -884,7 +913,7 @@ async function evaluate(
    lng.toFixed(6)+
 
    '<div class="row grey">'+
-   "v32では大熊町を詳細判定中です。"+
+   "v33の詳細データ対象外です。"+
    "</div>"
 
   );
@@ -895,7 +924,7 @@ async function evaluate(
 
 
  setStatus(
-  "<b>📍 住所・区域を照合しています…</b>"
+  "<b>📍 住所・町字データ照合中…</b>"
  );
 
 
@@ -905,14 +934,16 @@ async function evaluate(
  );
 
 
- lastAddress=ad;
+ const aza=
+ ad ? findAza(ad.town) : null;
 
 
  const c=
- classifyAddress(ad);
+ classify(ad);
 
 
- let place="大熊町";
+ let place=
+ "大熊町";
 
 
  if(ad && ad.town){
@@ -937,13 +968,36 @@ async function evaluate(
 
  '<div class="row blue">'+
  '<b>市町村</b><br>'+
- '🔵 大熊町内（ベクトル判定）'+
+ '🔵 大熊町内'+
  '</div>';
+
+
+ if(aza){
+
+  html+=
+
+  '<div class="row blue">'+
+  '<b>町字データ</b><br>'+
+  aza[1]+
+  "<br>ID："+
+  aza[0]+
+  '</div>';
+
+ }else{
+
+  html+=
+
+  '<div class="row grey">'+
+  '<b>町字データ</b><br>'+
+  '住所名は取得しましたが30町字IDとの完全照合なし'+
+  '</div>';
+
+ }
 
 
  html+=
 
- '<div class="row '+c.evacClass+'">'+
+ '<div class="row '+c.ec+'">'+
  '<b>避難指示</b><br>'+
  c.evac+
  '</div>';
@@ -951,7 +1005,7 @@ async function evaluate(
 
  html+=
 
- '<div class="row '+c.slarClass+'">'+
+ '<div class="row '+c.sc+'">'+
  '<b>特定帰還居住区域</b><br>'+
  c.slar+
  '</div>';
@@ -959,7 +1013,7 @@ async function evaluate(
 
  html+=
 
- '<div class="row '+c.entryClass+'">'+
+ '<div class="row '+c.ic+'">'+
  '<b>立入規制</b><br>'+
  c.entry+
  '</div>';
@@ -967,18 +1021,15 @@ async function evaluate(
 
  html+=
 
- '<div style="'+
- 'font-size:8px;'+
- 'color:#666;'+
- 'margin-top:4px'+
- '">'+
+ '<div style="font-size:8px;color:#666;margin-top:4px">'+
 
- c.reason;
+ c.note;
 
 
  if(accuracy>0){
 
   html+=
+
   "<br>GPS精度 約±"+
   Math.round(accuracy)+
   "m";
@@ -995,12 +1046,12 @@ async function evaluate(
 }
 
 
-/* ===================================
+/* ==============================
  GPS
-=================================== */
+============================== */
 
 let gpsMarker=null;
-let accuracyCircle=null;
+let accCircle=null;
 
 
 function drawGPS(
@@ -1021,8 +1072,8 @@ function drawGPS(
   map.removeLayer(gpsMarker);
 
 
- if(accuracyCircle)
-  map.removeLayer(accuracyCircle);
+ if(accCircle)
+  map.removeLayer(accCircle);
 
 
  gpsMarker=
@@ -1040,7 +1091,7 @@ function drawGPS(
  .addTo(map);
 
 
- accuracyCircle=
+ accCircle=
 
  L.circle(
   [lat,lng],
@@ -1077,7 +1128,7 @@ document
 .onclick=()=>{
 
  setStatus(
-  "<b>📍 現在地を取得しています…</b>"
+  "<b>📍 現在地取得中…</b>"
  );
 
 
@@ -1101,9 +1152,9 @@ document
 };
 
 
-/* ===================================
+/* ==============================
  TRACKING
-=================================== */
+============================== */
 
 let tracking=false;
 let watchId=null;
@@ -1173,9 +1224,9 @@ document
 };
 
 
-/* ===================================
+/* ==============================
  MAP TAP
-=================================== */
+============================== */
 
 let tapMarker=null;
 
@@ -1213,9 +1264,9 @@ map.on(
 );
 
 
-/* ===================================
- MAP OVERLAYS
-=================================== */
+/* ==============================
+ OVERLAY
+============================== */
 
 function hideOverlay(){
 
@@ -1230,7 +1281,7 @@ function hideOverlay(){
 }
 
 
-function showWholeMap(){
+function showOfficial(){
 
  hideOverlay();
 
@@ -1242,7 +1293,7 @@ function showWholeMap(){
   wholeBounds,
   {
    opacity:
-   opacities[opacityIndex],
+   opacityList[opacityIndex],
    zIndex:400
   }
  )
@@ -1257,9 +1308,9 @@ function showWholeMap(){
 
  setStatus(
 
-  "<b>🟣 大熊町公式区域図</b><br>"+
-  "特定帰還居住区域等の位置を確認できます。<br>"+
-  "画像の位置合わせは参考表示です。"
+ "<b>🟣 大熊町公式区域図</b><br>"+
+ "特定帰還居住区域等を確認するための参考表示です。"+
+ "<br>画像そのものから自動判定はしていません。"
 
  );
 
@@ -1282,7 +1333,7 @@ function showGreen(n){
   z.bounds,
   {
    opacity:
-   opacities[opacityIndex],
+   opacityList[opacityIndex],
    zIndex:450
   }
  )
@@ -1298,12 +1349,12 @@ function showGreen(n){
 
  setStatus(
 
-  "<b>🟩 立入規制緩和区域</b><br>"+
-  z.name+
-  "<br>"+
-  "2026年6月22日から。"+
-  "<br>"+
-  "公式図の緑部分を参考表示しています。"
+ "<b>🟩 立入規制緩和区域</b><br>"+
+ z.name+
+ "<br>"+
+ "2026年6月22日から。"+
+ "<br>"+
+ "公式図の緑色部分を参考表示しています。"
 
  );
 
@@ -1315,13 +1366,13 @@ function changeOpacity(){
  opacityIndex=
 
  (opacityIndex+1)%
- opacities.length;
+ opacityList.length;
 
 
  if(overlay){
 
   overlay.setOpacity(
-   opacities[opacityIndex]
+   opacityList[opacityIndex]
   );
 
  }
@@ -1329,20 +1380,20 @@ function changeOpacity(){
 
  setStatus(
 
-  "<b>👁 画像透明度 "+
-  Math.round(
-   opacities[opacityIndex]*100
-  )+
-  "%</b>"
+ "<b>👁 画像透明度 "+
+ Math.round(
+  opacityList[opacityIndex]*100
+ )+
+ "%</b>"
 
  );
 
 }
 
 
-/* ===================================
+/* ==============================
  TOWN
-=================================== */
+============================== */
 
 function toggleTown(){
 
@@ -1365,43 +1416,53 @@ function toggleTown(){
 }
 
 
-/* ===================================
- ADDRESS BUTTON
-=================================== */
+/* ==============================
+ AZA INFO
+============================== */
 
-function showLastAddress(){
+function showAzaInfo(){
 
- if(!lastAddress){
+ const groups={
 
-  setStatus(
-   "<b>🏠 まだ地点を選択していません。</b>"
-  );
+  "野上":5,
+  "下野上":5,
+  "大川原":2,
+  "熊":6,
+  "熊川":2,
+  "小入野":4,
+  "夫沢":5,
+  "小良浜":1
 
-  return;
+ };
+
+
+ let text=
+ "<b>🏠 大熊町30町字データ</b><br>";
+
+
+ for(const k in groups){
+
+  text+=
+  k+
+  "："+
+  groups[k]+
+  "区画<br>";
 
  }
 
 
- setStatus(
+ text+=
+ "<br>合計：30区画";
 
-  "<b>🏠 地理院住所情報</b><br>"+
-  "市町村コード："+
-  lastAddress.muni+
-  "<br>"+
-  "町字："+
-  (
-   lastAddress.town||
-   "取得できません"
-  )
 
- );
+ setStatus(text);
 
 }
 
 
-/* ===================================
- OTHER BUTTONS
-=================================== */
+/* ==============================
+ BUTTONS
+============================== */
 
 document
 .getElementById("source")
@@ -1409,7 +1470,7 @@ document
 
  window.open(
 
- "https://www.town.okuma.fukushima.jp/soshiki/somu/1534.html",
+ "https://geoshape.ex.nii.ac.jp/ka/resource/07545.html",
 
  "_blank"
 
@@ -1432,9 +1493,9 @@ document
 };
 
 
-/* ===================================
+/* ==============================
  LEGEND
-=================================== */
+============================== */
 
 const legend=
 
@@ -1455,18 +1516,13 @@ legend.onAdd=function(){
 
  d.innerHTML=
 
- "<b>v32</b><br>"+
-
+ "<b>v33</b><br>"+
  "🔵 大熊町境界<br>"+
-
+ "🏠 30町字データ<br>"+
  "🔴 帰還困難<br>"+
-
  "🟣 特定帰還居住<br>"+
-
  "🟩 立入規制緩和<br>"+
-
  "🟢 避難指示解除<br>"+
-
  "📍 GPS";
 
 
@@ -1478,9 +1534,9 @@ legend.onAdd=function(){
 legend.addTo(map);
 
 
-/* ===================================
+/* ==============================
  START
-=================================== */
+============================== */
 
 setTimeout(
  ()=>{
