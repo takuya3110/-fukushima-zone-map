@@ -1,4 +1,375 @@
 <!DOCTYPE html>
-<html>
-...
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>福島・規制区域マップ</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:#fff}
+header{padding:10px}h1{margin:0;font-size:23px}.sub{font-size:12px;color:#666}
+#status{margin-top:8px;padding:8px;background:#eef3f8;border-radius:12px;font-size:12px;line-height:1.5;max-height:220px;overflow:auto}
+.row{margin-top:5px;padding:7px;background:#fff;border-radius:8px}
+.blue{border-left:6px solid #1677ff}.red{border-left:6px solid #d92323}.green{border-left:6px solid #16963b}.yellow{border-left:6px solid #e0ad00}.grey{border-left:6px solid #777}
+#map{width:100%;height:450px;min-height:450px;background:#ddd}
+#controls{padding:8px}.title{font-size:12px;font-weight:bold;margin:6px 0 4px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}
+button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;font-size:11px}
+.town{background:#286bd7}.layer{background:#555}#gps{background:#286bd7}#wide{background:#555}#zonesBtn{background:#7034a0}
+.note{font-size:10px;color:#666;line-height:1.4;margin-top:7px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>福島・規制区域マップ</h1>
+<div class="sub">v40｜実町字ポリゴン拡張版</div>
+
+<div id="status">
+<b>🗺 実境界の着色を開始しました</b>
+<div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
+<div class="row red">🔴 大字全域が帰還困難区域と公式確認できる区域</div>
+<div class="row yellow">🟡 町字内で解除・未解除が混在するため要詳細確認</div>
+</div>
+</header>
+
+<div id="map"></div>
+
+<div id="controls">
+<div class="title">対象市町村</div>
+
+<div class="grid4">
+<button class="town" data-t="minamisoma">南相馬</button>
+<button class="town" data-t="iitate">飯舘</button>
+<button class="town" data-t="namie">浪江</button>
+<button class="town" data-t="katsurao">葛尾</button>
+<button class="town" data-t="futaba">双葉</button>
+<button class="town" data-t="okuma">大熊</button>
+<button class="town" data-t="tomioka">富岡</button>
+<button id="zonesBtn">着色区域</button>
+</div>
+
+<div class="grid3">
+<button id="gps">📍 現在地</button>
+<button class="layer" id="toggle">🎨 色 ON/OFF</button>
+<button id="wide">🗾 広域</button>
+</div>
+
+<div class="note">
+v40の面着色は、e-Stat 2020国勢調査の町丁・字等境界を表示用に軽量化し、
+公式の避難指示解除情報と照合した参考表示です。
+統計境界そのものを法的な避難指示境界とは扱いません。
+黄色区域は特に地番単位の公式図確認が必要です。
+</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+"use strict";
+
+const ZONES={"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"n":"大字両竹","c":"双葉町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0193,37.47],[141.0268,37.4683],[141.0314,37.4612],[141.0193,37.4587],[141.0193,37.47]]]}},
+{"type":"Feature","properties":{"n":"大字中野","c":"双葉町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0315,37.4611],[141.0377,37.4549],[141.0162,37.4533],[141.0193,37.4587],[141.0315,37.4611]]]}},
+{"type":"Feature","properties":{"n":"大字中浜","c":"双葉町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0364,37.4664],[141.0371,37.4594],[141.0347,37.4575],[141.0321,37.4645],[141.0364,37.4664]]]}},
+
+{"type":"Feature","properties":{"n":"大字権現堂","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.984,37.5012],[140.9992,37.4974],[140.9987,37.4909],[140.9869,37.4896],[140.9873,37.4937],[140.9811,37.4958],[140.984,37.5012]]]}},
+{"type":"Feature","properties":{"n":"大字北幾世橋","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0104,37.5119],[141.0241,37.5002],[141.0244,37.4921],[141.0297,37.4923],[141.0271,37.4867],[141.0012,37.4973],[141.0035,37.5044],[140.9998,37.5077],[141.0104,37.5119]]]}},
+{"type":"Feature","properties":{"n":"大字棚塩","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0346,37.5136],[141.0385,37.5034],[141.0407,37.4842],[141.0271,37.4867],[141.0297,37.4923],[141.0244,37.4921],[141.0241,37.5002],[141.0112,37.5102],[141.0346,37.5136]]]}},
+{"type":"Feature","properties":{"n":"大字幾世橋","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0062,37.4978],[141.0221,37.4862],[141.0203,37.4835],[140.9993,37.4894],[140.9992,37.4974],[141.0062,37.4978]]]}},
+{"type":"Feature","properties":{"n":"大字請戸","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0317,37.4872],[141.0453,37.4839],[141.0412,37.4836],[141.0434,37.4783],[141.0382,37.4742],[141.0098,37.4737],[141.0128,37.4827],[141.0317,37.4872]]]}},
+{"type":"Feature","properties":{"n":"大字樋渡","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9917,37.4899],[140.9979,37.4859],[140.9784,37.4831],[140.9781,37.4865],[140.9917,37.4899]]]}},
+{"type":"Feature","properties":{"n":"大字牛渡","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9989,37.4901],[140.9979,37.4859],[140.9917,37.4899],[140.9989,37.4901]]]}},
+{"type":"Feature","properties":{"n":"大字高瀬","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0023,37.4896],[141.0157,37.4831],[141.0085,37.4761],[140.9946,37.4769],[140.9927,37.4829],[141.0023,37.4896]]]}},
+{"type":"Feature","properties":{"n":"大字中浜","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0382,37.4742],[141.0364,37.4664],[141.0351,37.4663],[141.0336,37.4713],[141.0382,37.4742]]]}},
+{"type":"Feature","properties":{"n":"大字両竹","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[141.0352,37.4742],[141.0315,37.4611],[141.0252,37.4695],[141.0165,37.4716],[141.0352,37.4742]]]}},
+{"type":"Feature","properties":{"n":"大字田尻","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9627,37.4918],[140.9645,37.4869],[140.9448,37.4793],[140.9447,37.4917],[140.9627,37.4918]]]}},
+{"type":"Feature","properties":{"n":"大字小野田","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9601,37.485],[140.9741,37.482],[140.9473,37.4714],[140.9448,37.4793],[140.9601,37.485]]]}},
+{"type":"Feature","properties":{"n":"大字川添","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9814,37.4992],[140.9873,37.4937],[140.9872,37.4862],[140.9781,37.4865],[140.9741,37.482],[140.9599,37.4849],[140.9645,37.4869],[140.9632,37.494],[140.9814,37.4992]]]}},
+
+{"type":"Feature","properties":{"n":"大字酒井","c":"浪江町","s":"red"},"geometry":{"type":"Polygon","coordinates":[[[140.9729,37.4806],[140.9927,37.4829],[140.9946,37.4769],[140.9798,37.4711],[140.9729,37.4806]]]}},
+
+{"type":"Feature","properties":{"n":"大字谷津田","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9729,37.4806],[140.9811,37.4707],[140.9628,37.4642],[140.9586,37.4748],[140.9729,37.4806]]]}},
+{"type":"Feature","properties":{"n":"大字立野","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9271,37.5308],[140.9588,37.5186],[140.9762,37.517],[140.9743,37.5106],[140.9711,37.5059],[140.9248,37.5111],[140.9135,37.519],[140.918,37.528],[140.9271,37.5308]]]}},
+{"type":"Feature","properties":{"n":"大字藤橋","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9754,37.5152],[140.9998,37.5077],[141.0036,37.4986],[140.9848,37.5061],[140.9754,37.5152]]]}},
+{"type":"Feature","properties":{"n":"大字西台","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9877,37.5062],[140.9941,37.5052],[141.0012,37.4973],[140.9851,37.5004],[140.9877,37.5062]]]}},
+{"type":"Feature","properties":{"n":"大字酒田","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9753,37.5146],[140.9871,37.5044],[140.9797,37.4972],[140.9696,37.5044],[140.9753,37.5146]]]}},
+{"type":"Feature","properties":{"n":"大字苅宿","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.945,37.507],[140.9708,37.5063],[140.9711,37.5008],[140.9522,37.5015],[140.945,37.507]]]}},
+{"type":"Feature","properties":{"n":"大字加倉","c":"浪江町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9642,37.503],[140.9741,37.4988],[140.9713,37.4939],[140.9482,37.492],[140.9545,37.5012],[140.9642,37.503]]]}},
+
+{"type":"Feature","properties":{"n":"大字末森","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.9246,37.4874],[140.9434,37.4922],[140.947,37.4888],[140.9422,37.4876],[140.9448,37.4793],[140.9305,37.4774],[140.9246,37.4874]]]}},
+{"type":"Feature","properties":{"n":"大字大堀","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.9214,37.4869],[140.9309,37.4773],[140.9448,37.4793],[140.9499,37.4693],[140.9425,37.4661],[140.9342,37.4718],[140.9242,37.4689],[140.9108,37.4863],[140.9214,37.4869]]]}},
+{"type":"Feature","properties":{"n":"大字井手","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.9516,37.4755],[140.96,37.4745],[140.958,37.4698],[140.9628,37.4642],[140.9521,37.4488],[140.9259,37.443],[140.9032,37.449],[140.8932,37.4441],[140.8944,37.4332],[140.881,37.4307],[140.8681,37.4194],[140.8506,37.4236],[140.8506,37.4379],[140.844,37.4422],[140.8429,37.4493],[140.8455,37.4554],[140.8348,37.4623],[140.8512,37.4657],[140.8746,37.4538],[140.8828,37.4637],[140.895,37.4593],[140.9065,37.4655],[140.9306,37.463],[140.9355,37.4647],[140.9323,37.4712],[140.945,37.4665],[140.9516,37.4755]]]}},
+{"type":"Feature","properties":{"n":"大字昼曽根","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.8473,37.5549],[140.8771,37.542],[140.8755,37.5353],[140.8558,37.5436],[140.8471,37.5386],[140.8351,37.5532],[140.8435,37.5616],[140.8473,37.5549]]]}},
+{"type":"Feature","properties":{"n":"大字室原","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.877,37.5188],[140.9039,37.5221],[140.9257,37.5109],[140.9436,37.5113],[140.947,37.5039],[140.9545,37.5012],[140.9541,37.4966],[140.9482,37.492],[140.9108,37.4863],[140.8832,37.487],[140.8762,37.4946],[140.8552,37.5024],[140.849,37.4984],[140.8337,37.4965],[140.8354,37.501],[140.8494,37.4992],[140.8501,37.5138],[140.865,37.5241],[140.877,37.5188]]]}},
+{"type":"Feature","properties":{"n":"大字赤宇木","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.8249,37.6101],[140.8287,37.6003],[140.8258,37.5979],[140.8407,37.5937],[140.8429,37.5835],[140.8378,37.5778],[140.8442,37.562],[140.8339,37.5529],[140.8287,37.5605],[140.8057,37.5618],[140.8005,37.5671],[140.7774,37.5611],[140.7634,37.5724],[140.7566,37.5712],[140.7586,37.5812],[140.7505,37.5853],[140.7398,37.5854],[140.7336,37.5763],[140.7213,37.5844],[140.7264,37.5935],[140.7185,37.6015],[140.7818,37.5994],[140.7931,37.5933],[140.814,37.6048],[140.8147,37.6147],[140.8249,37.6101]]]}},
+{"type":"Feature","properties":{"n":"大字津島","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.7398,37.5854],[140.7591,37.5801],[140.753,37.5593],[140.7396,37.5585],[140.7333,37.5504],[140.7123,37.558],[140.7197,37.5639],[140.712,37.5682],[140.7213,37.5843],[140.7336,37.5763],[140.7398,37.5854]]]}},
+{"type":"Feature","properties":{"n":"大字下津島","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.7634,37.5724],[140.7774,37.5611],[140.795,37.5628],[140.7837,37.5535],[140.7664,37.5611],[140.7532,37.559],[140.7566,37.5712],[140.7634,37.5724]]]}},
+{"type":"Feature","properties":{"n":"大字南津島","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.7996,37.5672],[140.8059,37.5617],[140.8289,37.5604],[140.8453,37.5416],[140.8015,37.5329],[140.795,37.5355],[140.7898,37.5313],[140.7829,37.538],[140.7642,37.5386],[140.7569,37.5438],[140.7491,37.5415],[140.7497,37.5326],[140.7051,37.5434],[140.6836,37.5429],[140.6927,37.5573],[140.7073,37.5604],[140.7333,37.5504],[140.7396,37.5585],[140.7493,37.5613],[140.7623,37.5577],[140.7664,37.5611],[140.7837,37.5535],[140.7996,37.5672]]]}},
+{"type":"Feature","properties":{"n":"大字羽附","c":"浪江町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.7131,37.5728],[140.712,37.5676],[140.7183,37.5619],[140.6927,37.5573],[140.6987,37.5615],[140.6983,37.5746],[140.7131,37.5728]]]}},
+
+{"type":"Feature","properties":{"n":"小高区金谷","c":"南相馬市","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.9282,37.5608],[140.9434,37.5589],[140.943,37.5429],[140.9326,37.5497],[140.9182,37.55],[140.9282,37.5608]]]}},
+
+{"type":"Feature","properties":{"n":"大字小良ケ浜字深谷","c":"富岡町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[141.0122,37.3657],[141.0185,37.361],[141.0382,37.3626],[141.0324,37.3533],[141.0125,37.3528],[141.0122,37.3657]]]}},
+{"type":"Feature","properties":{"n":"大字小良ケ浜字赤坂","c":"富岡町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[141.0356,37.3729],[141.0385,37.3635],[141.0185,37.361],[141.0172,37.3711],[141.0356,37.3729]]]}},
+{"type":"Feature","properties":{"n":"大字小良ケ浜字松葉原","c":"富岡町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[141.0156,37.3736],[141.028,37.3755],[141.034,37.3731],[141.0173,37.3703],[141.0156,37.3736]]]}},
+{"type":"Feature","properties":{"n":"大字小良ケ浜字松ノ前","c":"富岡町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[141.0148,37.374],[141.0188,37.3645],[141.0092,37.3655],[141.0148,37.374]]]}},
+{"type":"Feature","properties":{"n":"大字小良ケ浜字市の沢","c":"富岡町","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[141.0079,37.3759],[141.0146,37.3742],[141.0136,37.3693],[141.0003,37.3661],[141.0084,37.3681],[141.0079,37.3759]]]}},
+
+{"type":"Feature","properties":{"n":"大字大川原字南平","c":"大熊町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.9578,37.3859],[140.9609,37.3793],[140.9508,37.3806],[140.9497,37.3838],[140.9578,37.3859]]]}},
+{"type":"Feature","properties":{"n":"大字大川原字西平","c":"大熊町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.957,37.4015],[140.9744,37.3926],[140.9339,37.379],[140.9536,37.3907],[140.957,37.4015]]]}},
+
+{"type":"Feature","properties":{"n":"長泥字曲田","c":"飯舘村","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.7451,37.6268],[140.7763,37.6182],[140.7738,37.6088],[140.7795,37.599],[140.7625,37.5976],[140.7427,37.6035],[140.7189,37.6014],[140.7292,37.6106],[140.7208,37.6218],[140.7451,37.6268]]]}}
+]};
+
+const map=L.map("map",{zoomAnimation:false}).setView([37.50,140.92],10);
+
+L.tileLayer(
+"https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
+{maxZoom:18,attribution:"地理院タイル"}
+).addTo(map);
+
+L.circleMarker(
+[37.4211,141.0328],
+{radius:6,color:"#fff",weight:2,fillColor:"#111",fillOpacity:1}
+).addTo(map).bindPopup("福島第一原子力発電所");
+
+const towns={
+minamisoma:["南相馬市",37.638,140.957,11],
+iitate:["飯舘村",37.616,140.744,11],
+namie:["浪江町",37.494,140.993,12],
+katsurao:["葛尾村",37.503,140.765,12],
+futaba:["双葉町",37.449,141.010,13],
+okuma:["大熊町",37.400,140.985,13],
+tomioka:["富岡町",37.345,141.008,13]
+};
+
+function color(s){
+return s==="green"?"#16963b":
+s==="red"?"#d92323":
+"#e0ad00";
+}
+
+function label(s){
+return s==="green"?"🟢 避難指示解除を大字全域で確認":
+s==="red"?"🔴 帰還困難区域を大字全域で確認":
+"🟡 地番単位の詳細確認が必要";
+}
+
+function status(h){
+document.getElementById("status").innerHTML=h;
+}
+
+const zoneLayer=L.geoJSON(ZONES,{
+style:f=>({
+color:color(f.properties.s),
+weight:f.properties.s==="yellow"?3:1.5,
+fillColor:color(f.properties.s),
+fillOpacity:f.properties.s==="yellow"?.08:.32,
+dashArray:f.properties.s==="yellow"?"7 5":null
+}),
+onEachFeature:(f,l)=>{
+l.bindPopup(
+"<b>"+f.properties.c+" "+f.properties.n+"</b><br>"+
+label(f.properties.s)
+);
+
+l.on("click",()=>{
+status(
+"<b>"+f.properties.c+" "+f.properties.n+"</b>"+
+"<div class='row "+f.properties.s+"'><b>"+
+label(f.properties.s)+"</b><br>"+
+(f.properties.s==="yellow"
+?"この町字は法的区域と町字境界が一致しない、または区域内が混在するため、町字ポリゴン全体の法的状態は判定しません。"
+:"公式情報と町字境界を照合した参考表示です。")+
+"</div>"
+);
+});
+}
+}).addTo(map);
+
+let visible=true;
+
+document.getElementById("toggle").onclick=()=>{
+visible=!visible;
+if(visible){
+zoneLayer.addTo(map);
+}else{
+map.removeLayer(zoneLayer);
+}
+};
+
+document.getElementById("zonesBtn").onclick=()=>{
+if(!visible){
+zoneLayer.addTo(map);
+visible=true;
+}
+
+map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});
+
+status(
+"<b>🎨 v40 着色区域</b>"+
+"<div class='row green'>浪江町：2017年に大字全域解除された20大字</div>"+
+"<div class='row red'>浪江町：酒井</div>"+
+"<div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div>"+
+"<div class='row green'>双葉町：両竹・中野・中浜</div>"+
+"<div class='row green'>大熊町：大川原字南平・西平（大川原地区の解除済み区域の参考表示）</div>"+
+"<div class='row yellow'>南相馬市：小高区金谷（帰還困難区域は字小畑・ドウケ・出戸間船・野中等のため町字全体は判定保留）</div>"+
+"<div class='row yellow'>富岡町：小良ケ浜の5町字・飯舘村：長泥字曲田（区域内が混在するため境界参考）</div>"
+);
+};
+
+document.querySelectorAll("[data-t]").forEach(b=>{
+b.onclick=()=>{
+const t=towns[b.dataset.t];
+
+map.invalidateSize(false);
+map.setView([t[1],t[2]],t[3],{animate:false});
+
+status(
+"<b>🔵 "+t[0]+"</b>"+
+"<div class='row blue'>地図の着色区域をタップすると根拠区分を表示します。</div>"
+);
+};
+});
+
+document.getElementById("wide").onclick=()=>{
+map.setView([37.50,140.92],10,{animate:false});
+};
+
+let gpsMarker=null;
+let accCircle=null;
+
+document.getElementById("gps").onclick=()=>{
+navigator.geolocation.getCurrentPosition(
+p=>{
+const lat=p.coords.latitude;
+const lng=p.coords.longitude;
+const acc=p.coords.accuracy;
+
+if(gpsMarker)map.removeLayer(gpsMarker);
+if(accCircle)map.removeLayer(accCircle);
+
+gpsMarker=L.circleMarker(
+[lat,lng],
+{
+radius:10,
+color:"#fff",
+weight:3,
+fillColor:"#1677ff",
+fillOpacity:1
+}
+).addTo(map);
+
+accCircle=L.circle(
+[lat,lng],
+{
+radius:acc,
+color:"#1677ff",
+weight:1,
+fillOpacity:.08
+}
+).addTo(map);
+
+map.invalidateSize(false);
+map.setView([lat,lng],16,{animate:false});
+
+let hit=null;
+
+zoneLayer.eachLayer(l=>{
+if(
+!hit &&
+l.getBounds &&
+l.getBounds().contains([lat,lng])
+){
+const f=l.feature;
+if(pointInFeature(l,[lat,lng])){
+hit=f;
+}
+}
+});
+
+if(hit){
+status(
+"<b>📍 現在地</b>"+
+"<div class='row "+hit.properties.s+"'>"+
+"<b>"+hit.properties.c+" "+hit.properties.n+"</b><br>"+
+label(hit.properties.s)+
+"</div>"+
+"<div class='row grey'>GPS精度 約±"+
+Math.round(acc)+"m</div>"
+);
+}else{
+status(
+"<b>📍 現在地</b>"+
+"<div class='row blue'>v40で着色済みの実町字ポリゴンには該当しません。</div>"+
+"<div class='row grey'>これは「解除」「帰還困難」の否定ではありません。未実装区域は判定保留です。<br>"+
+"GPS精度 約±"+Math.round(acc)+"m</div>"
+);
+}
+},
+()=>{
+status("<b>現在地を取得できませんでした。</b>");
+},
+{
+enableHighAccuracy:true,
+timeout:15000,
+maximumAge:1000
+}
+);
+};
+
+function pointInRing(p,ring){
+let x=p[1];
+let y=p[0];
+let inside=false;
+
+for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+let xi=ring[i][0];
+let yi=ring[i][1];
+let xj=ring[j][0];
+let yj=ring[j][1];
+
+if(
+((yi>y)!=(yj>y)) &&
+(x<(xj-xi)*(y-yi)/(yj-yi)+xi)
+){
+inside=!inside;
+}
+}
+
+return inside;
+}
+
+function pointInFeature(layer,p){
+const g=layer.feature.geometry;
+
+if(g.type==="Polygon"){
+return pointInRing(p,g.coordinates[0]);
+}
+
+if(g.type==="MultiPolygon"){
+return g.coordinates.some(poly=>pointInRing(p,poly[0]));
+}
+
+return false;
+}
+
+function fix(){
+map.invalidateSize(false);
+}
+
+window.addEventListener("load",()=>{
+setTimeout(fix,100);
+setTimeout(fix,500);
+setTimeout(fix,1500);
+});
+
+window.addEventListener(
+"orientationchange",
+()=>setTimeout(fix,500)
+);
+</script>
+</body>
 </html>
