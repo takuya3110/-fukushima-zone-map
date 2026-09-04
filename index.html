@@ -19,7 +19,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v45｜大熊町・公式図概略レイヤー版</div>
+<div class="sub">v46｜大熊町・実町字概略レイヤー版</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋現地追跡</b>
 <div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
@@ -93,6 +93,29 @@ const ZONES={"type":"FeatureCollection","features":[{"type":"Feature","propertie
 {"type":"Feature","properties":{"n":"大字大川原字南平","c":"大熊町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.95784401516835,37.38590114601516],[140.95862684713833,37.38377455593348],[140.95784879401793,37.38321586901447],[140.96001424234564,37.38222349899905],[140.96153597159628,37.38006280794711],[140.96092964689743,37.37932496908335],[140.95907591375894,37.37893480322299],[140.9576889204907,37.38046289359291],[140.95472181768466,37.38094220985676],[140.95076161106192,37.38057064833641],[140.9497132137425,37.38381320223589],[140.95784401516835,37.38590114601516]]]}},
 {"type":"Feature","properties":{"n":"大字大川原字西平","c":"大熊町","s":"green"},"geometry":{"type":"Polygon","coordinates":[[[140.95703519996263,37.40150175624863],[140.95846248379914,37.40146239068985],[140.96168255400212,37.39872703248108],[140.9636295418243,37.39913102989563],[140.96730996455798,37.39552828662813],[140.96849307011917,37.39290894227523],[140.97078011261524,37.394104390264616],[140.9722871071682,37.39264272793387],[140.9744215826725,37.39257076546567],[140.97192916681786,37.39121396959231],[140.9709837596315,37.389744988686545],[140.96875961553908,37.39027199589857],[140.9630904394693,37.38911078218107],[140.96134121158977,37.38831040621661],[140.9606430287587,37.38689245584646],[140.9591283716808,37.38688834495439],[140.95912851722338,37.38599011754893],[140.9547034140203,37.38542561597054],[140.95204492504968,37.38397976943807],[140.95048136513003,37.38428475012627],[140.9494000081118,37.38323428967236],[140.94608566538773,37.383252079547916],[140.9365718345571,37.37919538003016],[140.9339276764937,37.37903508699801],[140.93791268952702,37.381302521140206],[140.93818352010132,37.38309713354403],[140.93993731580142,37.38310561755038],[140.94245808456495,37.38446631494671],[140.94634122234766,37.38792481478665],[140.94782652085777,37.39030375860545],[140.9527754712919,37.39013328327134],[140.95357055812786,37.39070183684395],[140.95306950730495,37.392507972493846],[140.95409356289565,37.394123639735696],[140.95400043759955,37.39740069605382],[140.95512664171457,37.39852968690352],[140.95496935624152,37.40012928560532],[140.95703519996263,37.40150175624863]]]}},
 {"type":"Feature","properties":{"n":"長泥字曲田","c":"飯舘村","s":"yellow"},"geometry":{"type":"Polygon","coordinates":[[[140.76347603068876,37.623571183144264],[140.7680927546777,37.62079966698165],[140.77289104106936,37.61985028826115],[140.7762631797545,37.61824075112625],[140.77449731781982,37.61178128651738],[140.776306339366,37.609140315887366],[140.7737534957667,37.60875651829092],[140.77769847680247,37.60386982645806],[140.77729409082897,37.6031905331897],[140.7795500595623,37.60008343913853],[140.77948621369504,37.59897158762634],[140.7698598268787,37.596881960898045],[140.76503452963027,37.59845837727392],[140.76245031279083,37.59755487935151],[140.75916799559894,37.59865051663919],[140.75621411204207,37.59866083498809],[140.753196441275,37.601857503961135],[140.74695036957178,37.601902065391734],[140.7427414061705,37.60354774492942],[140.73470810942945,37.603603603444384],[140.72899237691874,37.600869493454745],[140.7189072300981,37.60141224741125],[140.72476206428027,37.60969569633346],[140.728152427418,37.60976013772515],[140.72924145931452,37.61055127879801],[140.72790145265722,37.61281433684292],[140.7197160501674,37.62092367048893],[140.72077980722142,37.62179786053047],[140.72337212767988,37.622562121386714],[140.73688868801025,37.62330376803448],[140.7410709682971,37.62571801757908],[140.7451201137336,37.626762979878436],[140.75864753344396,37.62527812828644],[140.76347603068876,37.623571183144264]]]}}]};
+const map=L.map("map",{zoomAnimation:false}).setView([37.50,140.92],10);
+L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",{maxZoom:18,attribution:"地理院タイル"}).addTo(map);
+L.circleMarker([37.4211,141.0328],{radius:6,color:"#fff",weight:2,fillColor:"#111",fillOpacity:1}).addTo(map).bindPopup("福島第一原子力発電所");
+
+const towns={
+minamisoma:["南相馬市",37.638,140.957,11,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
+iitate:["飯舘村",37.616,140.744,11,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
+namie:["浪江町",37.494,140.993,12,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
+katsurao:["葛尾村",37.503,140.765,12,"https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/"],
+futaba:["双葉町",37.449,141.010,13,"https://futaba-publicmap.maps.arcgis.com/home/index.html"],
+okuma:["大熊町",37.400,140.985,13,"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"],
+tomioka:["富岡町",37.345,141.008,13,"https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/"]
+};
+function color(s){return s==="green"?"#16963b":s==="red"?"#d92323":"#e0ad00"}
+function label(s){return s==="green"?"🟢 避難指示解除を大字全域で確認":s==="red"?"🔴 帰還困難区域を大字全域で確認":s==="purple"?"🟣 特定帰還居住区域（公式図からの概略）":s==="relax"?"🟩 立入規制緩和区域（公式図からの概略）":s==="reference"?"┄ e-Stat統計境界（法的区分は未判定）":"🟡 地番単位の詳細確認が必要"}
+function status(h){document.getElementById("status").innerHTML=h}
+function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]))}
+
+// 大熊町の公式区域図を、e-Statの実町字境界に丸めた概略レイヤー。
+// 地番単位・行政区単位の公式境界とは一致しないため、必ず approx:true として扱う。
+const OKUMA_RETURN_PREFIXES=["大字野上","大字下野上","大字熊","大字熊川","大字夫沢"];
+const OKUMA_RELAX_PREFIXES=["大字野上","大字下野上","大字熊"];
+function startsWithOne(value,prefixes){return prefixes.some(prefix=>value.startsWith(prefix))}
 const REFERENCE_ZONES={"type":"FeatureCollection","features":[
 {"type":"Feature","properties":{"n":"小高区西町一丁目","c":"南相馬市","s":"reference"},"geometry":{"type":"Polygon","coordinates":[[[140.98575,37.5639],[140.98369,37.56211],[140.98172,37.56419],[140.98247,37.56532],[140.98575,37.5639]]]}},
 {"type":"Feature","properties":{"n":"小高区西町二丁目","c":"南相馬市","s":"reference"},"geometry":{"type":"Polygon","coordinates":[[[140.98026,37.55915],[140.97954,37.55919],[140.98172,37.56419],[140.98364,37.56141],[140.98026,37.55915]]]}},
@@ -316,30 +339,9 @@ const REFERENCE_ZONES={"type":"FeatureCollection","features":[
 {"type":"Feature","properties":{"n":"前田字豊栄","c":"飯舘村","s":"reference"},"geometry":{"type":"Polygon","coordinates":[[[140.69264,37.74302],[140.69364,37.74217],[140.6932,37.73998],[140.69405,37.73941],[140.69406,37.73764],[140.69506,37.73657],[140.69752,37.7287],[140.7012,37.72699],[140.70571,37.72665],[140.70868,37.72493],[140.725,37.72634],[140.72918,37.72295],[140.72672,37.72207],[140.72536,37.71706],[140.72039,37.7126],[140.71488,37.71396],[140.69012,37.70914],[140.68631,37.70718],[140.68439,37.70357],[140.67007,37.70494],[140.66162,37.70871],[140.66509,37.71004],[140.6653,37.71104],[140.66812,37.71156],[140.66674,37.71381],[140.66717,37.71542],[140.6699,37.71853],[140.67129,37.71882],[140.66958,37.72021],[140.66918,37.7224],[140.67166,37.72364],[140.67311,37.72656],[140.6765,37.72803],[140.67499,37.73174],[140.678,37.73838],[140.67995,37.73848],[140.68308,37.74228],[140.69264,37.74302]]]}},
 {"type":"Feature","properties":{"n":"二枚橋字本町","c":"飯舘村","s":"reference"},"geometry":{"type":"Polygon","coordinates":[[[140.6725,37.70459],[140.68439,37.70357],[140.68324,37.70078],[140.68345,37.6985],[140.68689,37.69839],[140.68819,37.69761],[140.68696,37.69094],[140.69087,37.68937],[140.69197,37.68786],[140.68765,37.6836],[140.68418,37.68211],[140.68157,37.67782],[140.68532,37.67346],[140.67693,37.67184],[140.67171,37.67357],[140.66607,37.67251],[140.66671,37.67649],[140.65937,37.68065],[140.65882,37.68359],[140.65603,37.68731],[140.65232,37.68608],[140.65191,37.68454],[140.6507,37.68375],[140.6464,37.68453],[140.6457,37.68605],[140.64475,37.69169],[140.64784,37.69519],[140.64969,37.69597],[140.64951,37.69763],[140.65416,37.70025],[140.65815,37.69901],[140.6615,37.69942],[140.66222,37.70506],[140.66155,37.70867],[140.66848,37.70541],[140.6725,37.70459]]]}}
 ]};
-const map=L.map("map",{zoomAnimation:false}).setView([37.50,140.92],10);
-L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",{maxZoom:18,attribution:"地理院タイル"}).addTo(map);
-L.circleMarker([37.4211,141.0328],{radius:6,color:"#fff",weight:2,fillColor:"#111",fillOpacity:1}).addTo(map).bindPopup("福島第一原子力発電所");
-
-const towns={
-minamisoma:["南相馬市",37.638,140.957,11,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
-iitate:["飯舘村",37.616,140.744,11,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
-namie:["浪江町",37.494,140.993,12,"https://www.meti.go.jp/earthquake/nuclear/kinkyu.html"],
-katsurao:["葛尾村",37.503,140.765,12,"https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/"],
-futaba:["双葉町",37.449,141.010,13,"https://futaba-publicmap.maps.arcgis.com/home/index.html"],
-okuma:["大熊町",37.400,140.985,13,"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"],
-tomioka:["富岡町",37.345,141.008,13,"https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/"]
-};
-function color(s){return s==="green"?"#16963b":s==="red"?"#d92323":"#e0ad00"}
-function label(s){return s==="green"?"🟢 避難指示解除を大字全域で確認":s==="red"?"🔴 帰還困難区域を大字全域で確認":s==="purple"?"🟣 特定帰還居住区域（公式図からの概略）":s==="relax"?"🟩 立入規制緩和区域（公式図からの概略）":s==="reference"?"┄ e-Stat統計境界（法的区分は未判定）":"🟡 地番単位の詳細確認が必要"}
-function status(h){document.getElementById("status").innerHTML=h}
-function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]))}
-
 const APPROX_ZONES={"type":"FeatureCollection","features":[
-{"type":"Feature","properties":{"n":"野上2区・下野上1区","c":"大熊町","s":"relax","approx":true,"src":"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"},"geometry":{"type":"Polygon","coordinates":[[[140.912,37.412],[140.928,37.405],[140.949,37.401],[140.975,37.401],[140.989,37.406],[140.986,37.415],[140.968,37.420],[140.942,37.419],[140.925,37.417],[140.912,37.412]]]}},
-{"type":"Feature","properties":{"n":"熊2区・熊3区の一部","c":"大熊町","s":"relax","approx":true,"src":"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"},"geometry":{"type":"Polygon","coordinates":[[[140.967,37.389],[140.980,37.389],[140.994,37.391],[141.012,37.387],[141.025,37.382],[141.032,37.385],[141.020,37.394],[141.000,37.397],[140.983,37.398],[140.967,37.389]]]}},
-{"type":"Feature","properties":{"n":"熊2区・町区の一部","c":"大熊町","s":"relax","approx":true,"src":"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"},"geometry":{"type":"Polygon","coordinates":[[[140.987,37.381],[141.004,37.383],[141.020,37.382],[141.026,37.376],[141.023,37.370],[141.005,37.370],[140.987,37.374],[140.987,37.381]]]}},
-{"type":"Feature","properties":{"n":"特定帰還居住区域（町北部・東部）","c":"大熊町","s":"purple","approx":true,"src":"https://www.town.okuma.fukushima.jp/site/fukkou/33440.html"},"geometry":{"type":"Polygon","coordinates":[[[140.936,37.425],[140.971,37.423],[141.001,37.418],[141.010,37.408],[141.004,37.398],[140.986,37.399],[140.973,37.406],[140.953,37.409],[140.936,37.416],[140.936,37.425]]]}},
-{"type":"Feature","properties":{"n":"特定帰還居住区域（町南東部）","c":"大熊町","s":"purple","approx":true,"src":"https://www.town.okuma.fukushima.jp/site/fukkou/33440.html"},"geometry":{"type":"Polygon","coordinates":[[[140.981,37.399],[141.004,37.400],[141.023,37.393],[141.030,37.382],[141.017,37.377],[140.997,37.382],[140.981,37.389],[140.981,37.399]]]}}
+...REFERENCE_ZONES.features.filter(f=>f.properties.c==="大熊町"&&startsWithOne(f.properties.n,OKUMA_RETURN_PREFIXES)).map(f=>({"type":"Feature","properties":{"n":f.properties.n,"c":"大熊町","s":"purple","approx":true,"src":"https://www.town.okuma.fukushima.jp/site/fukkou/33440.html"},"geometry":f.geometry})),
+...REFERENCE_ZONES.features.filter(f=>f.properties.c==="大熊町"&&startsWithOne(f.properties.n,OKUMA_RELAX_PREFIXES)).map(f=>({"type":"Feature","properties":{"n":f.properties.n,"c":"大熊町","s":"relax","approx":true,"src":"https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html"},"geometry":f.geometry}))
 ]};
 const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features,APPROX_ZONES.features)};
 const zoneLayer=L.geoJSON(ALL_ZONES,{
@@ -388,7 +390,7 @@ async function showPosition(p,center=true,mode="現在地",isMapPoint=false){
  const accuracy=isMapPoint?"地図上で指定した地点（GPSではありません）":"GPS精度 約±"+Math.round(acc)+"m　"+new Date(p.timestamp).toLocaleTimeString("ja-JP");
  const head="<b>"+(isMapPoint?"📌 ":(watchId===null?"📍 ":"🟢 "))+esc(mode)+(watchId===null||isMapPoint?"":"中")+"</b><div class='row blue'><b>"+esc(address)+"</b><br>緯度 "+lat.toFixed(6)+"　経度 "+lng.toFixed(6)+"<br>"+accuracy+"</div>";
  const outside=!Object.prototype.hasOwnProperty.call(muniNames,lastMuniCode);
- const judgement=baseHit?(baseHit.properties.s==="reference"?"<div class='row yellow'><b>避難指示：未判定</b><br>現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の統計境界内です。ここでは法的な避難指示区分を判定しません。</div>":"<div class='row "+baseHit.properties.s+"'><b>避難指示："+esc(baseHit.properties.c+" "+baseHit.properties.n)+"</b><br>"+label(baseHit.properties.s)+"</div>"):outside?"<div class='row blue'><b>避難指示：対象区域外</b><br>現在地は、このアプリの対象7市町村外です。GPS取得は正常です。</div>":"<div class='row yellow'><b>避難指示：未判定</b><br>対象7市町村内ですが、v45収録の実町字ポリゴン外です。これは『解除』『帰還困難』の否定ではありません。</div>";
+ const judgement=baseHit?(baseHit.properties.s==="reference"?"<div class='row yellow'><b>避難指示：未判定</b><br>現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の統計境界内です。ここでは法的な避難指示区分を判定しません。</div>":"<div class='row "+baseHit.properties.s+"'><b>避難指示："+esc(baseHit.properties.c+" "+baseHit.properties.n)+"</b><br>"+label(baseHit.properties.s)+"</div>"):outside?"<div class='row blue'><b>避難指示：対象区域外</b><br>現在地は、このアプリの対象7市町村外です。GPS取得は正常です。</div>":"<div class='row yellow'><b>避難指示：未判定</b><br>対象7市町村内ですが、v46収録の実町字ポリゴン外です。これは『解除』『帰還困難』の否定ではありません。</div>";
  const separate="<div class='row purple'><b>特定帰還居住区域："+(approxReturn?"概略で該当":"未判定")+"</b><br>"+(approxReturn?esc(approxReturn.properties.n)+"。公式区域図から読んだ概略で、地番単位の該当は保証しません。":"地番単位の公式区域図を確認中です。避難指示解除済みではありません。")+"</div><div class='row green'><b>立入り："+(approxRelax?"規制緩和区域に概略で該当":"未判定")+"</b><br>"+(approxRelax?esc(approxRelax.properties.n)+"。公式区域図から読んだ概略で、実際のバリケード・地番を優先してください。":"立入規制緩和区域の正確な地番境界を未収録です。")+"</div><div class='row grey'><b>特別通過交通：未判定</b><br>対象道路の正確な中心線・条件を未収録です。</div>";
  status(head+judgement+separate+historyHtml())
 }
