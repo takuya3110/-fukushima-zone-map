@@ -19,13 +19,13 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v43｜対象7市町村・統計境界追加版</div>
+<div class="sub">v44｜未判定区域の薄黄表示版</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋現地追跡</b>
 <div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
 <div class="row red">🔴 大字全域が帰還困難区域と公式確認できる区域</div>
 <div class="row yellow">🟡 町字内で解除・未解除が混在するため要詳細確認</div>
-<div class="row yellow">┄ 黄の細い破線：e-Stat統計境界（法的区分は未判定）</div>
+<div class="row yellow">▨ 薄黄＋細い破線：e-Stat統計境界（法的区分は未判定）</div>
 </div>
 </header>
 <div id="map"></div>
@@ -41,7 +41,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
 </div>
 <div class="note">
-v43は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を黄の細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
+v44は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を薄黄＋細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
 赤・緑・太い黄色は従来どおり公式情報と照合した参考表示です。黄の細い破線と、地番単位の詳細が必要な太い黄色は、法的区分を「未判定」と表示します。特定帰還居住区域・立入規制緩和・特別通過交通は、正確な面／道路線を収録するまで「未判定」と表示します。<br>
 公式資料：<a href="https://www.meti.go.jp/earthquake/nuclear/kinkyu.html" target="_blank" rel="noopener">経済産業省</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html" target="_blank" rel="noopener">大熊町・立入規制緩和図</a>
 </div>
@@ -335,7 +335,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&
 
 const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features)};
 const zoneLayer=L.geoJSON(ALL_ZONES,{
- style:f=>f.properties.s==="reference"?{color:"#a27a00",weight:1,fillColor:"#e0ad00",fillOpacity:0,dashArray:"3 4"}:{color:color(f.properties.s),weight:f.properties.s==="yellow"?3:1.5,fillColor:color(f.properties.s),fillOpacity:f.properties.s==="yellow"?.08:.32,dashArray:f.properties.s==="yellow"?"7 5":null},
+ style:f=>f.properties.s==="reference"?{color:"#a27a00",weight:1,fillColor:"#e0ad00",fillOpacity:.055,dashArray:"3 4"}:{color:color(f.properties.s),weight:f.properties.s==="yellow"?3:1.5,fillColor:color(f.properties.s),fillOpacity:f.properties.s==="yellow"?.08:.32,dashArray:f.properties.s==="yellow"?"7 5":null},
  onEachFeature:(f,l)=>{
    l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>"+label(f.properties.s));
    l.on("click",()=>status("<b>"+f.properties.c+" "+f.properties.n+"</b><div class='row yellow'><b>"+label(f.properties.s)+"</b><br>"+(f.properties.s==="reference"?"この面はe-Stat 2020の統計境界です。避難指示・特定帰還居住区域・立入規制緩和の法的な境界や判定には使用しません。":f.properties.s==="yellow"?"この町字は法的区域と町字境界が一致しない、または区域内が混在するため、町字ポリゴン全体の法的状態は判定しません。":"公式情報と町字境界を照合した参考表示です。")+"</div>"));
@@ -344,7 +344,7 @@ const zoneLayer=L.geoJSON(ALL_ZONES,{
 
 let visible=true;
 document.getElementById("toggle").onclick=()=>{visible=!visible;if(visible)zoneLayer.addTo(map);else map.removeLayer(zoneLayer)};
-document.getElementById("zonesBtn").onclick=()=>{if(!visible){zoneLayer.addTo(map);visible=true}map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});status("<b>🎨 v43 収録区域</b><div class='row green'>浪江町：2017年に大字全域解除された20大字</div><div class='row red'>浪江町：酒井</div><div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div><div class='row green'>双葉町：両竹・中野・中浜</div><div class='row green'>大熊町：大川原字南平・西平（大川原地区の解除済み区域の参考表示）</div><div class='row yellow'>南相馬市：小高区金谷、富岡町：小良ケ浜の5町字、飯舘村：長泥字曲田（区域内が混在するため判定保留）</div><div class='row yellow'>┄ 追加221面：南相馬市小高区・富岡町・大熊町・双葉町・葛尾村・飯舘村のe-Stat統計境界。法的区分は未判定です。</div>")};
+document.getElementById("zonesBtn").onclick=()=>{if(!visible){zoneLayer.addTo(map);visible=true}map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});status("<b>🎨 v44 収録区域</b><div class='row green'>浪江町：2017年に大字全域解除された20大字</div><div class='row red'>浪江町：酒井</div><div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div><div class='row green'>双葉町：両竹・中野・中浜</div><div class='row green'>大熊町：大川原字南平・西平（大川原地区の解除済み区域の参考表示）</div><div class='row yellow'>南相馬市：小高区金谷、富岡町：小良ケ浜の5町字、飯舘村：長泥字曲田（区域内が混在するため判定保留）</div><div class='row yellow'>▨ 追加221面：南相馬市小高区・富岡町・大熊町・双葉町・葛尾村・飯舘村のe-Stat統計境界。薄黄色は法的区分ではなく未判定を表します。</div>")};
 
 let selectedTown=null;
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const t=towns[b.dataset.t];selectedTown=b.dataset.t;map.invalidateSize(false);map.setView([t[1],t[2]],t[3],{animate:false});status("<b>🔵 "+t[0]+"</b><div class='row blue'>地図の着色区域をタップすると根拠区分を表示します。<br>「📄 公式図」で、この自治体の公式資料を開けます。</div>")});
