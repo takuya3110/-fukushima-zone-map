@@ -19,7 +19,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v64｜公式図リンク・現行情報更新版</div>
+<div class="sub">v66｜帰還困難区域の全体外郭・現行概略面追加版</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋現地追跡</b>
 <div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
@@ -42,8 +42,8 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button id="legend">🧭 凡例</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
 </div>
 <div class="note">
-v64は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を薄黄＋細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
-赤・緑・太い黄色は従来どおり公式情報と照合した参考表示です。黄の細い破線と、地番単位の詳細が必要な太い黄色は、法的区分を「未判定」と表示します。紫・緑の破線は公式区域図を読んだ概略であり、地番単位の立入り可否を保証しません。特別通過交通は、正確な道路線を収録するまで「未判定」と表示します。<br>
+v66は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を薄黄＋細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
+太い紺線は「過去に帰還困難区域だった範囲」の外郭概略、薄赤面は「現在も帰還困難区域が残る範囲」の概略です。いずれも福島県の概念図を地理院地図に照合したもので、地番単位の法的境界ではありません。赤・緑・太い黄色は従来どおり公式情報と照合した参考表示です。黄の細い破線と、地番単位の詳細が必要な太い黄色は、法的区分を「未判定」と表示します。紫・緑の破線は公式区域図を読んだ概略であり、地番単位の立入り可否を保証しません。特別通過交通は、正確な道路線を収録するまで「未判定」と表示します。<br>
 公式資料：<a href="https://www.meti.go.jp/earthquake/nuclear/kinkyu.html" target="_blank" rel="noopener">経済産業省</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html" target="_blank" rel="noopener">大熊町・立入規制緩和図</a>
 </div>
 </div>
@@ -111,6 +111,12 @@ const contextByMuni={"07212":townContext.minamisoma,"07543":townContext.tomioka,
 const trafficByMuni={"07212":"国道114号（大柿トンネル内～浪江町特定復興再生拠点区域境、約0.6km）／県道49号（原浪トンネル内、約0.6km）。二輪車・軽車両・歩行者も通行証不要で通過可。","07545":"大熊町道東15号～県道252号、県道35号～国道288号、国道288号の一部、大熊町道東67号～国道6号","07546":"双葉町道101号・109号"};
 function color(s){return (s==="green"||s==="released")?"#16963b":s==="red"?"#d92323":"#e0ad00"}
 function label(s){return s==="green"?"🟢 避難指示解除を大字全域で確認":s==="released"?"🟢 避難指示解除済み（公式解除図からの概略）":s==="red"?"🔴 帰還困難区域を大字全域で確認":s==="purple"?"🟣 特定帰還居住区域（公式図からの概略）":s==="relax"?"🟩 立入規制緩和区域（公式図からの概略）":s==="reference"?"┄ e-Stat統計境界（法的区分は未判定）":"🟡 地番単位の詳細確認が必要"}
+function installHatchPatterns(){
+ const svg=map.getPanes().overlayPane.querySelector("svg");if(!svg||svg.querySelector("#hatchPurple"))return;
+ const ns="http://www.w3.org/2000/svg",defs=document.createElementNS(ns,"defs");
+ function pattern(id,stroke){const p=document.createElementNS(ns,"pattern");p.setAttribute("id",id);p.setAttribute("width","10");p.setAttribute("height","10");p.setAttribute("patternUnits","userSpaceOnUse");p.setAttribute("patternTransform","rotate(45)");const bg=document.createElementNS(ns,"rect");bg.setAttribute("width","10");bg.setAttribute("height","10");bg.setAttribute("fill",stroke);bg.setAttribute("fill-opacity","0.10");const line=document.createElementNS(ns,"line");line.setAttribute("x1","0");line.setAttribute("y1","0");line.setAttribute("x2","0");line.setAttribute("y2","10");line.setAttribute("stroke",stroke);line.setAttribute("stroke-width","3");line.setAttribute("stroke-opacity","0.66");p.append(bg,line);defs.appendChild(p)}
+ pattern("hatchPurple","#8231a8");pattern("hatchGreen","#16963b");svg.insertBefore(defs,svg.firstChild);
+}
 function status(h){document.getElementById("status").innerHTML=h}
 function showLegend(){status("<b>🧭 地図の凡例（2026年7月確認）</b><div class='row red'><b>🔴 赤</b><br>現在の帰還困難区域。避難指示が継続しています。</div><div class='row purple'><b>🟣 紫ハッチ</b><br>特定帰還居住区域。避難指示は解除済みではありません。公開区域図を町字境界へ丸めた概略を含みます。</div><div class='row green'><b>🟩 緑ハッチ</b><br>立入規制緩和区域。バリケード撤去・一時立入り手続不要等の取扱いがありますが、地番単位の正確な範囲は公式図で確認してください。</div><div class='row green'><b>白地＋緑枠</b><br>避難指示解除済みの特定復興再生拠点区域（公式図からの概略）。</div><div class='row yellow'><b>🟡 黄色</b><br>町字内で法的区域が混在、または地番指定のため未判定です。</div><div class='row yellow'><b>薄黄＋細い破線</b><br>e-Statの統計境界。位置確認用であり、法的な区域線ではありません。</div><div class='row blue'><b>🔵 GPS</b><br>現在地。GPS精度の円を併せて表示します。</div><div class='row grey'>🚗 特別通過交通は道路の通過制度であり、沿道への立入り可否とは別です。</div>")}
 document.getElementById("legend").onclick=showLegend;
@@ -380,15 +386,33 @@ const APPROX_ZONES={"type":"FeatureCollection","features":[
 ...REFERENCE_ZONES.features.filter(f=>f.properties.c==="双葉町"&&startsWithOne(f.properties.n,FUTABA_RELAX_PREFIXES)).map(f=>({"type":"Feature","properties":{"n":f.properties.n,"c":"双葉町","s":"relax","approx":true,"detail":"羽鳥行政区は2026年2月16日から立入規制緩和。下長塚・三字も既に緩和済みですが、町字境界に対応できないため面表示はしていません。","src":"https://www.town.fukushima-futaba.lg.jp/12648.htm"},"geometry":f.geometry})),
 ...REFERENCE_ZONES.features.filter(f=>f.properties.c==="富岡町"&&startsWithOne(f.properties.n,TOMIOKA_RETURN_PREFIXES)).map(f=>({"type":"Feature","properties":{"n":f.properties.n,"c":"富岡町","s":"purple","approx":true,"detail":"特定帰還居住区域の公開範囲をe-Stat町字境界に丸めた概略です。地番境界ではありません。","src":"https://www.tomioka-town.jp/site/mayor/9260.html"},"geometry":f.geometry}))
 ]};
+// 福島県「避難指示区域の概念図（令和7年3月31日）」を地理院地図と照合して作成した表示用の概略面。
+// 法的な地番境界ではない。解除済み拠点の白地・紫／緑ハッチを上から表示する。
+const CURRENT_DIFFICULT_APPROX={"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"浪江町","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。地番単位の法的境界ではありません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.703,37.548],[140.720,37.582],[140.752,37.611],[140.790,37.623],[140.830,37.613],[140.873,37.592],[140.908,37.568],[140.931,37.540],[140.923,37.510],[140.909,37.486],[140.884,37.463],[140.850,37.447],[140.810,37.449],[140.773,37.468],[140.738,37.497],[140.715,37.523],[140.703,37.548]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"双葉町","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。駅前等の白地＋緑枠は解除済み表示を優先します。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.930,37.466],[140.949,37.481],[140.987,37.485],[141.019,37.472],[141.026,37.446],[141.008,37.425],[140.973,37.423],[140.944,37.438],[140.930,37.466]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"大熊町","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。大川原等の白地＋緑枠は解除済み表示を優先します。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.928,37.425],[140.949,37.441],[140.982,37.443],[141.012,37.425],[141.014,37.395],[140.993,37.374],[140.958,37.369],[140.934,37.387],[140.928,37.425]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"富岡町","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。小良ヶ浜・深谷等は地番単位で混在するため、最終確認には公式図を用います。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.935,37.381],[140.964,37.390],[140.991,37.377],[141.002,37.354],[140.989,37.330],[140.958,37.323],[140.936,37.340],[140.935,37.381]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"葛尾村","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。特定帰還居住区域の位置は非公表部分があるため描きません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.737,37.551],[140.765,37.564],[140.813,37.550],[140.841,37.528],[140.840,37.500],[140.811,37.478],[140.774,37.482],[140.747,37.510],[140.737,37.551]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"飯舘村","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。長泥曲田の解除済み部分は町字全体を塗り分けません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.716,37.624],[140.742,37.635],[140.775,37.626],[140.789,37.605],[140.771,37.588],[140.744,37.589],[140.721,37.604],[140.716,37.624]]] }},
+{"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"南相馬市","s":"red","approx":true,"detail":"小高区金谷の一部と指定国有林。福島県の概念図に照合した概略であり、金谷町字全体を帰還困難区域とするものではありません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.901,37.564],[140.919,37.573],[140.940,37.565],[140.943,37.545],[140.929,37.538],[140.909,37.544],[140.901,37.564]]] }}
+]};
+// 太線は「一度でも帰還困難区域に指定された範囲」の外郭を示す概略線。現在の法的境界ではない。
+const HISTORICAL_DIFFICULT_OUTLINES={"type":"FeatureCollection","features":[
+...CURRENT_DIFFICULT_APPROX.features.map(f=>({"type":"Feature","properties":{"n":"過去の帰還困難区域外郭（概略）","c":f.properties.c,"approx":true,"detail":"特定復興再生拠点区域等として既に解除された部分も含む、過去に帰還困難区域だった範囲の外郭概略です。","src":f.properties.src},"geometry":f.geometry}))
+]};
 // 解除済み概略は最後に描画し、紫の町字丸め概略が駅前・拠点区域を覆わないようにする。
 const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features,APPROX_ZONES.features.filter(f=>f.properties.s!=="released"),APPROX_ZONES.features.filter(f=>f.properties.s==="released"))};
+const difficultLayer=L.geoJSON(CURRENT_DIFFICULT_APPROX,{style:{color:"#d92323",weight:2.5,fillColor:"#d92323",fillOpacity:.20,dashArray:"10 5"},onEachFeature:(f,l)=>l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>🔴 帰還困難区域の概略面。<br>福島県の公式概念図を地理院地図に照合した表示で、地番単位の法的境界ではありません。<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>福島県の公式概念図を開く</a>")}).addTo(map);
 const zoneLayer=L.geoJSON(ALL_ZONES,{
- style:f=>f.properties.s==="reference"?{color:"#a27a00",weight:1,fillColor:"#e0ad00",fillOpacity:.055,dashArray:"3 4"}:f.properties.s==="released"?{color:"#16963b",weight:3,fillColor:"#fff",fillOpacity:.76,dashArray:null}:f.properties.s==="purple"?{color:"#8231a8",weight:2.5,fillColor:"#8231a8",fillOpacity:.20,dashArray:"8 5"}:f.properties.s==="relax"?{color:"#16963b",weight:2.5,fillColor:"#16963b",fillOpacity:.20,dashArray:"8 5"}:{color:color(f.properties.s),weight:f.properties.s==="yellow"?3:1.5,fillColor:color(f.properties.s),fillOpacity:f.properties.s==="yellow"?.08:.32,dashArray:f.properties.s==="yellow"?"7 5":null},
+ style:f=>f.properties.s==="reference"?{color:"#a27a00",weight:1,fillColor:"#e0ad00",fillOpacity:.055,dashArray:"3 4"}:f.properties.s==="released"?{color:"#16963b",weight:3,fillColor:"#fff",fillOpacity:.76,dashArray:null}:f.properties.s==="purple"?{color:"#8231a8",weight:2.5,fillColor:"url(#hatchPurple)",fillOpacity:1,dashArray:"8 5"}:f.properties.s==="relax"?{color:"#16963b",weight:2.5,fillColor:"url(#hatchGreen)",fillOpacity:1,dashArray:"8 5"}:{color:color(f.properties.s),weight:f.properties.s==="yellow"?3:1.5,fillColor:color(f.properties.s),fillOpacity:f.properties.s==="yellow"?.08:.32,dashArray:f.properties.s==="yellow"?"7 5":null},
  onEachFeature:(f,l)=>{
    l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>"+label(f.properties.s)+(f.properties.detail?"<br>範囲："+f.properties.detail:""));
    l.on("click",()=>status("<b>"+f.properties.c+" "+f.properties.n+"</b><div class='row "+(f.properties.s==="purple"?"purple":(f.properties.s==="relax"||f.properties.s==="released"||f.properties.s==="green")?"green":"yellow")+"'><b>"+label(f.properties.s)+"</b><br>"+(f.properties.detail?"<b>公式資料の範囲：</b>"+f.properties.detail+"<br>":"")+(f.properties.approx?"公式区域図を読み取って表示した概略です。地番単位の立入り可否・避難指示の最終確認には使えません。":f.properties.s==="reference"?"この面はe-Stat 2020の統計境界です。避難指示・特定帰還居住区域・立入規制緩和の法的な境界や判定には使用しません。":f.properties.s==="yellow"?"この町字は法的区域と町字境界が一致しない、または区域内が混在するため、町字ポリゴン全体の法的状態は判定しません。":"公式情報と町字境界を照合した参考表示です。 ")+(f.properties.src?"<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>公式区域図を開く</a>":"")+"</div>"));
  }
 }).addTo(map);
+installHatchPatterns();
+const historicalLayer=L.geoJSON(HISTORICAL_DIFFICULT_OUTLINES,{style:{color:"#182b3a",weight:4,opacity:.90,fill:false,dashArray:null},onEachFeature:(f,l)=>l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>太線：過去に帰還困難区域だった範囲の外郭概略です。<br>現在の避難指示境界ではありません。解除済みの拠点区域等を含みます。<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>福島県の公式概念図を開く</a>")}).addTo(map);
 
 // 国の2025年6月別紙地図を地理院地図に照合してなぞった概略線。
 // 表示・近接確認用であり、法的な道路中心線または通行可否の確定には使用しない。
@@ -396,9 +420,15 @@ const TRAFFIC_LINES={"type":"FeatureCollection","features":[{"type":"Feature","p
 const trafficLayer=L.geoJSON(TRAFFIC_LINES,{style:{color:"#007c91",weight:5,opacity:.9,dashArray:"10 6"},onEachFeature:(f,l)=>l.bindPopup("<b>🚗 "+f.properties.n+"</b><br>特別通過交通の公式図から読んだ概略線です。"+(f.properties.conditions?"<br>条件："+f.properties.conditions:"")+"<br>道路上か・通行条件は公式資料で確認してください。<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>国の公式資料を開く</a>")}).addTo(map);
 
 let visible=true;
+document.getElementById("legend").onclick=()=>status("<b>🧭 地図の凡例（v66）</b><div class='row grey'><b>太い紺線</b><br>一度でも帰還困難区域に指定された範囲の外郭概略。現在の避難指示境界ではありません。</div><div class='row red'><b>薄赤面／🔴赤</b><br>現在も帰還困難区域が残る範囲。薄赤面は福島県概念図に照合した概略、濃い赤は従来からの町字照合表示です。</div><div class='row purple'><b>🟣 紫ハッチ</b><br>特定帰還居住区域。避難指示は解除済みではありません。</div><div class='row green'><b>🟩 緑ハッチ</b><br>立入規制緩和区域の概略。</div><div class='row green'><b>白地＋緑枠</b><br>避難指示解除済みの特定復興再生拠点区域の概略。</div><div class='row yellow'><b>🟡 黄色／薄黄破線</b><br>地番単位の詳細が必要、またはe-Stat統計境界で法的区分は未判定です。</div><div class='row blue'><b>🔵 GPS</b><br>現在地。境界に近い場合は精度警告を表示します。</div>");
 document.getElementById("toggle").onclick=()=>{visible=!visible;if(visible)zoneLayer.addTo(map);else map.removeLayer(zoneLayer)};
 document.getElementById("zonesBtn").onclick=()=>{if(!visible){zoneLayer.addTo(map);visible=true}map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});status("<b>🎨 v64 収録区域</b><div class='row green'>浪江町：2017年に大字全域解除された20大字</div><div class='row red'>浪江町：酒井</div><div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div><div class='row green'>解除済み概略：双葉・大熊・浪江・富岡・飯舘・葛尾の特定復興再生拠点区域（復興庁資料に基づく）</div><div class='row purple'>双葉町：特定帰還居住区域の概略。立入規制緩和は下長塚・三字・羽鳥行政区で実施済み（町字に丸められる羽鳥のみ着色）。</div><div class='row purple'>富岡町：小良ヶ浜・深谷・新夜ノ森の特定帰還居住区域概略</div><div class='row purple'>大熊町：特定帰還居住区域概略／立入規制緩和区域概略（2026年6月22日開始）</div><div class='row yellow'>南相馬市・葛尾村：特定帰還居住区域は認定済み。ただし個人宅特定につながるため位置は非公表で、推測着色はしません。</div><div class='row yellow'>▨ 追加221面：南相馬市小高区・富岡町・大熊町・双葉町・葛尾村・飯舘村のe-Stat統計境界。薄黄色は法的区分ではなく未判定を表します。</div>")};
 
+// 色ON/OFFは概略面・太線も含めて切り替える。
+const baseToggle=document.getElementById("toggle").onclick;
+document.getElementById("toggle").onclick=()=>{baseToggle();if(visible){difficultLayer.addTo(map);historicalLayer.addTo(map);installHatchPatterns()}else{map.removeLayer(difficultLayer);map.removeLayer(historicalLayer)}};
+const baseZonesButton=document.getElementById("zonesBtn").onclick;
+document.getElementById("zonesBtn").onclick=()=>{baseZonesButton();difficultLayer.addTo(map);historicalLayer.addTo(map);installHatchPatterns()};
 let selectedTown=null;
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const t=towns[b.dataset.t],c=townContext[b.dataset.t];selectedTown=b.dataset.t;map.invalidateSize(false);map.setView([t[1],t[2]],t[3],{animate:false});status("<b>🔵 "+t[0]+"</b><div class='row "+c.s+"'>"+c.t+"</div><div class='row blue'>地図の着色区域をタップすると根拠区分を表示します。<br>「📄 公式図」で、この自治体の公式資料を開けます。</div>")});
 document.getElementById("official").onclick=()=>{if(!selectedTown){status("<b>📄 公式図</b><div class='row yellow'>先に対象市町村のボタンを選んでください。</div>");return}const t=towns[selectedTown];window.open(t[4],"_blank","noopener")};
@@ -413,7 +443,7 @@ const geoOptions={enableHighAccuracy:true,timeout:20000,maximumAge:2000};
 function pointInRing(p,ring){let x=p[1],y=p[0],inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){let xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside}return inside}
 function pointInPolygon(p,poly){if(!poly.length||!pointInRing(p,poly[0]))return false;for(let i=1;i<poly.length;i++)if(pointInRing(p,poly[i]))return false;return true}
 function pointInFeature(layer,p){const g=layer.feature.geometry;if(g.type==="Polygon")return pointInPolygon(p,g.coordinates);if(g.type==="MultiPolygon")return g.coordinates.some(poly=>pointInPolygon(p,poly));return false}
-function findHits(lat,lng){const hits=[];zoneLayer.eachLayer(l=>{if(l.getBounds&&l.getBounds().contains([lat,lng])&&pointInFeature(l,[lat,lng]))hits.push(l.feature)});return hits}
+function findHits(lat,lng){const hits=[];zoneLayer.eachLayer(l=>{if(l.getBounds&&l.getBounds().contains([lat,lng])&&pointInFeature(l,[lat,lng]))hits.push(l.feature)});CURRENT_DIFFICULT_APPROX.features.forEach(f=>{if(pointInFeature({feature:f},[lat,lng]))hits.push(f)});return hits}
 function distanceM(a,b){if(!a||!b)return Infinity;const r=6371000,p1=a[0]*Math.PI/180,p2=b[0]*Math.PI/180,dp=(b[0]-a[0])*Math.PI/180,dl=(b[1]-a[1])*Math.PI/180;const q=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*r*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))}
 function distanceToTrafficM(lat,lng){let best=Infinity,hit=null;TRAFFIC_LINES.features.forEach(f=>{const cs=f.geometry.coordinates;for(let i=1;i<cs.length;i++){const a=cs[i-1],b=cs[i],k=Math.cos(lat*Math.PI/180)*111320,x=lng*k,y=lat*110540,ax=a[0]*k,ay=a[1]*110540,bx=b[0]*k,by=b[1]*110540,dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy))),d=Math.hypot(x-(ax+t*dx),y-(ay+t*dy));if(d<best){best=d;hit=f}}});return{d:best,f:hit}}
 function distanceToSegmentM(lat,lng,a,b){const k=Math.cos(lat*Math.PI/180)*111320,x=lng*k,y=lat*110540,ax=a[0]*k,ay=a[1]*110540,bx=b[0]*k,by=b[1]*110540,dx=bx-ax,dy=by-ay,q=dx*dx+dy*dy;if(!q)return Math.hypot(x-ax,y-ay);const t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/q));return Math.hypot(x-(ax+t*dx),y-(ay+t*dy))}
