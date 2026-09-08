@@ -19,7 +19,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v66｜帰還困難区域の全体外郭・現行概略面追加版</div>
+<div class="sub">v67｜帰還困難区域の全体外周・現行概略面整理版</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋現地追跡</b>
 <div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
@@ -42,7 +42,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button id="legend">🧭 凡例</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
 </div>
 <div class="note">
-v66は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を薄黄＋細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
+v67は、v40収録の43区域に加え、対象7市町村のe-Stat 2020町丁・字等境界を薄黄＋細い破線で追加します。これは場所の確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
 太い紺線は「過去に帰還困難区域だった範囲」の外郭概略、薄赤面は「現在も帰還困難区域が残る範囲」の概略です。いずれも福島県の概念図を地理院地図に照合したもので、地番単位の法的境界ではありません。赤・緑・太い黄色は従来どおり公式情報と照合した参考表示です。黄の細い破線と、地番単位の詳細が必要な太い黄色は、法的区分を「未判定」と表示します。紫・緑の破線は公式区域図を読んだ概略であり、地番単位の立入り可否を保証しません。特別通過交通は、正確な道路線を収録するまで「未判定」と表示します。<br>
 公式資料：<a href="https://www.meti.go.jp/earthquake/nuclear/kinkyu.html" target="_blank" rel="noopener">経済産業省</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html" target="_blank" rel="noopener">大熊町・立入規制緩和図</a>
 </div>
@@ -397,9 +397,9 @@ const CURRENT_DIFFICULT_APPROX={"type":"FeatureCollection","features":[
 {"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"飯舘村","s":"red","approx":true,"detail":"福島県の現行概念図を地理院地図に照合した概略面です。長泥曲田の解除済み部分は町字全体を塗り分けません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.716,37.624],[140.742,37.635],[140.775,37.626],[140.789,37.605],[140.771,37.588],[140.744,37.589],[140.721,37.604],[140.716,37.624]]] }},
 {"type":"Feature","properties":{"n":"現行帰還困難区域（概略）","c":"南相馬市","s":"red","approx":true,"detail":"小高区金谷の一部と指定国有林。福島県の概念図に照合した概略であり、金谷町字全体を帰還困難区域とするものではありません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.901,37.564],[140.919,37.573],[140.940,37.565],[140.943,37.545],[140.929,37.538],[140.909,37.544],[140.901,37.564]]] }}
 ]};
-// 太線は「一度でも帰還困難区域に指定された範囲」の外郭を示す概略線。現在の法的境界ではない。
+// 太線は「一度でも帰還困難区域に指定された範囲」の外周だけを示す概略線。現在の法的境界ではない。
 const HISTORICAL_DIFFICULT_OUTLINES={"type":"FeatureCollection","features":[
-...CURRENT_DIFFICULT_APPROX.features.map(f=>({"type":"Feature","properties":{"n":"過去の帰還困難区域外郭（概略）","c":f.properties.c,"approx":true,"detail":"特定復興再生拠点区域等として既に解除された部分も含む、過去に帰還困難区域だった範囲の外郭概略です。","src":f.properties.src},"geometry":f.geometry}))
+{"type":"Feature","properties":{"n":"過去の帰還困難区域・全体外周（概略）","c":"7市町村","approx":true,"detail":"特定復興再生拠点区域等として既に解除された部分も含む、過去に帰還困難区域だった範囲の全体外周です。市町村ごとの内側の境界線は表示しません。","src":"https://www.pref.fukushima.lg.jp/uploaded/attachment/688152.pdf"},"geometry":{"type":"Polygon","coordinates":[[[140.936,37.323],[140.972,37.322],[140.990,37.330],[141.003,37.354],[141.015,37.394],[141.027,37.446],[141.020,37.472],[140.988,37.486],[140.941,37.558],[140.928,37.572],[140.872,37.593],[140.831,37.614],[140.790,37.627],[140.743,37.636],[140.716,37.625],[140.703,37.549],[140.737,37.497],[140.810,37.449],[140.850,37.447],[140.884,37.463],[140.930,37.466],[140.928,37.425],[140.934,37.387],[140.936,37.323]]]}}
 ]};
 // 解除済み概略は最後に描画し、紫の町字丸め概略が駅前・拠点区域を覆わないようにする。
 const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features,APPROX_ZONES.features.filter(f=>f.properties.s!=="released"),APPROX_ZONES.features.filter(f=>f.properties.s==="released"))};
