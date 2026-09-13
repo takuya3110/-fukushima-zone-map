@@ -19,7 +19,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v73｜避難指示GPS判定・根拠明示版</div>
+<div class="sub">v74｜GPS判定・属性別公式図リンク版</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋現地追跡</b>
 <div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
@@ -42,7 +42,7 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button id="legend">🧭 凡例</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
 </div>
 <div class="note">
-v73は、GPS表示ごとに「公式一覧と町字境界の一致」か「公式図からの概略」かを明示します。薄黄＋細い破線のe-Stat境界は場所確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
+v74は、現在地が重なる避難指示・特定帰還居住区域・立入規制緩和区域ごとに、該当する公式図を開けます。薄黄＋細い破線のe-Stat境界は場所確認用であり、統計境界そのものを法的な避難指示境界とは扱いません。
 薄赤面は「現在も帰還困難区域が残る範囲」の概略です。福島県の概念図を地理院地図に照合したもので、地番単位の法的境界ではありません。旧・帰還困難区域の全体外周は、正確なGISを確認できるまで表示しません。赤・緑・太い黄色は従来どおり公式情報と照合した参考表示です。黄の細い破線と、地番単位の詳細が必要な太い黄色は、法的区分を「未判定」と表示します。紫・緑の破線は公式区域図を読んだ概略であり、地番単位の立入り可否を保証しません。特別通過交通は、正確な道路線を収録するまで「未判定」と表示します。<br>
 公式資料：<a href="https://www.meti.go.jp/earthquake/nuclear/kinkyu.html" target="_blank" rel="noopener">経済産業省</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html" target="_blank" rel="noopener">大熊町・立入規制緩和図</a>
 </div>
@@ -531,7 +531,7 @@ async function showPosition(p,center=true,mode="現在地",isMapPoint=false){
  const judgement=baseHit?(baseHit.properties.s==="reference"?"<div class='row yellow'><b>避難指示：未判定</b><br>現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の統計境界内です。ここでは法的な避難指示区分を判定しません。</div>":baseHit.properties.returnBasis?"<div class='row red'><b>避難指示：帰還困難区域</b><br>特定帰還居住区域内は、避難指示が解除されるまで帰還困難区域です。現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の紫ハッチ概略に該当します。</div>":"<div class='row "+(baseHit.properties.s==="released"?"green":baseHit.properties.s)+"'><b>避難指示："+esc(baseHit.properties.c+" "+baseHit.properties.n)+"</b><br>"+label(baseHit.properties.s)+(baseHit.properties.detail?"<br>公式資料の範囲："+esc(baseHit.properties.detail):"")+(baseHit.properties.src?"<br><a href='"+baseHit.properties.src+"' target='_blank' rel='noopener'>根拠の公式資料を開く</a>":"")+"</div>"):outside?"<div class='row blue'><b>避難指示：対象区域外</b><br>現在地は、このアプリの対象7市町村外です。GPS取得は正常です。</div>":"<div class='row yellow'><b>避難指示：未判定</b><br>対象7市町村内ですが、v72収録の確定ポリゴン外です。これは『解除』『帰還困難』の否定ではありません。</div>";
  const conceptNote=!releasedHit&&!hits.find(f=>f.properties.s==="red")&&!returnHardHit&&conceptHit?"<div class='row grey'><b>薄赤の広域概念図：面内</b><br>この位置は "+esc(conceptHit.properties.c)+" の現行帰還困難区域概念図に重なりますが、概念図はGPSの法的確定には使いません。公式図・現地の標識を確認してください。</div>":"";
  const trafficNear=distanceToTrafficM(lat,lng),trafficContext=trafficNear.d<=50?"<div class='row blue'><b>特別通過交通：概略線に近接</b><br>"+trafficNear.f.properties.n+" の概略線から約"+Math.round(trafficNear.d)+"mです。公式図を地図に照合した表示であり、道路上・通行条件の確定ではありません。</div>":trafficByMuni[lastMuniCode]?"<div class='row blue'><b>特別通過交通：対象路線あり（道路上かは未判定）</b><br>"+trafficByMuni[lastMuniCode]+"。道路中心線・区間端点の正確なデータを未収録のため、GPSだけでは道路上かを判定しません。</div>":"<div class='row grey'><b>特別通過交通：未判定</b><br>対象道路の正確な中心線・条件を未収録です。</div>";
- const separate="<div class='row purple'><b>特定帰還居住区域："+(approxReturn?"概略で該当":"未判定")+"</b><br>"+(approxReturn?esc(approxReturn.properties.n)+"。公式区域図から読んだ概略で、地番単位の該当は保証しません。":"地番単位の公式区域図を確認中です。避難指示解除済みではありません。")+"</div><div class='row green'><b>立入り："+(approxRelax?"規制緩和区域に概略で該当":"未判定")+"</b><br>"+(approxRelax?esc(approxRelax.properties.n)+"。公式区域図から読んだ概略で、実際のバリケード・地番を優先してください。":"立入規制緩和区域の正確な地番境界を未収録です。")+"</div>"+trafficContext;
+ const separate="<div class='row purple'><b>特定帰還居住区域："+(approxReturn?"概略で該当":"未判定")+"</b><br>"+(approxReturn?esc(approxReturn.properties.n)+"。公式区域図から読んだ概略で、地番単位の該当は保証しません。"+(approxReturn.properties.src?"<br><a href='"+approxReturn.properties.src+"' target='_blank' rel='noopener'>特定帰還居住区域の公式図を開く</a>":""):"地番単位の公式区域図を確認中です。避難指示解除済みではありません。")+"</div><div class='row green'><b>立入り："+(approxRelax?"規制緩和区域に概略で該当":"未判定")+"</b><br>"+(approxRelax?esc(approxRelax.properties.n)+"。公式区域図から読んだ概略で、実際のバリケード・地番を優先してください。"+(approxRelax.properties.src?"<br><a href='"+approxRelax.properties.src+"' target='_blank' rel='noopener'>立入規制緩和の公式図を開く</a>":""):"立入規制緩和区域の正確な地番境界を未収録です。")+"</div>"+trafficContext;
  const municipalContext=contextByMuni[lastMuniCode]?"<div class='row "+contextByMuni[lastMuniCode].s+"'><b>自治体全体の補足</b><br>"+contextByMuni[lastMuniCode].t+"</div>":"";
  const edgeM=baseHit?distanceToFeatureEdgeM(baseHit,lat,lng):Infinity,boundaryWarning=baseHit&&edgeM<=acc?"<div class='row yellow'><b>⚠ 境界に近いため確定できません</b><br>表示上の区域境界まで約"+Math.round(edgeM)+"m、GPS精度は約±"+Math.round(acc)+"mです。公式図・現地の標識やバリケードを優先してください。</div>":"";
  status(head+judgement+evidenceHtml(baseHit)+conceptNote+boundaryWarning+separate+municipalContext+historyHtml())
