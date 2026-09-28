@@ -19,10 +19,10 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <body>
 <header>
 <h1>福島・規制区域マップ</h1>
-<div class="sub">v86｜位置合わせ未検証の画像重ねを除き、公式原図を別表示</div>
+<div class="sub">v88｜飯舘村の解除済み20面とGPS判定を更新</div>
 <div id="status" role="status" aria-live="polite">
 <b>🗺 実町字ポリゴン＋公式原図へのリンク</b>
-<div class="row green">🟢 大字全域の解除を公式確認できる区域</div>
+<div class="row green">🟢 大字・地区全体の解除を確認した区域。大熊・大川原の緑面は参考表示</div>
 <div class="row red">🔴 大字全域が帰還困難区域と公式確認できる区域</div>
 <div class="row yellow">🟡 町字内で解除・未解除が混在するため要詳細確認</div>
 <div class="row yellow">▨ 薄黄＋細い破線：e-Stat統計境界（法的区分は未判定）</div>
@@ -45,13 +45,14 @@ button{border:0;border-radius:8px;padding:11px 2px;color:#fff;font-weight:bold;f
 <button class="town" data-t="tomioka">富岡</button><button id="zonesBtn">着色区域</button>
 </div>
 <div class="grid4 actions">
-<button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button id="facilityMap">🏭 施設図</button><button id="tepcoMap">⬛ 原発公式図</button><button id="okumaMap">🗺 大熊公式図</button><button id="futabaMap">🟣 双葉公式図</button><button id="tomiokaMap">🟡 富岡公式図</button><button id="namieMap">🟣 浪江公式図</button><button id="legend">🧭 凡例</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
+<button id="gps">📍 現在地</button><button id="pin">📌 地点判定</button><button id="track">▶ 移動追跡</button><button id="official">📄 公式図</button><button id="traffic">🚗 通過交通</button><button id="facilityMap">🏭 施設図</button><button id="tepcoMap">⬛ 原発公式図</button><button id="okumaMap">🗺 大熊規制図</button><button id="futabaMap">🟣 双葉公式図</button><button id="tomiokaMap">🟡 富岡公式図</button><button id="namieMap">🟣 浪江公式図</button><button id="legend">🧭 凡例</button><button class="layer" id="toggle">🎨 色 ON/OFF</button><button id="wide">🗾 広域</button>
 </div>
 <div class="note">
-v86では、縦横比・地理座標を検証できない公式画像を地理院地図に引き伸ばして重ねる方式をやめました。大熊・双葉・富岡・浪江・原発の各公式図ボタンは、公式の原図を別画面で開きます。地図の色面は従来どおり参照用で、黄色・ハッチ・細い破線は地番単位の法的境界を保証しません。<br>
+v88では、飯舘村の長泥以外の20町字等統計面を緑で追加しました。村の2017年3月31日の解除情報に対応します。GPS地点が概略の解除区域・特定帰還居住区域に重なる場合は、避難指示を『未判定』として公式図を案内します。公式情報と町字全域の一致を確認した面を先に判定します。大熊町の最新資料も区分別に確認できます。2026年3月24日認定の特定帰還居住区域は10行政区・約570ha、6月22日開始の立入規制緩和はそのうち野上2区・下野上1区（概ね全域）・熊2区・熊3区・町区の一部です。特定帰還居住区域の指定と立入規制緩和は別属性で、避難指示解除とも別です。大熊のボタンから立入規制緩和図、区域図、町管内図を開けます。<br>
+縦横比・地理座標を検証できない公式画像を地理院地図に引き伸ばして重ねる方式は使いません。大熊・双葉・富岡・浪江・原発の各公式図ボタンは公式原図を別画面で開きます。地図の色面は参照用で、黄色・ハッチ・細い破線は地番単位の法的境界を保証しません。<br>
 赤の細い点線は福島県の広域概念図を参照した位置の目安だけで、面塗りもGPS判定も行いません。公式資料・現地の標識と食い違う場合は、必ず公式資料・現地表示を優先してください。<br>
 南相馬市の金谷は字小畑・字ドウケ・字出戸間船・字野中等が対象とされ、金谷全域は赤にしていません。富岡町は小良ヶ浜・深谷・新夜ノ森の各一部を特定帰還居住区域として公式図で確認します。特定帰還居住区域は避難指示解除済みではありません。<br>
-公式資料：<a href="https://www.pref.fukushima.lg.jp/sec/11050a/" target="_blank" rel="noopener">福島県・区域情報</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/site/fukkou/4598.html" target="_blank" rel="noopener">大熊町・最新管内図</a>
+公式資料：<a href="https://www.pref.fukushima.lg.jp/sec/11050a/" target="_blank" rel="noopener">福島県・区域情報</a> ／ <a href="https://www.reconstruction.go.jp/topics/cat-11/cat-41/cat-142/20230928101604/" target="_blank" rel="noopener">復興庁・特定帰還居住区域計画</a> ／ <a href="https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html" target="_blank" rel="noopener">大熊町・立入規制緩和図（2026年6月）</a> ／ <a href="https://www.town.okuma.fukushima.jp/site/fukkou/33440.html" target="_blank" rel="noopener">大熊町・区域図（2026年3月改定）</a>
 </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -105,6 +106,11 @@ const ZONES={"type":"FeatureCollection","features":[{"type":"Feature","propertie
 const NAMIE_FULL_RELEASE_SRC="https://www.town.namie.fukushima.jp/soshiki/2/34026.html";
 const NAMIE_FULL_RELEASED=new Set(["大字立野","大字藤橋","大字西台","大字酒田","大字苅宿","大字棚塩","大字北幾世橋","大字幾世橋","大字権現堂","大字請戸","大字中浜","大字両竹","大字高瀬","大字牛渡","大字川添","大字樋渡","大字谷津田","大字加倉","大字田尻","大字小野田"]);
 ZONES.features.forEach(f=>{
+ if(f.properties.c==="大熊町"&&["大字大川原字南平","大字大川原字西平"].includes(f.properties.n)){
+  f.properties.approx=true;
+  f.properties.detail="大川原地区の解除済み区域と町字統計境界を重ねた参考表示。町字全域の法的区分はこの面から判定しません。";
+  f.properties.src="https://www.town.okuma.fukushima.jp/site/fukkou/4598.html";
+ }
  if(f.properties.c==="浪江町"&&NAMIE_FULL_RELEASED.has(f.properties.n)&&f.properties.s==="green"){
   f.properties.detail="2017年3月31日に大字全域の避難指示解除を確認。";
   f.properties.src=NAMIE_FULL_RELEASE_SRC;
@@ -129,11 +135,12 @@ futaba:["双葉町",37.449,141.010,13,"https://www.town.fukushima-futaba.lg.jp/1
 okuma:["大熊町",37.400,140.985,13,"https://www.town.okuma.fukushima.jp/site/fukkou/4598.html"],
 tomioka:["富岡町",37.345,141.008,13,"https://www.tomioka-town.jp/soshiki/kikaku/8865.html"]
 };
-const townContext={minamisoma:{s:"yellow",t:"帰還困難区域は小高区金谷の字小畑・字ドウケ・字出戸間船・字野中と指定国有林です。金谷のe-Stat境界は一つの面のため、全域を赤にせず黄色の未判定面としています。特定帰還居住区域は個人宅特定につながるため位置が非公表です。"},iitate:{s:"yellow",t:"長泥地区には帰還困難区域が残ります。2025年3月31日に、長泥曲田のたい肥製造施設用地と周辺農地約6.2haは土地活用スキームで解除されましたが、居住目的ではなく位置も町字全体に一致しないため、全域を緑・赤にはしていません。"},namie:{s:"yellow",t:"解除済み・帰還困難・地番指定解除の各区域を既に重ねて表示しています。"},katsurao:{s:"yellow",t:"帰還困難区域と特定帰還居住区域が残ります。2025年3月31日に野行地区の風力発電事業用地・村道約20haは土地活用スキームで解除されましたが、町字全体に一致しないため面着色しません。2026年3月に小出谷地区を含む計画変更が認定され、区域図は非公表です。"},futaba:{s:"green",t:"双葉駅前は2020年3月に、特定復興再生拠点区域は2022年8月に避難指示が解除されています。立入規制緩和は下長塚・三字・羽鳥行政区で実施済みです。紫・緑ハッチは公開範囲を町字境界に丸めた概略です。"},okuma:{s:"purple",t:"特定帰還居住区域は2026年3月に変更認定されました。立入規制緩和は野上2区・下野上1区、熊2区・熊3区・町区の一部で2026年6月22日から実施されています。ハッチは町字境界に丸めた概略です。"},tomioka:{s:"yellow",t:"特定帰還居住区域は2026年2月変更認定で、小良ヶ浜・深谷・新夜ノ森行政区の各一部です。町字全体の紫ハッチは使わず、「🟡 富岡詳細図」で公式の地番単位範囲を確認できます。"}};
+const townContext={minamisoma:{s:"yellow",t:"帰還困難区域は小高区金谷の字小畑・字ドウケ・字出戸間船・字野中と指定国有林です。金谷のe-Stat境界は一つの面のため、全域を赤にせず黄色の未判定面としています。特定帰還居住区域は個人宅特定につながるため位置が非公表です。"},iitate:{s:"green",t:"長泥地区以外は2017年3月31日に避難指示が解除されました。長泥地区には帰還困難区域が残ります。2025年3月31日に、長泥曲田のたい肥製造施設用地と周辺農地約6.2haは土地活用スキームで解除されましたが、居住目的ではなく位置も町字全体に一致しないため、全域を緑・赤にはしていません。"},namie:{s:"yellow",t:"解除済み・帰還困難・地番指定解除の各区域を既に重ねて表示しています。"},katsurao:{s:"yellow",t:"帰還困難区域と特定帰還居住区域が残ります。2025年3月31日に野行地区の風力発電事業用地・村道約20haは土地活用スキームで解除されましたが、町字全体に一致しないため面着色しません。2026年3月に小出谷地区を含む計画変更が認定され、区域図は非公表です。"},futaba:{s:"green",t:"双葉駅前は2020年3月に、特定復興再生拠点区域は2022年8月に避難指示が解除されています。立入規制緩和は下長塚・三字・羽鳥行政区で実施済みです。紫・緑ハッチは公開範囲を町字境界に丸めた概略です。"},okuma:{s:"purple",t:"特定帰還居住区域は2026年3月に変更認定されました。立入規制緩和は野上2区・下野上1区、熊2区・熊3区・町区の一部で2026年6月22日から実施されています。ハッチは町字境界に丸めた概略です。"},tomioka:{s:"yellow",t:"特定帰還居住区域は2026年2月変更認定で、小良ヶ浜・深谷・新夜ノ森行政区の各一部です。町字全体の紫ハッチは使わず、「🟡 富岡詳細図」で公式の地番単位範囲を確認できます。"}};
 const contextByMuni={"07212":townContext.minamisoma,"07543":townContext.tomioka,"07545":townContext.okuma,"07546":townContext.futaba,"07547":townContext.namie,"07548":townContext.katsurao,"07564":townContext.iitate};
 const trafficByMuni={"07212":"国道114号（大柿トンネル内～浪江町特定復興再生拠点区域境、約0.6km）／県道49号（原浪トンネル内、約0.6km）。二輪車・軽車両・歩行者も通行証不要で通過可。","07545":"大熊町道東15号～県道252号、県道35号～国道288号、国道288号の一部、大熊町道東67号～国道6号","07546":"双葉町道101号・109号"};
 function color(s){return (s==="green"||s==="released")?"#16963b":s==="red"?"#d92323":"#e0ad00"}
 function label(s){return s==="green"?"🟢 避難指示解除を大字全域で確認":s==="released"?"🟢 避難指示解除済み（公式解除図からの概略）":s==="red"?"🔴 帰還困難区域（公式情報と照合）":s==="purple"?"🟣 特定帰還居住区域（公式図からの概略）":s==="relax"?"🟩 立入規制緩和区域（公式図からの概略）":s==="reference"?"┄ e-Stat統計境界（法的区分は未判定）":"🟡 地番単位の詳細確認が必要"}
+function featureLabel(f){return f.properties.gpsConfidence==="municipal"?"🟢 長泥地区以外の避難指示解除（2017年）":f.properties.approx&&f.properties.s==="green"?"🟡 解除済み区域の参考面（町字全域の法的判定は未判定）":f.properties.s==="released"?"🟢 解除済み区域の概略（GPS地点の法的判定は未判定）":label(f.properties.s)}
 function installHatchPatterns(){
  const svg=map.getPanes().overlayPane.querySelector("svg");if(!svg||(svg.querySelector("#hatchPurple")&&svg.querySelector("#hatchGreen")&&svg.querySelector("#hatchFacility")))return;
  const ns="http://www.w3.org/2000/svg",defs=document.createElementNS(ns,"defs");
@@ -461,14 +468,19 @@ const NAMIE_RETURN_APPROX={"type":"FeatureCollection","features":NAMIE_RETURN_SO
 // 旧・帰還困難区域の外周は、正確な全国GISを確認できるまで表示しない。
 const HISTORICAL_DIFFICULT_OUTLINES={"type":"FeatureCollection","features":[]};
 // 解除済み概略は最後に描画し、紫の町字丸め概略が駅前・拠点区域を覆わないようにする。
-const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features,APPROX_ZONES.features.filter(f=>f.properties.s!=="released"),NAMIE_RETURN_APPROX.features,APPROX_ZONES.features.filter(f=>f.properties.s==="released"))};
+// The village confirms that all of Iitate outside Nagadoro was released on 2017-03-31.
+// The 2020 census shapes identify 20 non-Nagadoro pieces. Nagadoro remains mixed.
+const IITATE_RELEASED={type:"FeatureCollection",features:REFERENCE_ZONES.features
+ .filter(f=>f.properties.c==="飯舘村"&&!f.properties.n.startsWith("長泥"))
+ .map(f=>({type:"Feature",properties:{n:f.properties.n,c:"飯舘村",s:"green",gpsConfidence:"municipal",detail:"2017年3月31日、長泥地区を除く村内の避難指示が解除。表示はe-Stat 2020の統計境界です。",src:"https://www.vill.iitate.fukushima.jp/uploaded/attachment/4505.pdf"},geometry:f.geometry}))};
+const ALL_ZONES={type:"FeatureCollection",features:ZONES.features.concat(REFERENCE_ZONES.features.filter(f=>f.properties.c!=="飯舘村"||f.properties.n.startsWith("長泥")),APPROX_ZONES.features.filter(f=>f.properties.s!=="released"),NAMIE_RETURN_APPROX.features,APPROX_ZONES.features.filter(f=>f.properties.s==="released"),IITATE_RELEASED.features)};
 // 薄赤は現在の残存位置を把握するための広域概念図。GPSの法的な確定判定には絶対に使用しない。
 const difficultLayer=L.geoJSON(CURRENT_DIFFICULT_APPROX,{style:{color:"#b84a4a",weight:1.3,fillColor:"#d92323",fillOpacity:0,dashArray:"4 8"},onEachFeature:(f,l)=>l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>🔴 帰還困難区域が残る範囲の<b>広域概念図</b>です。<br>GPSの法的判定には使用しません。地番単位の避難指示は、濃い赤・白地＋緑枠・公式図で確認します。<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>福島県の公式概念図を開く</a>")}).addTo(map);
 const zoneLayer=L.geoJSON(ALL_ZONES,{
  style:f=>f.properties.s==="reference"?{color:"#a27a00",weight:1,fillColor:"#e0ad00",fillOpacity:.055,dashArray:"3 4"}:f.properties.s==="released"?{color:"#16963b",weight:3,fillColor:"#fff",fillOpacity:.76,dashArray:null}:f.properties.s==="purple"?{color:"#8231a8",weight:2.5,fillColor:"url(#hatchPurple)",fillOpacity:1,dashArray:"8 5"}:f.properties.s==="relax"?{color:"#16963b",weight:2.5,fillColor:"url(#hatchGreen)",fillOpacity:1,dashArray:"8 5"}:{color:color(f.properties.s),weight:f.properties.s==="yellow"?3:1.5,fillColor:color(f.properties.s),fillOpacity:f.properties.s==="yellow"?.08:.32,dashArray:f.properties.s==="yellow"?"7 5":null},
  onEachFeature:(f,l)=>{
-   l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>"+label(f.properties.s)+(f.properties.detail?"<br>範囲："+f.properties.detail:""));
-   l.on("click",()=>status("<b>"+f.properties.c+" "+f.properties.n+"</b><div class='row "+(f.properties.s==="purple"?"purple":(f.properties.s==="relax"||f.properties.s==="released"||f.properties.s==="green")?"green":"yellow")+"'><b>"+label(f.properties.s)+"</b><br>"+(f.properties.detail?"<b>公式資料の範囲：</b>"+f.properties.detail+"<br>":"")+(f.properties.approx?"公式区域図を読み取って表示した概略です。地番単位の立入り可否・避難指示の最終確認には使えません。":f.properties.s==="reference"?"この面はe-Stat 2020の統計境界です。避難指示・特定帰還居住区域・立入規制緩和の法的な境界や判定には使用しません。":f.properties.s==="yellow"?"この町字は法的区域と町字境界が一致しない、または区域内が混在するため、町字ポリゴン全体の法的状態は判定しません。":"公式情報と町字境界を照合した参考表示です。 ")+(f.properties.src?"<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>公式区域図を開く</a>":"")+"</div>"));
+   l.bindPopup("<b>"+f.properties.c+" "+f.properties.n+"</b><br>"+featureLabel(f)+(f.properties.detail?"<br>範囲："+f.properties.detail:""));
+   l.on("click",()=>status("<b>"+f.properties.c+" "+f.properties.n+"</b><div class='row "+(f.properties.s==="purple"?"purple":(f.properties.s==="relax"||f.properties.s==="released"||f.properties.s==="green")?"green":"yellow")+"'><b>"+featureLabel(f)+"</b><br>"+(f.properties.detail?"<b>公式資料の範囲：</b>"+f.properties.detail+"<br>":"")+(f.properties.approx?"公式区域図を読み取って表示した概略です。地番単位の立入り可否・避難指示の最終確認には使えません。":f.properties.s==="reference"?"この面はe-Stat 2020の統計境界です。避難指示・特定帰還居住区域・立入規制緩和の法的な境界や判定には使用しません。":f.properties.s==="yellow"?"この町字は法的区域と町字境界が一致しない、または区域内が混在するため、町字ポリゴン全体の法的状態は判定しません。":"公式情報と町字境界を照合した参考表示です。 ")+(f.properties.src?"<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>公式区域図を開く</a>":"")+"</div>"));
  }
 }).addTo(map);
 installHatchPatterns();
@@ -495,13 +507,13 @@ function registerOfficialMap(buttonId,title,url,detail){
 }
 registerOfficialMap("tepcoMap","福島第一原発・東京電力公式配置図","https://www.tepco.co.jp/decommission/information/committee/roadmap_progress/2026-j.html","東京電力の2026年公表資料ページです。最新掲載の構内配置図を原図で確認できます。黒い敷地枠は地図上の別レイヤーです。");
 
-registerOfficialMap("futabaMap","双葉町・区域の公式図","https://www.town.fukushima-futaba.lg.jp/12648.htm","2026年2月追加の立入規制緩和区域図と、町の区域案内を原図で確認できます。紫の特定帰還居住区域は避難指示解除済みではありません。");
+registerOfficialMap("futabaMap","双葉町・区域の公式図","https://www.town.fukushima-futaba.lg.jp/12648.htm","2026年2月追加の立入規制緩和区域図と、町の区域案内を原図で確認できます。双葉駅前は2020年3月4日、特定復興再生拠点区域は2022年8月30日に避難指示が解除されています。現在の帰還困難区域・特定帰還居住区域・立入規制緩和区域とは区別してください。<br><a href='https://www.town.fukushima-futaba.lg.jp/7829.htm' target='_blank' rel='noopener'>2020年3月解除（双葉駅周辺等）の町公式資料</a><br><a href='https://www.town.fukushima-futaba.lg.jp/10137.htm' target='_blank' rel='noopener'>2022年8月解除（特定復興再生拠点区域）の町公式資料</a><br><a href='https://www.town.fukushima-futaba.lg.jp/12649.htm' target='_blank' rel='noopener'>2026年2月変更・特定帰還居住区域</a>");
 
 registerOfficialMap("tomiokaMap","富岡町・特定帰還居住区域図","https://www.tomioka-town.jp/soshiki/kikaku/8865.html","2026年2月13日認定の計画変更。小良ヶ浜・深谷・新夜ノ森行政区の各一部を含む公式図を原図で確認できます。");
 
 registerOfficialMap("namieMap","浪江町・特定帰還居住区域図","https://www.reconstruction.go.jp/files/user/topics/main-cat1/sub-cat1-4/saiseikyoten/namie_tokuteikikankyojuukuikifukkosaiseikeikaku_20250318henkou.pdf","復興庁の2025年3月変更計画図です。津島・赤宇木など山側の区域を原図で確認できます。紫色の範囲は解除済みではありません。");
 
-registerOfficialMap("okumaMap","大熊町・区域の公式図","https://www.town.okuma.fukushima.jp/site/fukkou/4598.html","2026年3月24日現在の最新管内図を含む町のページです。特定帰還居住区域の変更後の図を原図で確認できます。");
+registerOfficialMap("okumaMap","大熊町・立入規制緩和の公式図","https://www.town.okuma.fukushima.jp/soshiki/kankyoutaisaku/34555.html","2026年6月22日開始の立入規制緩和は、特定帰還居住区域全体ではなく、野上2区・下野上1区（概ね全域）・熊2区・熊3区・町区の一部です。緑色で示された部分はバリケードが撤去され自由に立入できると町が案内しています。ただし特定帰還居住区域の避難指示自体は解除されていません。<br><a href='https://www.town.okuma.fukushima.jp/site/fukkou/33440.html' target='_blank' rel='noopener'>2026年3月改定・特定帰還居住区域図（約570ha、10行政区）</a><br><a href='https://www.town.okuma.fukushima.jp/site/fukkou/4598.html' target='_blank' rel='noopener'>2026年3月24日現在・大熊町管内図</a><br>公開図は地番確認用の原図として開きます。図面画像をGPS用の確定ポリゴンには変換していません。");
 
 // 国の2025年6月別紙地図を地理院地図に照合してなぞった概略線。
 // 表示・近接確認用であり、法的な道路中心線または通行可否の確定には使用しない。
@@ -511,7 +523,7 @@ const trafficLayer=L.geoJSON(TRAFFIC_LINES,{style:{color:"#007c91",weight:5,opac
 let visible=true;
 
 document.getElementById("toggle").onclick=()=>{visible=!visible;if(visible)zoneLayer.addTo(map);else map.removeLayer(zoneLayer)};
-document.getElementById("zonesBtn").onclick=()=>{if(!visible){zoneLayer.addTo(map);visible=true}map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});status("<b>🎨 v73 収録区域</b><div class='row green'>浪江町：2017年に大字全域解除された20大字（公式一覧と町字境界が一致）</div><div class='row red'>浪江町：酒井（大字全域の帰還困難区域）</div><div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div><div class='row green'>白地＋緑枠：双葉・大熊・浪江・富岡・飯舘・葛尾の特定復興再生拠点区域。公式図からの概略です。</div><div class='row purple'>紫ハッチ：特定帰還居住区域の概略。解除済みではありません。</div><div class='row yellow'>南相馬市・葛尾村の特定帰還居住区域は位置非公表部分があるため、推測着色していません。</div><div class='row yellow'>薄黄破線：e-Stat統計境界。法的区分ではなく未判定です。</div>")};
+document.getElementById("zonesBtn").onclick=()=>{if(!visible){zoneLayer.addTo(map);visible=true}map.fitBounds(zoneLayer.getBounds(),{padding:[10,10]});status("<b>🎨 v88 収録区域</b><div class='row green'>浪江町：2017年に大字全域解除された20大字（公式一覧と町字境界が一致）</div><div class='row green'>飯舘村：長泥地区を除く20の町字等統計面を2017年解除として表示</div><div class='row red'>浪江町：酒井（大字全域の帰還困難区域）</div><div class='row yellow'>浪江町：2023年解除が地番指定の10大字</div><div class='row green'>白地＋緑枠：双葉・大熊・浪江・富岡・飯舘・葛尾の特定復興再生拠点区域。公式図からの概略です。</div><div class='row purple'>紫ハッチ：特定帰還居住区域の概略。解除済みではありません。</div><div class='row yellow'>南相馬市・葛尾村の特定帰還居住区域は位置非公表部分があるため、推測着色していません。</div><div class='row yellow'>薄黄破線：e-Stat統計境界。法的区分ではなく未判定です。</div>")};
 
 
 // 色ON/OFFは概略面・太線も含めて切り替える。
@@ -521,11 +533,11 @@ const baseZonesButton=document.getElementById("zonesBtn").onclick;
 document.getElementById("zonesBtn").onclick=()=>{baseZonesButton();difficultLayer.addTo(map);historicalLayer.addTo(map);facilityLayer.addTo(map);installHatchPatterns()};
 
 
-function showLegend(){status("<b>🧭 凡例（2026年9月確認）</b><div class='row red'><b>🔴 赤</b><br>公式情報と町字境界の一致を確認できた区域。未実装の場所を赤に推定しません。</div><div class='row purple'><b>🟣 紫ハッチ</b><br>特定帰還居住区域の概略。避難指示は継続中で、解除済みではありません。</div><div class='row green'><b>🟩 緑ハッチ</b><br>立入規制緩和区域の概略。避難指示解除とは別の属性です。</div><div class='row green'><b>白地＋緑枠</b><br>避難指示解除済み区域の参考表示です。</div><div class='row yellow'><b>🟡 黄色／薄黄破線</b><br>区域内混在・未判定、またはe-Stat統計境界（法的区分未判定）です。</div><div class='row red'><b>細い赤点線</b><br>県の広域概念図に照合した目安。面塗り・GPSの法的判定には使いません。</div><div class='row facility'><b>⬛ 黒枠</b><br>福島第一原発の施設管理区域。避難指示とは別です。厳密な筆界・入構可否は現地表示・管理者を優先してください。</div><div class='row grey'><b>公式図ボタン</b><br>位置合わせ未検証の画像は地図に重ねず、公式原図を別画面で開きます。</div>")};document.getElementById("legend").onclick=showLegend;
+function showLegend(){status("<b>🧭 凡例（2026年9月確認）</b><div class='row red'><b>🔴 赤</b><br>公式情報と町字境界の一致を確認できた区域。未実装の場所を赤に推定しません。</div><div class='row purple'><b>🟣 紫ハッチ</b><br>特定帰還居住区域の概略。避難指示は継続中で、解除済みではありません。</div><div class='row green'><b>🟩 緑ハッチ</b><br>立入規制緩和区域の概略。避難指示解除とは別の属性です。</div><div class='row green'><b>白地＋緑枠</b><br>解除済み区域の概略。GPS地点の解除を確定する境界ではありません。大熊・大川原の緑面も参考表示です。</div><div class='row yellow'><b>🟡 黄色／薄黄破線</b><br>区域内混在・未判定、またはe-Stat統計境界（法的区分未判定）です。</div><div class='row red'><b>細い赤点線</b><br>県の広域概念図に照合した目安。面塗り・GPSの法的判定には使いません。</div><div class='row facility'><b>⬛ 黒枠</b><br>福島第一原発の施設管理区域。避難指示とは別です。厳密な筆界・入構可否は現地表示・管理者を優先してください。</div><div class='row grey'><b>公式図ボタン</b><br>位置合わせ未検証の画像は地図に重ねず、公式原図を別画面で開きます。</div>")};document.getElementById("legend").onclick=showLegend;
 let selectedTown=null;
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const t=towns[b.dataset.t],c=townContext[b.dataset.t];selectedTown=b.dataset.t;map.invalidateSize(false);map.setView([t[1],t[2]],t[3],{animate:false});status("<b>🔵 "+t[0]+"</b><div class='row "+c.s+"'>"+c.t+"</div><div class='row blue'>地図の着色区域をタップすると根拠区分を表示します。<br>「📄 公式図」で、この自治体の公式資料を開けます。</div>")});
 document.getElementById("official").onclick=()=>{if(!selectedTown){status("<b>📄 公式図</b><div class='row yellow'>先に対象市町村のボタンを選んでください。</div>");return}const t=towns[selectedTown];window.open(t[4],"_blank","noopener")};
-document.getElementById("traffic").onclick=()=>status("<b>🚗 特別通過交通（v64）</b><div class='row grey'>帰還困難区域内の対象道路を通過できる制度です。脇道・沿道への立入り可否、車種、時間帯等は路線ごとに異なります。</div><div class='row blue'><b>収録した対象8系統</b><br>① 国道114号（南相馬市区間）<br>② 県道49号（南相馬市区間）<br>③ 大熊町道東15号～県道252号の一部<br>④ 県道252号<br>⑤ 県道35号～国道288号<br>⑥ 国道288号の一部<br>⑦ 双葉町道101号／109号<br>⑧ 大熊町道東67号～国道6号</div><div class='row yellow'><b>GPS判定について</b><br>公式資料で路線・区間は確認済みですが、正確な道路中心線データを未収録です。そのため地図上の線・GPSの「道路上」判定はまだ表示しません。適当な直線で誤判定しないための扱いです。</div><div class='row blue'><b>国の公式確認先</b><br><a href='https://www.meti.go.jp/earthquake/nuclear/20250606.html' target='_blank' rel='noopener'>大熊町道東67号（避難指示解除区域境～国道6号）</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/ookuma_st67east-st20west-tokutuseido.html' target='_blank' rel='noopener'>大熊町道東67号等・県道252号等</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/hutaba-tokutu-tekiyo.html' target='_blank' rel='noopener'>双葉町道101号・109号</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2023/20230320minamisoumakokudo114_kendou49_tokubetsutuukakoutu.html' target='_blank' rel='noopener'>南相馬市・国道114号／県道49号（二輪車等）</a></div>");
+document.getElementById("traffic").onclick=()=>status("<b>🚗 特別通過交通</b><div class='row grey'>帰還困難区域内の対象道路を通過できる制度です。脇道・沿道への立入り可否、車種、時間帯等は路線ごとに異なります。</div><div class='row blue'><b>収録した対象8系統</b><br>① 国道114号（南相馬市区間）<br>② 県道49号（南相馬市区間）<br>③ 大熊町道東15号～県道252号の一部<br>④ 県道252号<br>⑤ 県道35号～国道288号<br>⑥ 国道288号の一部<br>⑦ 双葉町道101号／109号<br>⑧ 大熊町道東67号～国道6号</div><div class='row yellow'><b>GPS判定について</b><br>公式資料で路線・区間は確認済みですが、正確な道路中心線データを未収録です。そのため地図上の線・GPSの「道路上」判定はまだ表示しません。適当な直線で誤判定しないための扱いです。</div><div class='row blue'><b>国の公式確認先</b><br><a href='https://www.meti.go.jp/earthquake/nuclear/20250606.html' target='_blank' rel='noopener'>大熊町道東67号（避難指示解除区域境～国道6号）</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/ookuma_st67east-st20west-tokutuseido.html' target='_blank' rel='noopener'>大熊町道東67号等・県道252号等</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/hutaba-tokutu-tekiyo.html' target='_blank' rel='noopener'>双葉町道101号・109号</a><br><a href='https://www.meti.go.jp/earthquake/nuclear/kinkyu/hinanshiji/2023/20230320minamisoumakokudo114_kendou49_tokubetsutuukakoutu.html' target='_blank' rel='noopener'>南相馬市・国道114号／県道49号（二輪車等）</a></div>");
 document.getElementById("wide").onclick=()=>map.setView([37.50,140.92],10,{animate:false});
 
 let gpsMarker=null,accCircle=null,pinMarker=null,watchId=null,lastAddress="住所取得中",lastMuniCode="",lastGeocodeAt=0,lastGeocodePos=null,lastAreaKey="",lastPosition=null,pinMode=false;
@@ -541,7 +553,8 @@ function difficultConceptHit(lat,lng){return CURRENT_DIFFICULT_APPROX.features.f
 function facilityHitAt(lat,lng){return RESTRICTED_FACILITIES.features.find(f=>pointInFeature({feature:f},[lat,lng]))||null}
 function evidenceHtml(hit){
  if(!hit)return"";
- if(hit.properties.returnBasis)return"<div class='row grey'><b>判定根拠：特定帰還居住区域の概略</b><br>特定帰還居住区域は帰還困難区域内であるため、避難指示は継続中と表示しています。地番単位の境界ではありません。</div>";
+ if(hit.properties.returnBasis)return"<div class='row grey'><b>区域図の概略</b><br>この表示面は地番単位の指定を確認できません。</div>";
+ if(hit.properties.gpsConfidence==="municipal")return"<div class='row grey'><b>判定根拠：飯舘村の地区全体の解除</b><br>村は長泥地区を除く全域の解除を明記しています。表示はe-Stat 2020の町字等統計境界で、境界付近は公式図とGPS精度を確認してください。</div>";
  if(hit.properties.gpsConfidence==="confirmed")return"<div class='row grey'><b>判定根拠：公式一覧と町字境界の一致確認</b><br>このGPS判定は、公式の解除・帰還困難情報と町字境界が一致する区域に限っています。</div>";
  if(hit.properties.approx)return"<div class='row grey'><b>判定根拠：公式区域図からの概略</b><br>表示面は公式図を地図に照合した概略です。地番・道路・現地標識を優先してください。</div>";
  return"<div class='row grey'><b>判定根拠：公式情報と表示ポリゴンの照合</b><br>境界付近ではGPS精度と公式図を併せて確認してください。</div>";
@@ -563,22 +576,44 @@ async function showPosition(p,center=true,mode="現在地",isMapPoint=false){
  const lat=p.coords.latitude,lng=p.coords.longitude,acc=p.coords.accuracy;lastPosition=p;
  if(isMapPoint){if(pinMarker)map.removeLayer(pinMarker);pinMarker=L.circleMarker([lat,lng],{radius:10,color:"#fff",weight:3,fillColor:"#0f8491",fillOpacity:1}).addTo(map)}else{if(gpsMarker)map.removeLayer(gpsMarker);if(accCircle)map.removeLayer(accCircle);gpsMarker=L.circleMarker([lat,lng],{radius:10,color:"#fff",weight:3,fillColor:watchId===null?"#1677ff":"#16963b",fillOpacity:1}).addTo(map);accCircle=L.circle([lat,lng],{radius:acc,color:watchId===null?"#1677ff":"#16963b",weight:1,fillOpacity:.08}).addTo(map)}
  map.invalidateSize(false);if(center)map.setView([lat,lng],Math.max(map.getZoom(),16),{animate:false});
- const hits=findHits(lat,lng),releasedHit=hits.find(f=>f.properties.s==="released")||null,approxReturn=releasedHit?null:(hits.find(f=>f.properties.s==="purple")||null),approxRelax=hits.find(f=>f.properties.s==="relax")||null,returnHardHit=approxReturn?{type:"Feature",properties:{n:approxReturn.properties.n,c:approxReturn.properties.c,s:"red",approx:true,returnBasis:true,detail:"特定帰還居住区域は帰還困難区域内です。紫ハッチは公開図を町字境界に丸めた概略です。"},geometry:approxReturn.geometry}:null,baseHit=releasedHit||hits.find(f=>f.properties.s==="red")||returnHardHit||hits.find(f=>f.properties.s==="green")||hits.find(f=>f.properties.s==="yellow")||hits.find(f=>f.properties.s==="reference")||null,facilityHit=facilityHitAt(lat,lng),areaKey=facilityHit?facilityHit.properties.n:(baseHit?baseHit.properties.c+" "+baseHit.properties.n:"未収録区域");addHistory(areaKey,areaKey);
+ const hits=findHits(lat,lng);
+ const confirmedHit=hits.find(f=>f.properties.gpsConfidence==="confirmed"&&["red","green"].includes(f.properties.s))||null;
+ const wholeAzaHit=hits.find(f=>["red","green"].includes(f.properties.s)&&!f.properties.approx)||null;
+ const definiteHit=confirmedHit||wholeAzaHit;
+ const rawReleased=hits.find(f=>f.properties.s==="released")||null;
+ const releasedHit=definiteHit?null:rawReleased;
+ const approxReturn=definiteHit&&definiteHit.properties.s==="green"?null:(hits.find(f=>f.properties.s==="purple")||null);
+ const approxRelax=definiteHit&&definiteHit.properties.s==="green"?null:(hits.find(f=>f.properties.s==="relax")||null);
+ const roughConflict=!!(releasedHit&&approxReturn);
+ const baseHit=definiteHit||releasedHit||approxReturn||hits.find(f=>f.properties.s==="green")||hits.find(f=>f.properties.s==="yellow")||hits.find(f=>f.properties.s==="reference")||null;
+ const facilityHit=facilityHitAt(lat,lng);
+ const areaKey=facilityHit?facilityHit.properties.n:(baseHit?baseHit.properties.c+" "+baseHit.properties.n:"未収録区域");
+ addHistory(areaKey,areaKey);
  const address=await reverseGeocode(lat,lng);
  const accuracy=isMapPoint?"地図上で指定した地点（GPSではありません）":"GPS精度 約±"+Math.round(acc)+"m　"+new Date(p.timestamp).toLocaleTimeString("ja-JP");
  const head="<b>"+(isMapPoint?"📌 ":(watchId===null?"📍 ":"🟢 "))+esc(mode)+(watchId===null||isMapPoint?"":"中")+"</b><div class='row blue'><b>"+esc(address)+"</b><br>緯度 "+lat.toFixed(6)+"　経度 "+lng.toFixed(6)+"<br>"+accuracy+"</div>";
  const geocoderHasResult=!!lastMuniCode,outside=geocoderHasResult&&!Object.prototype.hasOwnProperty.call(muniNames,lastMuniCode);
  const facilityNotice=facilityHit?"<div class='row facility'><b>⬛ 施設管理区域："+esc(facilityHit.properties.n)+"</b><br><b>一般の立入り・入構はできません。</b>避難指示の区分とは別の施設管理区域です。表示面は資料に照合した概略のため、現地標識・バリケード・管理者の指示を最優先してください。<br><a href='"+facilityHit.properties.src+"' target='_blank' rel='noopener'>根拠の公式資料を開く</a></div>":"";
- const judgement=baseHit?(baseHit.properties.s==="reference"?"<div class='row yellow'><b>避難指示：未判定</b><br>現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の統計境界内です。ここでは法的な避難指示区分を判定しません。</div>":baseHit.properties.returnBasis?"<div class='row red'><b>避難指示：帰還困難区域</b><br>特定帰還居住区域内は、避難指示が解除されるまで帰還困難区域です。現在地は "+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の紫ハッチ概略に該当します。</div>":"<div class='row "+(baseHit.properties.s==="released"?"green":baseHit.properties.s)+"'><b>避難指示："+esc(baseHit.properties.c+" "+baseHit.properties.n)+"</b><br>"+label(baseHit.properties.s)+(baseHit.properties.detail?"<br>公式資料の範囲："+esc(baseHit.properties.detail):"")+(baseHit.properties.src?"<br><a href='"+baseHit.properties.src+"' target='_blank' rel='noopener'>根拠の公式資料を開く</a>":"")+"</div>"):!geocoderHasResult?"<div class='row yellow'><b>避難指示：未判定</b><br>住所・自治体コードを取得できませんでした。区域外とは判定しません。</div>":outside?"<div class='row blue'><b>避難指示：対象区域外</b><br>現在地は、このアプリの対象7市町村外です。GPS取得は正常です。</div>":"<div class='row yellow'><b>避難指示：未判定</b><br>対象7市町村内ですが、v72収録の確定ポリゴン外です。これは『解除』『帰還困難』の否定ではありません。</div>";
+ const featureSource=f=>f&&f.properties.src?"<br><a href='"+f.properties.src+"' target='_blank' rel='noopener'>公式資料を開く</a>":"";
+ let judgement;
+ if(baseHit&&baseHit.properties.s==="reference")judgement="<div class='row yellow'><b>避難指示：未判定</b><br>"+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の統計境界内です。町字境界だけでは法的区分を判定できません。</div>";
+ else if(baseHit&&baseHit.properties.s==="released")judgement="<div class='row yellow'><b>避難指示：未判定（解除済み区域の概略面に重なる）</b><br>"+esc(baseHit.properties.c+" "+baseHit.properties.n)+"。この白地＋緑枠は公式図を読み取った概略で、GPS地点の法的な解除を確定しません。"+(roughConflict?"<br>紫の概略面とも重なるため、両方の公式図で地番を確認してください。":"")+featureSource(baseHit)+(roughConflict?featureSource(approxReturn):"")+"</div>";
+ else if(baseHit&&baseHit.properties.s==="purple")judgement="<div class='row yellow'><b>避難指示：未判定（特定帰還居住区域の概略面に重なる）</b><br>指定区域内の避難指示は解除まで継続します。ただし、紫ハッチは町字境界に丸めた概略のため、このGPS地点が指定区域内かは公式図で確認してください。"+featureSource(baseHit)+"</div>";
+ else if(baseHit&&baseHit.properties.approx)judgement="<div class='row yellow'><b>避難指示：未判定（参考表示）</b><br>"+esc(baseHit.properties.c+" "+baseHit.properties.n)+" の面は町字境界を使った参考表示です。法的な解除・未解除の確定には使用しません。"+featureSource(baseHit)+"</div>";
+ else if(baseHit&&baseHit.properties.s==="yellow")judgement="<div class='row yellow'><b>避難指示：未判定</b><br>"+esc(baseHit.properties.c+" "+baseHit.properties.n)+" は町字内で法的区域が混在します。"+featureSource(baseHit)+"</div>";
+ else if(baseHit)judgement="<div class='row "+baseHit.properties.s+"'><b>避難指示："+esc(baseHit.properties.c+" "+baseHit.properties.n)+"</b><br>"+featureLabel(baseHit)+(baseHit.properties.detail?"<br>公式資料の範囲："+esc(baseHit.properties.detail):"")+featureSource(baseHit)+"</div>";
+ else if(!geocoderHasResult)judgement="<div class='row yellow'><b>避難指示：未判定</b><br>住所・自治体コードを取得できませんでした。区域外とは判定しません。</div>";
+ else if(outside)judgement="<div class='row blue'><b>避難指示：対象区域外</b><br>現在地は、このアプリの対象7市町村外です。GPS取得は正常です。</div>";
+ else judgement="<div class='row yellow'><b>避難指示：未判定</b><br>対象7市町村内ですが、v88収録の確定ポリゴン外です。これは『解除』『帰還困難』の否定ではありません。</div>";
  const conceptNote="";
  const trafficNear=distanceToTrafficM(lat,lng),trafficContext=trafficNear.d<=50?"<div class='row blue'><b>特別通過交通：概略線に近接</b><br>"+trafficNear.f.properties.n+" の概略線から約"+Math.round(trafficNear.d)+"mです。公式図を地図に照合した表示であり、道路上・通行条件の確定ではありません。</div>":trafficByMuni[lastMuniCode]?"<div class='row blue'><b>特別通過交通：対象路線あり（道路上かは未判定）</b><br>"+trafficByMuni[lastMuniCode]+"。道路中心線・区間端点の正確なデータを未収録のため、GPSだけでは道路上かを判定しません。</div>":"<div class='row grey'><b>特別通過交通：未判定</b><br>対象道路の正確な中心線・条件を未収録です。</div>";
- const separate="<div class='row purple'><b>特定帰還居住区域："+(approxReturn?"概略で該当":"未判定")+"</b><br>"+(approxReturn?esc(approxReturn.properties.n)+"。公式区域図から読んだ概略で、地番単位の該当は保証しません。"+(approxReturn.properties.src?"<br><a href='"+approxReturn.properties.src+"' target='_blank' rel='noopener'>特定帰還居住区域の公式図を開く</a>":""):"地番単位の公式区域図を確認中です。避難指示解除済みではありません。")+"</div><div class='row green'><b>立入り："+(approxRelax?"規制緩和区域に概略で該当":"未判定")+"</b><br>"+(approxRelax?esc(approxRelax.properties.n)+"。公式区域図から読んだ概略で、実際のバリケード・地番を優先してください。"+(approxRelax.properties.src?"<br><a href='"+approxRelax.properties.src+"' target='_blank' rel='noopener'>立入規制緩和の公式図を開く</a>":""):"立入規制緩和区域の正確な地番境界を未収録です。")+"</div>"+trafficContext;
+ const separate="<div class='row purple'><b>特定帰還居住区域："+(approxReturn?"概略面と重なる":"未判定")+"</b><br>"+(approxReturn?esc(approxReturn.properties.n)+"。町字境界への丸め表示であり、この地点の地番単位の指定は確認が必要です。"+featureSource(approxReturn):"地番単位の区域図を未収録です。")+"</div><div class='row green'><b>立入り："+(approxRelax?"規制緩和の概略面と重なる":"未判定")+"</b><br>"+(approxRelax?esc(approxRelax.properties.n)+"。実際の規制緩和対象地番・現地のバリケードを確認してください。"+featureSource(approxRelax):"立入規制緩和区域の正確な地番境界を未収録です。")+"</div>"+trafficContext;
  const municipalContext=contextByMuni[lastMuniCode]?"<div class='row "+contextByMuni[lastMuniCode].s+"'><b>自治体全体の補足</b><br>"+contextByMuni[lastMuniCode].t+"</div>":"";
  const edgeM=baseHit?distanceToFeatureEdgeM(baseHit,lat,lng):Infinity,boundaryWarning=baseHit&&edgeM<=acc?"<div class='row yellow'><b>⚠ 境界に近いため確定できません</b><br>表示上の区域境界まで約"+Math.round(edgeM)+"m、GPS精度は約±"+Math.round(acc)+"mです。公式図・現地の標識やバリケードを優先してください。</div>":"";
  status(head+facilityNotice+judgement+evidenceHtml(baseHit)+conceptNote+boundaryWarning+separate+municipalContext+historyHtml())
 }
 document.getElementById("gps").onclick=()=>{if(!navigator.geolocation)return locationError();navigator.geolocation.getCurrentPosition(p=>showPosition(p,true,"現在地"),locationError,geoOptions)};
-document.getElementById("pin").onclick=()=>{pinMode=!pinMode;const b=document.getElementById("pin");b.classList.toggle("active",pinMode);b.textContent=pinMode?"■ 地点判定終了":"📌 地点判定";status(pinMode?"<b>📌 地図上の地点判定</b><div class='row blue'>地図を移動・拡大して、確認したい地点を1回タップしてください。これはGPS判定ではなく、v64収録ポリゴンとの照合です。</div>":"<b>📌 地点判定を終了しました</b>")};
+document.getElementById("pin").onclick=()=>{pinMode=!pinMode;const b=document.getElementById("pin");b.classList.toggle("active",pinMode);b.textContent=pinMode?"■ 地点判定終了":"📌 地点判定";status(pinMode?"<b>📌 地図上の地点判定</b><div class='row blue'>地図を移動・拡大して、確認したい地点を1回タップしてください。これはGPS判定ではなく、v88収録ポリゴンとの照合です。</div>":"<b>📌 地点判定を終了しました</b>")};
 map.on("click",e=>{if(!pinMode)return;showPosition({coords:{latitude:e.latlng.lat,longitude:e.latlng.lng,accuracy:0},timestamp:Date.now()},false,"地図上の確認地点",true)});
 document.getElementById("track").onclick=()=>{
  const b=document.getElementById("track");
